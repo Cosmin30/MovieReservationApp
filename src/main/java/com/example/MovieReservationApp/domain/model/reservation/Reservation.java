@@ -1,5 +1,8 @@
 package com.example.MovieReservationApp.domain.model.reservation;
 
+import com.example.MovieReservationApp.domain.model.payment.Payment;
+import com.example.MovieReservationApp.domain.model.screening.Screening;
+import com.example.MovieReservationApp.domain.model.ticket.Ticket;
 import com.example.MovieReservationApp.domain.model.user.*;
 import jakarta.persistence.*;
 import lombok.*;

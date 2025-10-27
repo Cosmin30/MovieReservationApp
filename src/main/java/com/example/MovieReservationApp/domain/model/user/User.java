@@ -1,5 +1,6 @@
 package com.example.MovieReservationApp.domain.model.user;
 
+import com.example.MovieReservationApp.domain.model.reservation.Reservation;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.OffsetDateTime;
