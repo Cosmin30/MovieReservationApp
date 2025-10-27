@@ -9,5 +9,5 @@ public class MovieReservationAppApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MovieReservationAppApplication.class, args);
 	}
-	// push de test
+	// push de test pt cocea
 }
