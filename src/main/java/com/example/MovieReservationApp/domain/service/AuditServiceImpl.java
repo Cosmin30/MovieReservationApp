@@ -1,4 +1,12 @@
 package com.example.MovieReservationApp.domain.service;
+import com.example.MovieReservationApp.domain.service.IAuditService;
+import org.springframework.stereotype.Service;
 
-public class AuditServiceImpl {
+@Service
+public class AuditServiceImpl implements IAuditService {
+
+    @Override
+    public void logAction(String message) {
+        System.out.println("[AUDIT] " + message);
+    }
 }
