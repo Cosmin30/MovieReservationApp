@@ -42,6 +42,15 @@ public class Reservation {
 
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Payment> payments;
+
+    public void setUserId(UUID userId) {
+    }
+
+    public void setScreeningId(UUID screeningId) {
+    }
+
+    public void setTotalPrice(double totalPrice) {
+    }
 }
 
 

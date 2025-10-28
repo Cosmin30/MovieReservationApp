@@ -1,4 +1,6 @@
 package com.example.MovieReservationApp.domain.service;
 
-public class IValidationService {
+public interface IValidationService {
+    void validateEmail(String email);
+    void validateSeatAvailability(boolean isAvailable);
 }

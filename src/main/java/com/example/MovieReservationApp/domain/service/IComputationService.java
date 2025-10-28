@@ -1,4 +1,6 @@
 package com.example.MovieReservationApp.domain.service;
 
-public class IComputationService {
+public interface IComputationService {
+    double calculateTotalPrice(double ticketPrice, int quantity);
 }
+
