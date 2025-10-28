@@ -1,4 +1,5 @@
 package com.example.MovieReservationApp.domain.service;
 
-public class IAuditService {
+public interface IAuditService {
+    void logAction(String message);
 }
