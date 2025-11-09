@@ -26,6 +26,7 @@ public class Movie {
 
     private Integer duration;
 
+
     private String genre;
 
     private LocalDate releaseDate;
