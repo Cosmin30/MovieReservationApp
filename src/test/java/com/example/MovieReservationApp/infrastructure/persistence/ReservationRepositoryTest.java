@@ -1,8 +1,11 @@
-package com.example.MovieReservationApp.infrastructure.persistence.repository;
+package com.example.MovieReservationApp.infrastructure.persistence;
 
 import com.example.MovieReservationApp.domain.model.reservation.Reservation;
 import com.example.MovieReservationApp.domain.model.screening.Screening;
 import com.example.MovieReservationApp.domain.model.user.User;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.ReservationRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,21 +56,21 @@ class ReservationRepositoryTest {
         reservation1.setScreening(screening1);
         reservation1.setCreatedAt(OffsetDateTime.now());
         reservation1.setStatus("CONFIRMED");
-        reservation1.setTotalPrice(new BigDecimal("15.00"));
+        reservation1.setTotalPrice(15.00);
 
         reservation2 = new Reservation();
         reservation2.setUser(user1);
         reservation2.setScreening(screening2);
         reservation2.setCreatedAt(OffsetDateTime.now());
         reservation2.setStatus("CANCELLED");
-        reservation2.setTotalPrice(new BigDecimal("0.00"));
+        reservation2.setTotalPrice(0.00);
 
         reservation3 = new Reservation();
         reservation3.setUser(user2);
         reservation3.setScreening(screening1);
         reservation3.setCreatedAt(OffsetDateTime.now());
         reservation3.setStatus("CONFIRMED");
-        reservation3.setTotalPrice(new BigDecimal("12.00"));
+        reservation3.setTotalPrice(12.00);
 
         reservationRepository.saveAll(List.of(reservation1, reservation2, reservation3));
     }
@@ -99,4 +102,10 @@ class ReservationRepositoryTest {
     void testFindByStatus() {
         var result = reservationRepository.findByStatus("CONFIRMED");
 
-        assertT
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .extracting(Reservation::getUser)
+                .containsExactlyInAnyOrder(user1, user2);
+    }
+}
+

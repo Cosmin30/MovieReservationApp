@@ -1,6 +1,7 @@
-package com.example.MovieReservationApp.infrastructure.persistence.repository;
+package com.example.MovieReservationApp.infrastructure.persistence;
 
 import com.example.MovieReservationApp.domain.model.user.User;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

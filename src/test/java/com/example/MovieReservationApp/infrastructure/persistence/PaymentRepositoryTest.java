@@ -1,7 +1,9 @@
-package com.example.MovieReservationApp.infrastructure.persistence.repository;
+package com.example.MovieReservationApp.infrastructure.persistence;
 
 import com.example.MovieReservationApp.domain.model.payment.Payment;
 import com.example.MovieReservationApp.domain.model.reservation.Reservation;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.PaymentRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.ReservationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

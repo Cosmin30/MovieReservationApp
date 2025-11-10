@@ -4,12 +4,13 @@ import com.example.MovieReservationApp.domain.model.reservation.Reservation;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Component
 public class ReservationFactory {
 
-    public Reservation createReservation(UUID userId, UUID screeningId, double totalPrice) {
+    public Reservation createReservation(UUID userId, UUID screeningId, List<UUID> seatIds, double totalPrice) {
         Reservation reservation = new Reservation();
         reservation.setId(UUID.randomUUID());
         reservation.setUserId(userId);

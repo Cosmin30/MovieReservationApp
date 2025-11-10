@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,18 +40,25 @@ class WorkflowServiceTest {
         UUID userId = UUID.randomUUID();
         UUID screeningId = UUID.randomUUID();
 
+        List<UUID> seatIds = List.of(UUID.randomUUID(), UUID.randomUUID()); // exemplu: 2 locuri
+
+        double pricePerSeat = 25.0;
+        double totalPrice = pricePerSeat * seatIds.size(); // 50.0
+
         Reservation mockReservation = new Reservation();
         mockReservation.setUserId(userId);
         mockReservation.setScreeningId(screeningId);
-        mockReservation.setTotalPrice(50.0);
+        mockReservation.setTotalPrice(totalPrice);
 
-        when(computationService.calculateTotalPrice(25.0, 2)).thenReturn(50.0);
-        when(reservationFactory.createReservation(userId, screeningId, 50.0)).thenReturn(mockReservation);
+        when(computationService.calculateTotalPrice(pricePerSeat, seatIds.size())).thenReturn(totalPrice);
+        when(reservationFactory.createReservation(userId, screeningId, seatIds, totalPrice))
+                .thenReturn(mockReservation);
 
-        Reservation result = workflowService.processReservation(userId, screeningId, 25.0, 2, "user@example.com");
+        Reservation result = workflowService.processReservation(userId, screeningId, seatIds, totalPrice);
 
-        verify(validationService).validateEmail("user@example.com");
+        verify(validationService).validateSeats(seatIds);
         verify(auditService).logAction(contains("Rezervare creată"));
-        assertEquals(50.0, result.getTotalPrice());
+        assertEquals(totalPrice, result.getTotalPrice());
     }
+
 }
