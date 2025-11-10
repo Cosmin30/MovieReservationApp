@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="entity repository">
+    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="entity manager">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/infrastructure/persistence/jpa/EntityRepositoryJPA.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/infrastructure/persistence/jpa/EntityRepositoryBase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/infrastructure/persistence/jpa/IRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/infrastructure/persistence/jpa/EntityRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/service/ComputationServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/service/ComputationServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/service/WorkflowService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/service/WorkflowService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -200,7 +200,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762720885811</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="entity manager">
+      <option name="closed" value="true" />
+      <created>1762804146783</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1762804146783</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -224,6 +232,7 @@
     <MESSAGE value="database connection + postgres dependency" />
     <MESSAGE value="repository" />
     <MESSAGE value="entity repository" />
-    <option name="LAST_COMMIT_MESSAGE" value="entity repository" />
+    <MESSAGE value="entity manager" />
+    <option name="LAST_COMMIT_MESSAGE" value="entity manager" />
   </component>
 </project>
