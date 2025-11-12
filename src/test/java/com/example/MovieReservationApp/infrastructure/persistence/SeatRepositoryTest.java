@@ -1,20 +1,26 @@
 package com.example.MovieReservationApp.infrastructure.persistence;
 
+import com.example.MovieReservationApp.domain.model.movie.Movie;
 import com.example.MovieReservationApp.domain.model.screening.Screening;
 import com.example.MovieReservationApp.domain.model.seat.Seat;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.MovieRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.SeatRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class SeatRepositoryTest {
 
     @Autowired
@@ -22,6 +28,9 @@ class SeatRepositoryTest {
 
     @Autowired
     private ScreeningRepository screeningRepository;
+
+    @Autowired
+    private MovieRepository movieRepository;
 
     private Screening screening1;
     private Screening screening2;
@@ -32,9 +41,30 @@ class SeatRepositoryTest {
 
     @BeforeEach
     void setup() {
+          seatRepository.deleteAll();
+        screeningRepository.deleteAll();
+        movieRepository.deleteAll();
+
+         Movie movie = new Movie();
+        movie.setTitle("Test Movie");
+        movie.setDescription("Test Description");
+        movie.setDuration(120);
+        movie.setGenre("Action");
+        movie.setReleaseDate(LocalDate.of(2024, 1, 1));
+        movie = movieRepository.save(movie);
 
         screening1 = new Screening();
+        screening1.setMovie(movie);
+        screening1.setRoomNumber(1);
+        screening1.setStartTime(OffsetDateTime.now().plusDays(1));
+        screening1.setCapacity(100);
+
         screening2 = new Screening();
+        screening2.setMovie(movie);
+        screening2.setRoomNumber(2);
+        screening2.setStartTime(OffsetDateTime.now().plusDays(2));
+        screening2.setCapacity(80);
+
         screeningRepository.saveAll(List.of(screening1, screening2));
 
         seat1 = new Seat();
