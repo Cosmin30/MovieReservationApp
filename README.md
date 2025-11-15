@@ -16,7 +16,7 @@ Aplicație web pentru rezervarea biletelor la cinema. Permite utilizatorilor să
 
 ## Tehnologii folosite
 
-- Frontend: React / HTML / CSS / JavaScript
+- Frontend: Angular
 - Backend: Spring Boot
 - Baza de date: PostgreSQL
   
