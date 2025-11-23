@@ -4,17 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="added dtos">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/HallService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/MovieService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/PaymentService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/ReservationService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/ScreeningService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/TicketService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/TicketDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/TicketDTO.java" afterDir="false" />
-    </list>
+    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="added services" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -265,7 +255,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763905626100</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="added services">
+      <option name="closed" value="true" />
+      <created>1763907186044</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1763907186044</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -295,6 +293,7 @@
     <MESSAGE value="fixed all tests" />
     <MESSAGE value="added halls entity" />
     <MESSAGE value="added dtos" />
-    <option name="LAST_COMMIT_MESSAGE" value="added dtos" />
+    <MESSAGE value="added services" />
+    <option name="LAST_COMMIT_MESSAGE" value="added services" />
   </component>
 </project>
