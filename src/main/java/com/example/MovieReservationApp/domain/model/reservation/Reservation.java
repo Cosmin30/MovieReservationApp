@@ -49,9 +49,10 @@ public class Reservation {
     public void setScreeningId(UUID screeningId) {
     }
 
-    public void setTotalPrice(double totalPrice) {
-        this.totalPrice = BigDecimal.valueOf(totalPrice);
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
     }
+
 }
 
 
