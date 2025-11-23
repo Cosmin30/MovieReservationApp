@@ -39,7 +39,7 @@ public class ReservationService {
         reservation.setScreening(screening);
         reservation.setCreatedAt(OffsetDateTime.now());
         reservation.setStatus("CREATED");
-        reservation.setTotalPrice(pricePerSeat.multiply(BigDecimal.valueOf(seatIds.size())).doubleValue());
+        reservation.setTotalPrice(pricePerSeat.multiply(BigDecimal.valueOf(seatIds.size())));
         reservationRepository.save(reservation);
 
         List<TicketDTO> tickets = seatIds.stream().map(seatId -> {

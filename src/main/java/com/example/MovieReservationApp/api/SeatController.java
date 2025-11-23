@@ -3,10 +3,8 @@ package com.example.MovieReservationApp.api;
 import com.example.MovieReservationApp.application.dto.SeatDTO;
 import com.example.MovieReservationApp.domain.model.seat.Seat;
 import com.example.MovieReservationApp.domain.model.screening.Screening;
-
 import com.example.MovieReservationApp.infrastructure.persistence.repository.SeatRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
-
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,43 +22,39 @@ public class SeatController {
     @Autowired
     private ScreeningRepository screeningRepository;
 
-    // ENTITY → DTO
     private SeatDTO toDTO(Seat seat) {
-        return new SeatDTO(
-                seat.getId(),
-                seat.getScreening().getId(),
-                seat.getRow(),
-                seat.getNumber(),
-                seat.getIsAvailable()
-        );
+        SeatDTO dto = new SeatDTO();
+        dto.setId(seat.getId());
+        dto.setRow(seat.getRow());
+        dto.setNumber(seat.getNumber());
+        dto.setIsAvailable(seat.getIsAvailable());
+        if (seat.getScreening() != null) {
+            dto.setScreeningId(seat.getScreening().getId());
+        }
+        return dto;
     }
 
-    // DTO → ENTITY
     private Seat toEntity(SeatDTO dto) {
-
-        Screening screening = screeningRepository.findById(dto.getScreeningId())
-                .orElseThrow(() -> new RuntimeException("Screening not found"));
-
         Seat seat = new Seat();
         seat.setId(dto.getId());
-        seat.setScreening(screening);
         seat.setRow(dto.getRow());
         seat.setNumber(dto.getNumber());
         seat.setIsAvailable(dto.getIsAvailable());
-
+        if (dto.getScreeningId() != null) {
+            Screening screening = screeningRepository.findById(dto.getScreeningId())
+                    .orElseThrow(() -> new RuntimeException("Screening not found"));
+            seat.setScreening(screening);
+        }
         return seat;
     }
 
-    // GET ALL
     @GetMapping
     public List<SeatDTO> getAll() {
-        return seatRepository.findAll()
-                .stream()
+        return seatRepository.findAll().stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    // GET BY ID
     @GetMapping("/{id}")
     public SeatDTO getById(@PathVariable UUID id) {
         Seat seat = seatRepository.findById(id)
@@ -68,27 +62,24 @@ public class SeatController {
         return toDTO(seat);
     }
 
-    // CREATE
     @PostMapping
     public SeatDTO create(@RequestBody SeatDTO dto) {
         Seat seat = toEntity(dto);
         seat.setId(null);
-
         seat = seatRepository.save(seat);
         return toDTO(seat);
     }
 
-    // UPDATE
     @PutMapping("/{id}")
     public SeatDTO update(@PathVariable UUID id, @RequestBody SeatDTO dto) {
-
         Seat seat = seatRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Seat not found"));
 
-        Screening screening = screeningRepository.findById(dto.getScreeningId())
-                .orElseThrow(() -> new RuntimeException("Screening not found"));
-
-        seat.setScreening(screening);
+        if (dto.getScreeningId() != null) {
+            Screening screening = screeningRepository.findById(dto.getScreeningId())
+                    .orElseThrow(() -> new RuntimeException("Screening not found"));
+            seat.setScreening(screening);
+        }
         seat.setRow(dto.getRow());
         seat.setNumber(dto.getNumber());
         seat.setIsAvailable(dto.getIsAvailable());
@@ -97,7 +88,24 @@ public class SeatController {
         return toDTO(seat);
     }
 
-    // DELETE
+    @PatchMapping("/{id}")
+    public SeatDTO patch(@PathVariable UUID id, @RequestBody SeatDTO dto) {
+        Seat seat = seatRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Seat not found"));
+
+        if (dto.getRow() != null) seat.setRow(dto.getRow());
+        if (dto.getNumber() != null) seat.setNumber(dto.getNumber());
+        if (dto.getIsAvailable() != null) seat.setIsAvailable(dto.getIsAvailable());
+        if (dto.getScreeningId() != null) {
+            Screening screening = screeningRepository.findById(dto.getScreeningId())
+                    .orElseThrow(() -> new RuntimeException("Screening not found"));
+            seat.setScreening(screening);
+        }
+
+        seat = seatRepository.save(seat);
+        return toDTO(seat);
+    }
+
     @DeleteMapping("/{id}")
     public void delete(@PathVariable UUID id) {
         seatRepository.deleteById(id);

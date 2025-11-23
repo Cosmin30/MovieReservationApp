@@ -4,7 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="added services" />
+    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="added services">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/HallController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/HallController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/MovieController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/MovieController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/PaymentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/PaymentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/ReservationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/ReservationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/ScreeningController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/ScreeningController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/SeatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/SeatController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/TicketController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/TicketController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/ReservationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/ReservationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/reservation/Reservation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/reservation/Reservation.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -263,7 +275,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763907186044</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="added services">
+      <option name="closed" value="true" />
+      <created>1763907325478</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1763907325478</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
