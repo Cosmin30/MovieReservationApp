@@ -4,14 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="fixed all tests">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/HallController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/hall/Hall.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/infrastructure/persistence/repository/HallRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/HallRepositoryTest.java" afterDir="false" />
+    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="added halls entity">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/HallDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/MovieDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/PaymentDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/ReservationDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/ScreeningDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/SeatDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/TicketDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/UserDTO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/screening/Screening.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/screening/Screening.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/SeatRepositoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/SeatRepositoryTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -247,7 +250,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762937615980</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="added halls entity">
+      <option name="closed" value="true" />
+      <created>1763904356918</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1763904356918</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -275,6 +286,7 @@
     <MESSAGE value="services." />
     <MESSAGE value="test fixes and repositories" />
     <MESSAGE value="fixed all tests" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed all tests" />
+    <MESSAGE value="added halls entity" />
+    <option name="LAST_COMMIT_MESSAGE" value="added halls entity" />
   </component>
 </project>
