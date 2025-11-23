@@ -1,9 +1,11 @@
 package com.example.MovieReservationApp.domain.model.screening;
 
 import com.example.MovieReservationApp.domain.model.seat.Seat;
+import com.example.MovieReservationApp.domain.model.movie.Movie;
+import com.example.MovieReservationApp.domain.model.hall.Hall;
 import jakarta.persistence.*;
 import lombok.*;
-import com.example.MovieReservationApp.domain.model.movie.Movie;
+
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -25,8 +27,10 @@ public class Screening {
     private Movie movie;
 
     private OffsetDateTime startTime;
-
     private Integer roomNumber;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "hall_id")
+    private Hall hall;
 
     private Integer capacity;
 
