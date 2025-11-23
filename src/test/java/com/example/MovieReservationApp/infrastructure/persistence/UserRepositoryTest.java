@@ -29,19 +29,19 @@ class UserRepositoryTest {
         user1 = new User();
         user1.setFullName("John Doe");
         user1.setEmail("john.doe@example.com");
-        user1.setPasswordHash("pwd1");
+        user1.setPasswordHash("pwd1sdfs");
         user1.setCreatedAt(OffsetDateTime.now());
 
         user2 = new User();
         user2.setFullName("Jane Doe");
         user2.setEmail("jane.doe@example.com");
-        user2.setPasswordHash("pwd2");
+        user2.setPasswordHash("pwd2sdfsf");
         user2.setCreatedAt(OffsetDateTime.now());
 
         user3 = new User();
         user3.setFullName("Johnny Bravo");
         user3.setEmail("johnny.bravo@example.com");
-        user3.setPasswordHash("pwd3");
+        user3.setPasswordHash("pwd3cdsf");
         user3.setCreatedAt(OffsetDateTime.now());
 
         userRepository.saveAll(List.of(user1, user2, user3));

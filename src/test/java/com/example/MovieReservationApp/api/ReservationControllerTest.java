@@ -10,6 +10,7 @@ import com.example.MovieReservationApp.infrastructure.persistence.repository.Res
 import com.example.MovieReservationApp.infrastructure.persistence.repository.UserRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -46,6 +48,11 @@ class ReservationControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @BeforeEach
+    void setupMapper() {
+        objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        objectMapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
     // ---------- GET ALL ----------
     @Test
     void testGetAll() throws Exception {
@@ -118,26 +125,22 @@ class ReservationControllerTest {
         Screening screening = new Screening();
         screening.setId(screeningId);
 
-        ReservationDTO dto = new ReservationDTO();
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(userId);
-        dto.setUser(userDTO);
-
-        ScreeningDTO screeningDTO = new ScreeningDTO();
-        screeningDTO.setId(screeningId);
-        dto.setScreening(screeningDTO);
-
-        dto.setStatus("NEW");
-        dto.setTotalPrice(new BigDecimal("99.99"));
-        dto.setCreatedAt(OffsetDateTime.now());
+        // Folosim Map pentru JSON, ca la PATCH
+        Map<String, Object> dtoMap = Map.of(
+                "user", Map.of("id", userId.toString()),
+                "screening", Map.of("id", screeningId.toString()),
+                "status", "NEW",
+                "totalPrice", 99.99,
+                "createdAt", OffsetDateTime.now().toString()
+        );
 
         Reservation saved = new Reservation();
         saved.setId(UUID.randomUUID());
         saved.setUser(user);
         saved.setScreening(screening);
-        saved.setStatus(dto.getStatus());
-        saved.setTotalPrice(dto.getTotalPrice());
-        saved.setCreatedAt(dto.getCreatedAt());
+        saved.setStatus("NEW");
+        saved.setTotalPrice(new BigDecimal("99.99"));
+        saved.setCreatedAt(OffsetDateTime.now());
 
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         Mockito.when(screeningRepository.findById(screeningId)).thenReturn(Optional.of(screening));
@@ -146,20 +149,24 @@ class ReservationControllerTest {
         mockMvc.perform(post("/api/reservations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+                        .content(objectMapper.writeValueAsString(dtoMap)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("NEW"))
                 .andExpect(jsonPath("$.totalPrice").value(99.99));
     }
 
-    // ---------- PATCH ----------
+
+
     @Test
     void testPatch() throws Exception {
         UUID id = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        UUID screeningId = UUID.randomUUID();
+
         User user = new User();
-        user.setId(UUID.randomUUID());
+        user.setId(userId);
         Screening screening = new Screening();
-        screening.setId(UUID.randomUUID());
+        screening.setId(screeningId);
 
         Reservation existing = new Reservation();
         existing.setId(id);
@@ -177,11 +184,10 @@ class ReservationControllerTest {
         patched.setTotalPrice(existing.getTotalPrice());
         patched.setCreatedAt(existing.getCreatedAt());
 
-        ReservationDTO dto = new ReservationDTO();
-        dto.setStatus("PATCHED");
-
         Mockito.when(reservationRepository.findById(id)).thenReturn(Optional.of(existing));
         Mockito.when(reservationRepository.save(any(Reservation.class))).thenReturn(patched);
+
+        Map<String, Object> dto = Map.of("status", "PATCHED");
 
         mockMvc.perform(patch("/api/reservations/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -190,6 +196,7 @@ class ReservationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("PATCHED"));
     }
+
 
     // ---------- UPDATE ----------
     @Test
@@ -219,16 +226,14 @@ class ReservationControllerTest {
         updated.setTotalPrice(new BigDecimal("200.00"));
         updated.setCreatedAt(existing.getCreatedAt());
 
-        ReservationDTO dto = new ReservationDTO();
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(userId);
-        dto.setUser(userDTO);
-        ScreeningDTO screeningDTO = new ScreeningDTO();
-        screeningDTO.setId(screeningId);
-        dto.setScreening(screeningDTO);
-        dto.setStatus("UPDATED");
-        dto.setTotalPrice(new BigDecimal("200.00"));
-        dto.setCreatedAt(updated.getCreatedAt());
+        Map<String, Object> dtoMap = Map.of(
+                "user", Map.of("id", userId.toString()),
+                "screening", Map.of("id", screeningId.toString()),
+                "status", "NEW",
+                "totalPrice", 99.99,
+                "createdAt", OffsetDateTime.now().toString()
+        );
+
 
         Mockito.when(reservationRepository.findById(id)).thenReturn(Optional.of(existing));
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
@@ -238,11 +243,12 @@ class ReservationControllerTest {
         mockMvc.perform(put("/api/reservations/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+                        .content(objectMapper.writeValueAsString(dtoMap)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("UPDATED"))
                 .andExpect(jsonPath("$.totalPrice").value(200.00));
     }
+
 
     // ---------- DELETE SUCCESS ----------
     @Test

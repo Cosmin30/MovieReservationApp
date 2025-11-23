@@ -13,7 +13,5 @@ public class SeatDTO {
     private Integer number;
     private String row;
     private Boolean isAvailable;
-
-    @JsonBackReference
-    private UUID screeningId; // optional
+    private UUID screeningId;
 }

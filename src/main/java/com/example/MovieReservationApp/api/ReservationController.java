@@ -14,7 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -80,52 +83,67 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ReservationDTO create(@RequestBody ReservationDTO dto) {
-        Reservation reservation = toEntity(dto);
-        reservation.setId(null);
+    public ReservationDTO create(@RequestBody Map<String, Object> dtoMap) {
+        UUID userId = UUID.fromString(((Map<String, String>) dtoMap.get("user")).get("id"));
+        UUID screeningId = UUID.fromString(((Map<String, String>) dtoMap.get("screening")).get("id"));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Screening screening = screeningRepository.findById(screeningId)
+                .orElseThrow(() -> new RuntimeException("Screening not found"));
+
+        Reservation reservation = new Reservation();
+        reservation.setUser(user);
+        reservation.setScreening(screening);
+        reservation.setStatus((String) dtoMap.get("status"));
+        reservation.setTotalPrice(new BigDecimal(dtoMap.get("totalPrice").toString()));
+        reservation.setCreatedAt(OffsetDateTime.parse((String) dtoMap.get("createdAt")));
+
         reservation = reservationRepository.save(reservation);
         return toDTO(reservation);
     }
 
     @PutMapping("/{id}")
-    public ReservationDTO update(@PathVariable UUID id, @RequestBody ReservationDTO dto) {
+    public ReservationDTO update(@PathVariable UUID id, @RequestBody Map<String, Object> dtoMap) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
-        User user = userRepository.findById(dto.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        UUID userId = UUID.fromString(((Map<String, String>) dtoMap.get("user")).get("id"));
+        UUID screeningId = UUID.fromString(((Map<String, String>) dtoMap.get("screening")).get("id"));
 
-        Screening screening = screeningRepository.findById(dto.getScreening().getId())
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Screening screening = screeningRepository.findById(screeningId)
                 .orElseThrow(() -> new RuntimeException("Screening not found"));
 
         reservation.setUser(user);
         reservation.setScreening(screening);
-        reservation.setCreatedAt(dto.getCreatedAt());
-        reservation.setStatus(dto.getStatus());
-        reservation.setTotalPrice(dto.getTotalPrice());
+        reservation.setStatus((String) dtoMap.get("status"));
+        reservation.setTotalPrice(new BigDecimal(dtoMap.get("totalPrice").toString()));
+        reservation.setCreatedAt(OffsetDateTime.parse((String) dtoMap.get("createdAt")));
 
         reservation = reservationRepository.save(reservation);
         return toDTO(reservation);
     }
-
     @PatchMapping("/{id}")
-    public ReservationDTO patch(@PathVariable UUID id, @RequestBody ReservationDTO dto) {
+    public ReservationDTO patch(@PathVariable UUID id, @RequestBody Map<String, Object> updates) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
-        if (dto.getStatus() != null) {
-            reservation.setStatus(dto.getStatus());
+        if (updates.containsKey("status")) {
+            reservation.setStatus((String) updates.get("status"));
         }
-        if (dto.getCreatedAt() != null) {
-            reservation.setCreatedAt(dto.getCreatedAt());
+        if (updates.containsKey("totalPrice")) {
+            reservation.setTotalPrice(new BigDecimal(updates.get("totalPrice").toString()));
         }
-        if (dto.getTotalPrice() != null) {
-            reservation.setTotalPrice(dto.getTotalPrice());
+        if (updates.containsKey("createdAt")) {
+            reservation.setCreatedAt(OffsetDateTime.parse((String) updates.get("createdAt")));
         }
 
         reservation = reservationRepository.save(reservation);
         return toDTO(reservation);
     }
+
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable UUID id) {
