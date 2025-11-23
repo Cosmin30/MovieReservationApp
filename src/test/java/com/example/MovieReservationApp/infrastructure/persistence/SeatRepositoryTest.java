@@ -55,13 +55,11 @@ class SeatRepositoryTest {
 
         screening1 = new Screening();
         screening1.setMovie(movie);
-        screening1.setRoomNumber(1);
         screening1.setStartTime(OffsetDateTime.now().plusDays(1));
         screening1.setCapacity(100);
 
         screening2 = new Screening();
         screening2.setMovie(movie);
-        screening2.setRoomNumber(2);
         screening2.setStartTime(OffsetDateTime.now().plusDays(2));
         screening2.setCapacity(80);
 
