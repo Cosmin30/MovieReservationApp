@@ -11,5 +11,6 @@ import java.util.UUID;
 public class TicketDTO {
     private UUID id;
     private BigDecimal price;
-    private SeatDTO seat;
+    private UUID reservationId;
+    private UUID seatId;
 }
