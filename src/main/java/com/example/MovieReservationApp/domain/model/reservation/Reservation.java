@@ -50,6 +50,7 @@ public class Reservation {
     }
 
     public void setTotalPrice(double totalPrice) {
+        this.totalPrice = BigDecimal.valueOf(totalPrice);
     }
 }
 

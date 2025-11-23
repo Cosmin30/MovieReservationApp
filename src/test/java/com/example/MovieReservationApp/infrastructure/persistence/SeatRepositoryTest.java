@@ -1,20 +1,30 @@
-package com.example.MovieReservationApp.infrastructure.persistence.repository;
+package com.example.MovieReservationApp.infrastructure.persistence;
 
 import com.example.MovieReservationApp.domain.model.movie.Movie;
 import com.example.MovieReservationApp.domain.model.screening.Screening;
+import com.example.MovieReservationApp.domain.model.seat.Seat;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.MovieRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.SeatRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-class ScreeningRepositoryTest {
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+class SeatRepositoryTest {
+
+    @Autowired
+    private SeatRepository seatRepository;
 
     @Autowired
     private ScreeningRepository screeningRepository;
@@ -22,95 +32,102 @@ class ScreeningRepositoryTest {
     @Autowired
     private MovieRepository movieRepository;
 
-    private Movie movie1;
-    private Movie movie2;
-
     private Screening screening1;
     private Screening screening2;
-    private Screening screening3;
+
+    private Seat seat1;
+    private Seat seat2;
+    private Seat seat3;
 
     @BeforeEach
     void setup() {
+          seatRepository.deleteAll();
+        screeningRepository.deleteAll();
+        movieRepository.deleteAll();
 
-        movie1 = new Movie();
-        movie1.setTitle("Inception");
-        movie1.setDescription("Mind-bending sci-fi");
-        movie1.setDuration(140);
-
-        movie2 = new Movie();
-        movie2.setTitle("The Godfather");
-        movie2.setDescription("Mafia drama");
-        movie2.setDuration(175);
-
-        movieRepository.saveAll(List.of(movie1, movie2));
+         Movie movie = new Movie();
+        movie.setTitle("Test Movie");
+        movie.setDescription("Test Description");
+        movie.setDuration(120);
+        movie.setGenre("Action");
+        movie.setReleaseDate(LocalDate.of(2024, 1, 1));
+        movie = movieRepository.save(movie);
 
         screening1 = new Screening();
-        screening1.setMovie(movie1);
-        screening1.setStartTime(OffsetDateTime.now().plusDays(1));
+        screening1.setMovie(movie);
         screening1.setRoomNumber(1);
-        screening1.setCapacity(120);
+        screening1.setStartTime(OffsetDateTime.now().plusDays(1));
+        screening1.setCapacity(100);
 
         screening2 = new Screening();
-        screening2.setMovie(movie1);
+        screening2.setMovie(movie);
+        screening2.setRoomNumber(2);
         screening2.setStartTime(OffsetDateTime.now().plusDays(2));
-        screening2.setRoomNumber(1);
         screening2.setCapacity(80);
 
-        screening3 = new Screening();
-        screening3.setMovie(movie2);
-        screening3.setStartTime(OffsetDateTime.now().plusDays(3));
-        screening3.setRoomNumber(2);
-        screening3.setCapacity(60);
+        screeningRepository.saveAll(List.of(screening1, screening2));
 
-        screeningRepository.saveAll(List.of(screening1, screening2, screening3));
+        seat1 = new Seat();
+        seat1.setScreening(screening1);
+        seat1.setRow("A");
+        seat1.setNumber(1);
+        seat1.setIsAvailable(true);
+
+        seat2 = new Seat();
+        seat2.setScreening(screening1);
+        seat2.setRow("A");
+        seat2.setNumber(2);
+        seat2.setIsAvailable(false);
+
+        seat3 = new Seat();
+        seat3.setScreening(screening2);
+        seat3.setRow("B");
+        seat3.setNumber(1);
+        seat3.setIsAvailable(true);
+
+        seatRepository.saveAll(List.of(seat1, seat2, seat3));
     }
 
     @Test
-    @DisplayName("Find screenings by movie ID")
-    void testFindByMovieId() {
-        List<Screening> result = screeningRepository.findByMovieId(movie1.getId());
+    @DisplayName("Find seats by screening ID")
+    void testFindByScreeningId() {
+        List<Seat> result = seatRepository.findByScreeningId(screening1.getId());
 
         assertThat(result).hasSize(2);
         assertThat(result)
-                .extracting(Screening::getRoomNumber)
-                .containsExactlyInAnyOrder(1, 1);
+                .extracting(Seat::getNumber)
+                .containsExactlyInAnyOrder(1, 2);
     }
 
     @Test
-    @DisplayName("Find screenings by room number")
-    void testFindByRoomNumber() {
-        List<Screening> result = screeningRepository.findByRoomNumber(1);
+    @DisplayName("Find seats by row")
+    void testFindByRow() {
+        List<Seat> result = seatRepository.findByRow("A");
 
         assertThat(result).hasSize(2);
         assertThat(result)
-                .extracting(Screening::getMovie)
-                .containsExactlyInAnyOrder(movie1, movie1);
+                .extracting(Seat::getNumber)
+                .containsExactlyInAnyOrder(1, 2);
     }
 
     @Test
-    @DisplayName("Find screenings between start times")
-    void testFindByStartTimeBetween() {
-        OffsetDateTime now = OffsetDateTime.now();
-        OffsetDateTime start = now.plusHours(1);
-        OffsetDateTime end   = now.plusDays(2).plusHours(12);
+    @DisplayName("Find available seats by screening ID")
+    void testFindByScreeningIdAndIsAvailable() {
+        List<Seat> result = seatRepository.findByScreeningIdAndIsAvailable(screening1.getId(), true);
 
-        List<Screening> result = screeningRepository.findByStartTimeBetween(start, end);
-
-        assertThat(result).hasSize(2);
-        assertThat(result)
-                .extracting(Screening::getMovie)
-                .containsExactlyInAnyOrder(movie1, movie1);
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getRow()).isEqualTo("A");
+        assertThat(result.get(0).getNumber()).isEqualTo(1);
     }
 
     @Test
-    @DisplayName("Find screenings by capacity less than")
-    void testFindByCapacityLessThan() {
-        List<Screening> result = screeningRepository.findByCapacityLessThan(100);
+    @DisplayName("Find seats by screening ID and row")
+    void testFindByScreeningIdAndRow() {
+        List<Seat> result = seatRepository.findByScreeningIdAndRow(screening1.getId(), "A");
 
         assertThat(result).hasSize(2);
         assertThat(result)
-                .extracting(Screening::getCapacity)
-                .containsExactlyInAnyOrder(80, 60);
+                .extracting(Seat::getNumber)
+                .containsExactlyInAnyOrder(1, 2);
     }
-
 }

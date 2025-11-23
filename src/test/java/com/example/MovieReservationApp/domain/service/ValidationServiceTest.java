@@ -2,6 +2,10 @@ package com.example.MovieReservationApp.domain.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ValidationServiceTest {
@@ -10,7 +14,12 @@ class ValidationServiceTest {
 
     @BeforeEach
     void setUp() {
-        validationService = new ValidationServiceImpl();
+        validationService = new ValidationServiceImpl() {
+            @Override
+            public void validateSeats(List<UUID> seatIds) {
+
+            }
+        };
     }
 
     @Test

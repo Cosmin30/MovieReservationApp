@@ -1,4 +1,4 @@
-package com.example.MovieReservationApp.domain.
+package com.example.MovieReservationApp.infrastructure.persistence;
 
 import com.example.MovieReservationApp.domain.model.movie.Movie;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.MovieRepository;

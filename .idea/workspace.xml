@@ -4,8 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="RepositoryTest">
+    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="test fixes and repositories">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/reservation/Reservation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/reservation/Reservation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/user/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/user/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/service/WorkflowService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/service/WorkflowService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/domain/service/WorkflowServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/domain/service/WorkflowServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/PaymentRepositoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/PaymentRepositoryTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/ReservationRepositoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/ReservationRepositoryTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/SeatRepositoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/SeatRepositoryTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,12 +37,12 @@
     &quot;assignee&quot;: &quot;Cosmin30&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Cosmin30/MovieReservationApp",
-    "accountId": "5294650a-473f-41d3-9b36-e5108248b954"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Cosmin30/MovieReservationApp&quot;,
+    &quot;accountId&quot;: &quot;69c33dfe-35da-40f8-b806-b4a597769227&quot;
   }
-}]]></component>
+}</component>
   <component name="JpbToolWindowState">
     <option name="isToolWindowVisible" value="false" />
   </component>
@@ -56,26 +64,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.MovieReservationAppApplication.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ComputationServiceTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.MovieReservationAppApplicationTests.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/denis/Desktop/MovieReservationApp&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.MovieReservationAppApplication.executor": "Run",
+    "JUnit.AuditServiceTest.executor": "Run",
+    "JUnit.ComputationServiceTest.executor": "Run",
+    "JUnit.MovieRepositoryTest.executor": "Run",
+    "JUnit.MovieReservationAppApplicationTests.executor": "Run",
+    "JUnit.PaymentRepositoryTest.executor": "Run",
+    "JUnit.ReservationRepositoryTest.executor": "Run",
+    "JUnit.ScreeningRepositoryTest.executor": "Run",
+    "JUnit.SeatRepositoryTest.executor": "Run",
+    "JUnit.TicketRepositoryTest.executor": "Run",
+    "JUnit.UserRepositoryTest.executor": "Run",
+    "JUnit.ValidationServiceTest.executor": "Run",
+    "JUnit.WorkflowServiceTest.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/denis/Desktop/MovieReservationApp"
   }
-}</component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.27397.103" />
-      </set>
-    </attachedChunks>
-  </component>
+}]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -213,15 +224,23 @@
       <option name="project" value="LOCAL" />
       <updated>1762804146783</updated>
     </task>
-    <task id="LOCAL-00017" summary="RepositoryTest">
+    <task id="LOCAL-00017" summary="services.">
       <option name="closed" value="true" />
-      <created>1762805877447</created>
+      <created>1762805777068</created>
       <option name="number" value="00017" />
       <option name="presentableId" value="LOCAL-00017" />
       <option name="project" value="LOCAL" />
-      <updated>1762805877447</updated>
+      <updated>1762805777068</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="test fixes and repositories">
+      <option name="closed" value="true" />
+      <created>1762807017603</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1762807017603</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -246,7 +265,8 @@
     <MESSAGE value="repository" />
     <MESSAGE value="entity repository" />
     <MESSAGE value="entity manager" />
-    <MESSAGE value="RepositoryTest" />
-    <option name="LAST_COMMIT_MESSAGE" value="RepositoryTest" />
+    <MESSAGE value="services." />
+    <MESSAGE value="test fixes and repositories" />
+    <option name="LAST_COMMIT_MESSAGE" value="test fixes and repositories" />
   </component>
 </project>
