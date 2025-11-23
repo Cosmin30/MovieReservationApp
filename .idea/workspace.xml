@@ -4,13 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="added services">
+    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="fixed controllers">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/HallControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/HallControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/MovieControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/MovieControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/PaymentControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/PaymentControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/ReservationControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/ReservationControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/ScreeningControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/ScreeningControllerTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,6 +21,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -60,30 +56,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.MovieReservationAppApplication.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.AuditServiceTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ComputationServiceTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.HallRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.MovieRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.MovieReservationAppApplicationTests.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.PaymentRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ReservationRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ScreeningRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.SeatRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.TicketRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ValidationServiceTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.WorkflowServiceTest.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/denis/Desktop/MovieReservationApp&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.MovieReservationAppApplication.executor": "Run",
+    "JUnit.AuditServiceTest.executor": "Run",
+    "JUnit.ComputationServiceTest.executor": "Run",
+    "JUnit.HallRepositoryTest.executor": "Run",
+    "JUnit.MovieRepositoryTest.executor": "Run",
+    "JUnit.MovieReservationAppApplicationTests.executor": "Run",
+    "JUnit.PaymentRepositoryTest.executor": "Run",
+    "JUnit.ReservationRepositoryTest.executor": "Run",
+    "JUnit.ScreeningRepositoryTest.executor": "Run",
+    "JUnit.SeatRepositoryTest.executor": "Run",
+    "JUnit.TicketRepositoryTest.executor": "Run",
+    "JUnit.UserRepositoryTest.executor": "Run",
+    "JUnit.ValidationServiceTest.executor": "Run",
+    "JUnit.WorkflowServiceTest.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/denis/Desktop/MovieReservationApp"
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.example.MovieReservationApp.api" />
+    </key>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -277,7 +278,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763907325478</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="fixed controllers">
+      <option name="closed" value="true" />
+      <created>1763909107748</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1763909107748</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -295,6 +304,7 @@
     <MESSAGE value="first commit" />
     <MESSAGE value="screening" />
     <MESSAGE value="push de test" />
+    <MESSAGE value="." />
     <MESSAGE value="part teodor" />
     <MESSAGE value="services" />
     <MESSAGE value="database connection + postgres dependency" />
@@ -307,7 +317,7 @@
     <MESSAGE value="added halls entity" />
     <MESSAGE value="added dtos" />
     <MESSAGE value="added services" />
-    <MESSAGE value="." />
-    <option name="LAST_COMMIT_MESSAGE" value="." />
+    <MESSAGE value="fixed controllers" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed controllers" />
   </component>
 </project>
