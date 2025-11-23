@@ -4,7 +4,9 @@ import com.example.MovieReservationApp.application.dto.MovieDTO;
 import com.example.MovieReservationApp.domain.model.movie.Movie;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -113,7 +115,7 @@ public class MovieController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable UUID id) {
         if (!movieRepository.existsById(id)) {
-            throw new RuntimeException("Movie not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie not found");
         }
         movieRepository.deleteById(id);
     }

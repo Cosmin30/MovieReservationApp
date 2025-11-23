@@ -4,7 +4,9 @@ import com.example.MovieReservationApp.application.dto.HallDTO;
 import com.example.MovieReservationApp.domain.model.hall.Hall;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.HallRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -93,7 +95,7 @@ public class HallController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable UUID id) {
         if (!hallRepository.existsById(id)) {
-            throw new RuntimeException("Hall not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Hall not found");
         }
         hallRepository.deleteById(id);
     }

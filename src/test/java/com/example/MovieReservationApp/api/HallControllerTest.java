@@ -3,7 +3,6 @@ package com.example.MovieReservationApp.api;
 import com.example.MovieReservationApp.application.dto.HallDTO;
 import com.example.MovieReservationApp.domain.model.hall.Hall;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.HallRepository;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.Test;
@@ -11,17 +10,13 @@ import org.mockito.Mockito;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -31,7 +26,7 @@ class HallControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private HallRepository hallRepository;
 
     @Autowired
@@ -39,10 +34,11 @@ class HallControllerTest {
 
     @Test
     void testGetAll() throws Exception {
+
         Hall h1 = new Hall(UUID.randomUUID(), 1, 100, "A");
         Hall h2 = new Hall(UUID.randomUUID(), 2, 200, "B");
 
-        Mockito.when(hallRepository.findAll()).thenReturn(Arrays.asList(h1, h2));
+        Mockito.when(hallRepository.findAll()).thenReturn(List.of(h1, h2));
 
         mockMvc.perform(get("/api/halls"))
                 .andExpect(status().isOk())
@@ -52,6 +48,7 @@ class HallControllerTest {
 
     @Test
     void testGetById() throws Exception {
+
         UUID id = UUID.randomUUID();
         Hall hall = new Hall(id, 5, 300, "VIP Room");
 
@@ -65,7 +62,12 @@ class HallControllerTest {
 
     @Test
     void testCreate() throws Exception {
-        HallDTO dto = new HallDTO(null, "Test Hall", 7, 250);
+
+        HallDTO dto = new HallDTO();
+        dto.setName("Test Hall");
+        dto.setNumber(7);
+        dto.setCapacity(250);
+
         Hall saved = new Hall(UUID.randomUUID(), 7, 250, "Test Hall");
 
         Mockito.when(hallRepository.save(any(Hall.class))).thenReturn(saved);
@@ -80,12 +82,17 @@ class HallControllerTest {
 
     @Test
     void testUpdate() throws Exception {
+
         UUID id = UUID.randomUUID();
 
         Hall existing = new Hall(id, 2, 100, "Old");
         Hall updated = new Hall(id, 8, 400, "Updated");
 
-        HallDTO dto = new HallDTO(id, "Updated", 8, 400);
+        HallDTO dto = new HallDTO();
+        dto.setId(id);
+        dto.setName("Updated");
+        dto.setNumber(8);
+        dto.setCapacity(400);
 
         Mockito.when(hallRepository.findById(id)).thenReturn(Optional.of(existing));
         Mockito.when(hallRepository.save(any(Hall.class))).thenReturn(updated);
@@ -100,12 +107,15 @@ class HallControllerTest {
 
     @Test
     void testPatch() throws Exception {
+
         UUID id = UUID.randomUUID();
 
         Hall existing = new Hall(id, 3, 120, "Old");
         Hall modified = new Hall(id, 3, 200, "Patched");
 
-        HallDTO dto = new HallDTO(null, "Patched", null, 200);
+        HallDTO dto = new HallDTO();
+        dto.setName("Patched");
+        dto.setCapacity(200);
 
         Mockito.when(hallRepository.findById(id)).thenReturn(Optional.of(existing));
         Mockito.when(hallRepository.save(any(Hall.class))).thenReturn(modified);
@@ -120,6 +130,7 @@ class HallControllerTest {
 
     @Test
     void testDeleteSuccess() throws Exception {
+
         UUID id = UUID.randomUUID();
 
         Mockito.when(hallRepository.existsById(id)).thenReturn(true);
@@ -134,9 +145,10 @@ class HallControllerTest {
     void testDeleteNotFound() throws Exception {
         UUID id = UUID.randomUUID();
 
-        Mockito.when(hallRepository.existsById(id)).thenReturn(false);
+        Mockito.when(hallRepository.findById(id)).thenReturn(Optional.empty());
 
         mockMvc.perform(delete("/api/halls/{id}", id))
                 .andExpect(status().is4xxClientError());
     }
+
 }

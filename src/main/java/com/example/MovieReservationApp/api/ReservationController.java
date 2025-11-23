@@ -10,7 +10,9 @@ import com.example.MovieReservationApp.infrastructure.persistence.repository.Res
 import com.example.MovieReservationApp.infrastructure.persistence.repository.UserRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -128,7 +130,7 @@ public class ReservationController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable UUID id) {
         if (!reservationRepository.existsById(id)) {
-            throw new RuntimeException("Reservation not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found");
         }
         reservationRepository.deleteById(id);
     }

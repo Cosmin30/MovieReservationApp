@@ -7,8 +7,10 @@ import com.example.MovieReservationApp.domain.model.seat.Seat;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.TicketRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.ReservationRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.SeatRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -94,7 +96,7 @@ public class TicketController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable UUID id) {
         if (!ticketRepository.existsById(id)) {
-            throw new RuntimeException("Ticket not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found");
         }
         ticketRepository.deleteById(id);
     }

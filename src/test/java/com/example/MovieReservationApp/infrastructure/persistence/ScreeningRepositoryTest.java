@@ -1,7 +1,9 @@
 package com.example.MovieReservationApp.infrastructure.persistence;
 
+import com.example.MovieReservationApp.domain.model.hall.Hall;
 import com.example.MovieReservationApp.domain.model.movie.Movie;
 import com.example.MovieReservationApp.domain.model.screening.Screening;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.HallRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.MovieRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,8 +24,11 @@ class ScreeningRepositoryTest {
     private ScreeningRepository screeningRepository;
 
     @Autowired
-    private MovieRepository movieRepository;
+    private HallRepository hallRepository;
 
+    @Autowired
+    private MovieRepository movieRepository;
+    private  Hall hall1;
     private Movie movie1;
     private Movie movie2;
 
@@ -34,14 +39,22 @@ class ScreeningRepositoryTest {
     @BeforeEach
     void setup() {
 
+        hall1 = new Hall(); // fără "Hall" în față
+        hall1.setName("Hall 1");
+        hall1.setCapacity(100);
+        hall1.setNumber(1);
+        hallRepository.save(hall1);
+
         movie1 = new Movie();
         movie1.setTitle("Inception");
         movie1.setDescription("Mind-bending");
+        movie1.setGenre("Thriller");
         movie1.setDuration(150);
 
         movie2 = new Movie();
         movie2.setTitle("Godfather");
         movie2.setDescription("Mafia story");
+        movie2.setGenre("Action");
         movie2.setDuration(180);
 
         movieRepository.saveAll(List.of(movie1, movie2));
@@ -50,12 +63,15 @@ class ScreeningRepositoryTest {
         screening1.setMovie(movie1);
         screening1.setStartTime(OffsetDateTime.now().plusDays(1));
         screening1.setRoomNumber(1);
+        screening1.setHall(hall1);
         screening1.setCapacity(120);
 
         screening2 = new Screening();
         screening2.setMovie(movie1);
         screening2.setStartTime(OffsetDateTime.now().plusDays(2));
         screening2.setRoomNumber(1);
+        screening2.setHall(hall1);
+
         screening2.setCapacity(80);
 
         screening3 = new Screening();
@@ -63,6 +79,7 @@ class ScreeningRepositoryTest {
         screening3.setStartTime(OffsetDateTime.now().plusDays(3));
         screening3.setRoomNumber(2);
         screening3.setCapacity(60);
+        screening3.setHall(hall1);
 
         screeningRepository.saveAll(List.of(screening1, screening2, screening3));
     }

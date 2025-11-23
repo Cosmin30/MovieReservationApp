@@ -3,8 +3,10 @@ package com.example.MovieReservationApp.api;
 import com.example.MovieReservationApp.application.dto.UserDTO;
 import com.example.MovieReservationApp.domain.model.user.User;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -94,7 +96,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable UUID id) {
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
         userRepository.deleteById(id);
     }

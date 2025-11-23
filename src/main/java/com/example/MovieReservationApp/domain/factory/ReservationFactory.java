@@ -1,23 +1,22 @@
 package com.example.MovieReservationApp.domain.factory;
 
 import com.example.MovieReservationApp.domain.model.reservation.Reservation;
-import org.springframework.stereotype.Component;
+import com.example.MovieReservationApp.domain.model.screening.Screening;
+import com.example.MovieReservationApp.domain.model.user.User;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.UUID;
 
-@Component
 public class ReservationFactory {
 
-    public Reservation createReservation(UUID userId, UUID screeningId, List<UUID> seatIds, double totalPrice) {
-        Reservation reservation = new Reservation();
-        reservation.setId(UUID.randomUUID());
-        reservation.setUserId(userId);
-        reservation.setScreeningId(screeningId);
-        reservation.setCreatedAt(OffsetDateTime.now());
-        reservation.setStatus("CREATED");
-        reservation.setTotalPrice(totalPrice);
-        return reservation;
+    public static Reservation createReservation(User user, Screening screening, BigDecimal totalPrice) {
+        return Reservation.builder()
+                .user(user)
+                .screening(screening)
+                .status("CREATED")
+                .totalPrice(totalPrice)
+                .createdAt(OffsetDateTime.now())
+                .build();
     }
+
 }

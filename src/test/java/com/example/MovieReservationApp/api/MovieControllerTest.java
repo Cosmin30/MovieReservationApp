@@ -3,17 +3,13 @@ package com.example.MovieReservationApp.api;
 import com.example.MovieReservationApp.application.dto.MovieDTO;
 import com.example.MovieReservationApp.domain.model.movie.Movie;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.MovieRepository;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -21,7 +17,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -31,7 +27,7 @@ class MovieControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private MovieRepository movieRepository;
 
     @Autowired
@@ -39,8 +35,19 @@ class MovieControllerTest {
 
     @Test
     void testGetAll() throws Exception {
-        Movie m1 = new Movie(UUID.randomUUID(), "Movie1", "Desc1", 120, "Action", LocalDate.of(2023,1,1), null);
-        Movie m2 = new Movie(UUID.randomUUID(), "Movie2", "Desc2", 90, "Comedy", LocalDate.of(2023,2,1), null);
+        Movie m1 = new Movie();
+        m1.setTitle("Movie1");
+        m1.setDescription("Desc1");
+        m1.setDuration(120);
+        m1.setGenre("Action");
+        m1.setReleaseDate(LocalDate.of(2023, 1, 1));
+
+        Movie m2 = new Movie();
+        m2.setTitle("Movie2");
+        m2.setDescription("Desc2");
+        m2.setDuration(90);
+        m2.setGenre("Comedy");
+        m2.setReleaseDate(LocalDate.of(2023, 2, 1));
 
         Mockito.when(movieRepository.findAll()).thenReturn(Arrays.asList(m1, m2));
 
@@ -53,7 +60,13 @@ class MovieControllerTest {
     @Test
     void testGetById() throws Exception {
         UUID id = UUID.randomUUID();
-        Movie movie = new Movie(id, "Avatar", "Epic", 180, "Sci-Fi", LocalDate.of(2022,12,1), null);
+        Movie movie = new Movie();
+        movie.setId(id);
+        movie.setTitle("Avatar");
+        movie.setDescription("Epic");
+        movie.setDuration(180);
+        movie.setGenre("Sci-Fi");
+        movie.setReleaseDate(LocalDate.of(2022, 12, 1));
 
         Mockito.when(movieRepository.findById(id)).thenReturn(Optional.of(movie));
 
@@ -65,8 +78,20 @@ class MovieControllerTest {
 
     @Test
     void testCreate() throws Exception {
-        MovieDTO dto = new MovieDTO(null, "Test Movie", "Test Desc", "Drama", 110, LocalDate.of(2024,1,1));
-        Movie saved = new Movie(UUID.randomUUID(), "Test Movie", "Test Desc", 110, "Drama", LocalDate.of(2024,1,1), null);
+        MovieDTO dto = new MovieDTO();
+        dto.setTitle("Test Movie");
+        dto.setDescription("Test Desc");
+        dto.setGenre("Drama");
+        dto.setDuration(110);
+        dto.setReleaseDate(LocalDate.of(2024, 1, 1));
+
+        Movie saved = new Movie();
+        saved.setId(UUID.randomUUID());
+        saved.setTitle(dto.getTitle());
+        saved.setDescription(dto.getDescription());
+        saved.setGenre(dto.getGenre());
+        saved.setDuration(dto.getDuration());
+        saved.setReleaseDate(dto.getReleaseDate());
 
         Mockito.when(movieRepository.save(any(Movie.class))).thenReturn(saved);
 
@@ -82,10 +107,29 @@ class MovieControllerTest {
     void testUpdate() throws Exception {
         UUID id = UUID.randomUUID();
 
-        Movie existing = new Movie(id, "Old", "Old Desc", 90, "Horror", LocalDate.of(2023,1,1), null);
-        Movie updated = new Movie(id, "New", "New Desc", 150, "Fantasy", LocalDate.of(2024,5,1), null);
+        Movie existing = new Movie();
+        existing.setId(id);
+        existing.setTitle("Old");
+        existing.setDescription("Old Desc");
+        existing.setDuration(90);
+        existing.setGenre("Horror");
+        existing.setReleaseDate(LocalDate.of(2023, 1, 1));
 
-        MovieDTO dto = new MovieDTO(id, "New", "New Desc", "Fantasy", 150, LocalDate.of(2024,5,1));
+        Movie updated = new Movie();
+        updated.setId(id);
+        updated.setTitle("New");
+        updated.setDescription("New Desc");
+        updated.setDuration(150);
+        updated.setGenre("Fantasy");
+        updated.setReleaseDate(LocalDate.of(2024, 5, 1));
+
+        MovieDTO dto = new MovieDTO();
+        dto.setId(id);
+        dto.setTitle("New");
+        dto.setDescription("New Desc");
+        dto.setGenre("Fantasy");
+        dto.setDuration(150);
+        dto.setReleaseDate(LocalDate.of(2024, 5, 1));
 
         Mockito.when(movieRepository.findById(id)).thenReturn(Optional.of(existing));
         Mockito.when(movieRepository.save(any(Movie.class))).thenReturn(updated);
@@ -102,10 +146,24 @@ class MovieControllerTest {
     void testPatch() throws Exception {
         UUID id = UUID.randomUUID();
 
-        Movie existing = new Movie(id, "Old Title", "Old Desc", 100, "Drama", LocalDate.of(2022,8,1), null);
-        Movie patched = new Movie(id, "Patched Title", "Old Desc", 100, "Drama", LocalDate.of(2022,8,1), null);
+        Movie existing = new Movie();
+        existing.setId(id);
+        existing.setTitle("Old Title");
+        existing.setDescription("Old Desc");
+        existing.setDuration(100);
+        existing.setGenre("Drama");
+        existing.setReleaseDate(LocalDate.of(2022, 8, 1));
 
-        MovieDTO dto = new MovieDTO(null, "Patched Title", null, null, null, null);
+        Movie patched = new Movie();
+        patched.setId(id);
+        patched.setTitle("Patched Title");
+        patched.setDescription("Old Desc");
+        patched.setDuration(100);
+        patched.setGenre("Drama");
+        patched.setReleaseDate(LocalDate.of(2022, 8, 1));
+
+        MovieDTO dto = new MovieDTO();
+        dto.setTitle("Patched Title");
 
         Mockito.when(movieRepository.findById(id)).thenReturn(Optional.of(existing));
         Mockito.when(movieRepository.save(any(Movie.class))).thenReturn(patched);

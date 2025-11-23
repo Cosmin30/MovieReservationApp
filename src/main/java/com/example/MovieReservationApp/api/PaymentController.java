@@ -6,7 +6,9 @@ import com.example.MovieReservationApp.domain.model.reservation.Reservation;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.PaymentRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -101,7 +103,7 @@ public class PaymentController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable UUID id) {
         if (!paymentRepository.existsById(id)) {
-            throw new RuntimeException("Payment not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found");
         }
         paymentRepository.deleteById(id);
     }

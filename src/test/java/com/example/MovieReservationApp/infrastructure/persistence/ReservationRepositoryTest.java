@@ -1,5 +1,6 @@
 package com.example.MovieReservationApp.infrastructure.persistence;
 
+import com.example.MovieReservationApp.domain.model.hall.Hall;
 import com.example.MovieReservationApp.domain.model.movie.Movie;
 import com.example.MovieReservationApp.domain.model.reservation.Reservation;
 import com.example.MovieReservationApp.domain.model.screening.Screening;
@@ -8,6 +9,7 @@ import com.example.MovieReservationApp.infrastructure.persistence.repository.Mov
 import com.example.MovieReservationApp.infrastructure.persistence.repository.ReservationRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.UserRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.HallRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -36,7 +39,8 @@ class ReservationRepositoryTest {
 
     @Autowired
     private MovieRepository movieRepository;
-
+    @Autowired
+    private HallRepository hallRepository;
     private User user1;
     private User user2;
 
@@ -53,7 +57,9 @@ class ReservationRepositoryTest {
         screeningRepository.deleteAll();
         movieRepository.deleteAll();
         userRepository.deleteAll();
+        hallRepository.deleteAll(); // dacă ai repository pentru Hall
 
+        // Creează și salvează filmul
         Movie movie = new Movie();
         movie.setTitle("Test Movie");
         movie.setDescription("Test Description");
@@ -62,6 +68,7 @@ class ReservationRepositoryTest {
         movie.setReleaseDate(LocalDate.of(2024, 1, 1));
         movie = movieRepository.save(movie);
 
+        // Creează și salvează utilizatorii
         user1 = new User();
         user1.setEmail("user1@example.com");
         user1.setPasswordHash("hashedPassword123");
@@ -76,43 +83,54 @@ class ReservationRepositoryTest {
 
         userRepository.saveAll(List.of(user1, user2));
 
+        Hall hall = new Hall();
+        hall.setName("Main Hall");
+        hall.setCapacity(100);
+        hall.setNumber(2);
+        hall = hallRepository.save(hall);
+
+        // Creează și salvează screening-urile
         screening1 = new Screening();
         screening1.setMovie(movie);
         screening1.setRoomNumber(1);
         screening1.setStartTime(OffsetDateTime.now().plusDays(1));
         screening1.setCapacity(100);
+        screening1.setHall(hall);
 
         screening2 = new Screening();
         screening2.setMovie(movie);
         screening2.setRoomNumber(2);
         screening2.setStartTime(OffsetDateTime.now().plusDays(2));
         screening2.setCapacity(80);
+        screening2.setHall(hall);
 
         screeningRepository.saveAll(List.of(screening1, screening2));
 
+        // Creează și salvează rezervările
         reservation1 = new Reservation();
         reservation1.setUser(user1);
         reservation1.setScreening(screening1);
         reservation1.setCreatedAt(OffsetDateTime.now());
         reservation1.setStatus("CONFIRMED");
-        reservation1.setTotalPrice(15.00);
+        reservation1.setTotalPrice(BigDecimal.valueOf(15.00));
 
         reservation2 = new Reservation();
         reservation2.setUser(user1);
         reservation2.setScreening(screening2);
         reservation2.setCreatedAt(OffsetDateTime.now());
         reservation2.setStatus("CANCELLED");
-        reservation2.setTotalPrice(0.00);
+        reservation2.setTotalPrice(BigDecimal.valueOf(0.00));
 
         reservation3 = new Reservation();
         reservation3.setUser(user2);
         reservation3.setScreening(screening1);
         reservation3.setCreatedAt(OffsetDateTime.now());
         reservation3.setStatus("CONFIRMED");
-        reservation3.setTotalPrice(12.00);
+        reservation3.setTotalPrice(BigDecimal.valueOf(12.00));
 
         reservationRepository.saveAll(List.of(reservation1, reservation2, reservation3));
     }
+
 
     @Test
     @DisplayName("Find reservations by User ID")

@@ -1,15 +1,12 @@
 package com.example.MovieReservationApp.infrastructure.persistence;
 
+import com.example.MovieReservationApp.domain.model.hall.Hall;
 import com.example.MovieReservationApp.domain.model.movie.Movie;
 import com.example.MovieReservationApp.domain.model.payment.Payment;
 import com.example.MovieReservationApp.domain.model.reservation.Reservation;
 import com.example.MovieReservationApp.domain.model.screening.Screening;
 import com.example.MovieReservationApp.domain.model.user.User;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.MovieRepository;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.PaymentRepository;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.ReservationRepository;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.UserRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,6 +40,9 @@ class PaymentRepositoryTest {
     @Autowired
     private MovieRepository movieRepository;
 
+    @Autowired
+    private HallRepository hallRepository;
+
     private Reservation reservation1;
     private Reservation reservation2;
 
@@ -52,12 +52,15 @@ class PaymentRepositoryTest {
 
     @BeforeEach
     void setup() {
+        // --- Clear tables ---
         paymentRepository.deleteAll();
         reservationRepository.deleteAll();
         screeningRepository.deleteAll();
+        hallRepository.deleteAll();
         movieRepository.deleteAll();
         userRepository.deleteAll();
 
+        // --- Movie ---
         Movie movie = new Movie();
         movie.setTitle("Test Movie");
         movie.setDescription("Test Description");
@@ -66,6 +69,7 @@ class PaymentRepositoryTest {
         movie.setReleaseDate(LocalDate.of(2024, 1, 1));
         movie = movieRepository.save(movie);
 
+        // --- User ---
         User user = new User();
         user.setEmail("test@example.com");
         user.setPasswordHash("hashedPassword123");
@@ -73,11 +77,28 @@ class PaymentRepositoryTest {
         user.setCreatedAt(OffsetDateTime.now());
         user = userRepository.save(user);
 
+        // --- Halls ---
+        Hall hall1 = new Hall();
+        hall1.setName("Hall 1");
+        hall1.setCapacity(100);
+        hall1.setNumber(1);
+
+        hall1 = hallRepository.save(hall1);
+
+        Hall hall2 = new Hall();
+        hall2.setName("Hall 2");
+        hall2.setCapacity(80);
+        hall2.setNumber(2); //
+
+        hall2 = hallRepository.save(hall2);
+
+        // --- Screenings ---
         Screening screening1 = new Screening();
         screening1.setMovie(movie);
         screening1.setRoomNumber(1);
         screening1.setStartTime(OffsetDateTime.now().plusDays(1));
         screening1.setCapacity(100);
+        screening1.setHall(hall1);
         screening1 = screeningRepository.save(screening1);
 
         Screening screening2 = new Screening();
@@ -85,24 +106,27 @@ class PaymentRepositoryTest {
         screening2.setRoomNumber(2);
         screening2.setStartTime(OffsetDateTime.now().plusDays(2));
         screening2.setCapacity(80);
+        screening2.setHall(hall2);
         screening2 = screeningRepository.save(screening2);
 
+        // --- Reservations ---
         reservation1 = new Reservation();
         reservation1.setUser(user);
         reservation1.setScreening(screening1);
         reservation1.setStatus("CREATED");
-        reservation1.setTotalPrice(30.00);
+        reservation1.setTotalPrice(BigDecimal.valueOf(30.00));
         reservation1.setCreatedAt(OffsetDateTime.now());
 
         reservation2 = new Reservation();
         reservation2.setUser(user);
         reservation2.setScreening(screening2);
         reservation2.setStatus("CREATED");
-        reservation2.setTotalPrice(5.00);
+        reservation2.setTotalPrice(BigDecimal.valueOf(5.00));
         reservation2.setCreatedAt(OffsetDateTime.now());
 
         reservationRepository.saveAll(List.of(reservation1, reservation2));
 
+        // --- Payments ---
         payment1 = Payment.builder()
                 .reservation(reservation1)
                 .status("PAID")
