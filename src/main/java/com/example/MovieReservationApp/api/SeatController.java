@@ -1,6 +1,6 @@
 package com.example.MovieReservationApp.api;
 
-import com.example.MovieReservationApp.api.dto.SeatDTO;
+import com.example.MovieReservationApp.application.dto.SeatDTO;
 import com.example.MovieReservationApp.domain.model.seat.Seat;
 import com.example.MovieReservationApp.domain.model.screening.Screening;
 
@@ -81,6 +81,7 @@ public class SeatController {
     // UPDATE
     @PutMapping("/{id}")
     public SeatDTO update(@PathVariable UUID id, @RequestBody SeatDTO dto) {
+
         Seat seat = seatRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Seat not found"));
 

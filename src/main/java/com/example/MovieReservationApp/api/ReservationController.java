@@ -1,6 +1,6 @@
 package com.example.MovieReservationApp.api;
 
-import com.example.MovieReservationApp.api.dto.ReservationDTO;
+import com.example.MovieReservationApp.application.dto.ReservationDTO;
 import com.example.MovieReservationApp.domain.model.reservation.Reservation;
 import com.example.MovieReservationApp.domain.model.user.User;
 import com.example.MovieReservationApp.domain.model.screening.Screening;

@@ -1,6 +1,6 @@
 package com.example.MovieReservationApp.api;
 
-import com.example.MovieReservationApp.api.dto.TicketDTO;
+import com.example.MovieReservationApp.application.dto.TicketDTO;
 import com.example.MovieReservationApp.domain.model.ticket.Ticket;
 import com.example.MovieReservationApp.domain.model.reservation.Reservation;
 import com.example.MovieReservationApp.domain.model.seat.Seat;
@@ -79,7 +79,6 @@ public class TicketController {
     public TicketDTO create(@RequestBody TicketDTO dto) {
         Ticket ticket = toEntity(dto);
         ticket.setId(null);
-
         ticket = ticketRepository.save(ticket);
         return toDTO(ticket);
     }

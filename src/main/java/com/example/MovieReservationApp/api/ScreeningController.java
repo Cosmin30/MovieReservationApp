@@ -1,6 +1,6 @@
 package com.example.MovieReservationApp.api;
 
-import com.example.MovieReservationApp.api.dto.ScreeningDTO;
+import com.example.MovieReservationApp.application.dto.ScreeningDTO;
 import com.example.MovieReservationApp.domain.model.screening.Screening;
 import com.example.MovieReservationApp.domain.model.movie.Movie;
 import com.example.MovieReservationApp.domain.model.hall.Hall;
@@ -83,6 +83,7 @@ public class ScreeningController {
     public ScreeningDTO create(@RequestBody ScreeningDTO dto) {
         Screening screening = toEntity(dto);
         screening.setId(null);
+
         screening = screeningRepository.save(screening);
         return toDTO(screening);
     }

@@ -1,6 +1,6 @@
 package com.example.MovieReservationApp.api;
 
-import com.example.MovieReservationApp.api.dto.PaymentDTO;
+import com.example.MovieReservationApp.application.dto.PaymentDTO;
 import com.example.MovieReservationApp.domain.model.payment.Payment;
 import com.example.MovieReservationApp.domain.model.reservation.Reservation;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.PaymentRepository;
@@ -64,7 +64,6 @@ public class PaymentController {
     public PaymentDTO getById(@PathVariable UUID id) {
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
-
         return toDTO(payment);
     }
 
@@ -81,6 +80,7 @@ public class PaymentController {
     // UPDATE
     @PutMapping("/{id}")
     public PaymentDTO update(@PathVariable UUID id, @RequestBody PaymentDTO dto) {
+
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
 

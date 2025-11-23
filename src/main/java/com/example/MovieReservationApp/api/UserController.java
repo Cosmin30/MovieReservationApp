@@ -1,6 +1,6 @@
 package com.example.MovieReservationApp.api;
 
-import com.example.MovieReservationApp.api.dto.UserDTO;
+import com.example.MovieReservationApp.application.dto.UserDTO;
 import com.example.MovieReservationApp.domain.model.user.User;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.UserRepository;
 
@@ -70,6 +70,7 @@ public class UserController {
     // UPDATE
     @PutMapping("/{id}")
     public UserDTO update(@PathVariable UUID id, @RequestBody UserDTO dto) {
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 

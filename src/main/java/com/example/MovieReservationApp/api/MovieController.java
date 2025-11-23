@@ -1,6 +1,6 @@
 package com.example.MovieReservationApp.api;
 
-import com.example.MovieReservationApp.api.dto.MovieDTO;
+import com.example.MovieReservationApp.application.dto.MovieDTO;
 import com.example.MovieReservationApp.domain.model.movie.Movie;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.MovieRepository;
 
@@ -42,7 +42,6 @@ public class MovieController {
         return movie;
     }
 
-    // GET ALL
     @GetMapping
     public List<MovieDTO> getAll() {
         return movieRepository.findAll()
@@ -51,26 +50,21 @@ public class MovieController {
                 .collect(Collectors.toList());
     }
 
-    // GET BY ID
     @GetMapping("/{id}")
     public MovieDTO getById(@PathVariable UUID id) {
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
-
         return toDTO(movie);
     }
 
-    // CREATE
     @PostMapping
     public MovieDTO create(@RequestBody MovieDTO dto) {
         Movie movie = toEntity(dto);
         movie.setId(null);
-
         movie = movieRepository.save(movie);
         return toDTO(movie);
     }
 
-    // UPDATE
     @PutMapping("/{id}")
     public MovieDTO update(@PathVariable UUID id, @RequestBody MovieDTO dto) {
         Movie movie = movieRepository.findById(id)
@@ -86,7 +80,6 @@ public class MovieController {
         return toDTO(movie);
     }
 
-    // DELETE
     @DeleteMapping("/{id}")
     public void delete(@PathVariable UUID id) {
         movieRepository.deleteById(id);

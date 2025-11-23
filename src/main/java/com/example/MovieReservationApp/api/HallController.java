@@ -1,6 +1,6 @@
 package com.example.MovieReservationApp.api;
 
-import com.example.MovieReservationApp.api.dto.HallDTO;
+import com.example.MovieReservationApp.application.dto.HallDTO;
 import com.example.MovieReservationApp.domain.model.hall.Hall;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.HallRepository;
 
@@ -52,7 +52,6 @@ public class HallController {
     public HallDTO getById(@PathVariable UUID id) {
         Hall hall = hallRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Hall not found"));
-
         return toDTO(hall);
     }
 
