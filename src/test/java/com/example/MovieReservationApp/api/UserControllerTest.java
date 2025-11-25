@@ -1,26 +1,25 @@
 package com.example.MovieReservationApp.api;
 
 import com.example.MovieReservationApp.application.dto.UserDTO;
-import com.example.MovieReservationApp.domain.model.user.User;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.UserRepository;
-
+import com.example.MovieReservationApp.application.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-
-import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -31,128 +30,113 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    // ---------- GET ALL ----------
     @Test
-    void testGetAll() throws Exception {
-        User u1 = new User(UUID.randomUUID(), "John Doe", "john@mail.com", "hash1", OffsetDateTime.now(), null);
-        User u2 = new User(UUID.randomUUID(), "Alice Smith", "alice@mail.com", "hash2", OffsetDateTime.now(), null);
-
-        Mockito.when(userRepository.findAll()).thenReturn(Arrays.asList(u1, u2));
-
-        mockMvc.perform(get("/api/users"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].fullName").value("John Doe"))
-                .andExpect(jsonPath("$[1].email").value("alice@mail.com"));
-    }
-
-    // ---------- GET BY ID ----------
-    @Test
-    void testGetById() throws Exception {
+    void testGetUserById() throws Exception {
         UUID id = UUID.randomUUID();
+        UserDTO dto = new UserDTO();
+        dto.setId(id);
+        dto.setEmail("test@example.com");
+        dto.setFullName("Test User");
+        dto.setCreatedAt(OffsetDateTime.now());
 
-        User user = new User(id, "Mark Lee", "mark@mail.com", "hashpass", OffsetDateTime.now(), null);
-
-        Mockito.when(userRepository.findById(id)).thenReturn(Optional.of(user));
+        Mockito.when(userService.getUserById(id)).thenReturn(dto);
 
         mockMvc.perform(get("/api/users/{id}", id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.fullName").value("Mark Lee"))
-                .andExpect(jsonPath("$.email").value("mark@mail.com"));
+                .andExpect(jsonPath("$.email").value("test@example.com"));
     }
 
-    // ---------- CREATE ----------
     @Test
-    void testCreate() throws Exception {
+    void testCreateUser() throws Exception {
         UserDTO dto = new UserDTO();
+        dto.setEmail("new@example.com");
         dto.setFullName("New User");
-        dto.setEmail("new@mail.com");
-        dto.setCreatedAt(OffsetDateTime.now());
 
-        User saved = new User(UUID.randomUUID(), "New User", "new@mail.com", null, dto.getCreatedAt(), null);
+        UserDTO saved = new UserDTO();
+        saved.setId(UUID.randomUUID());
+        saved.setEmail(dto.getEmail());
+        saved.setFullName(dto.getFullName());
+        saved.setCreatedAt(OffsetDateTime.now());
 
-        Mockito.when(userRepository.save(any(User.class))).thenReturn(saved);
+        Mockito.when(userService.createUser(any(UserDTO.class))).thenReturn(saved);
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.fullName").value("New User"))
-                .andExpect(jsonPath("$.email").value("new@mail.com"));
+                .andExpect(jsonPath("$.email").value("new@example.com"));
     }
 
-    // ---------- UPDATE ----------
     @Test
-    void testUpdate() throws Exception {
+    void testUpdateUser() throws Exception {
         UUID id = UUID.randomUUID();
-
-        User existing = new User(id, "Old Name", "old@mail.com", "hash", OffsetDateTime.now(), null);
-
-        User updated = new User(id, "Updated Name", "updated@mail.com", null, OffsetDateTime.now(), null);
-
         UserDTO dto = new UserDTO();
         dto.setFullName("Updated Name");
-        dto.setEmail("updated@mail.com");
-        dto.setCreatedAt(updated.getCreatedAt());
 
-        Mockito.when(userRepository.findById(id)).thenReturn(Optional.of(existing));
-        Mockito.when(userRepository.save(any(User.class))).thenReturn(updated);
+        UserDTO updated = new UserDTO();
+        updated.setId(id);
+        updated.setFullName("Updated Name");
+
+        Mockito.when(userService.updateUser(eq(id), any(UserDTO.class))).thenReturn(updated);
 
         mockMvc.perform(put("/api/users/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.fullName").value("Updated Name"))
-                .andExpect(jsonPath("$.email").value("updated@mail.com"));
+                .andExpect(jsonPath("$.fullName").value("Updated Name"));
+
+        UUID nonExistent = UUID.randomUUID();
+        Mockito.when(userService.updateUser(eq(nonExistent), any(UserDTO.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        mockMvc.perform(put("/api/users/{id}", nonExistent)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNotFound());
     }
 
-    // ---------- PATCH ----------
     @Test
-    void testPatch() throws Exception {
+    void testPatchUser() throws Exception {
         UUID id = UUID.randomUUID();
-
-        User existing = new User(id, "Patch Name", "patch@mail.com", "hashpass", OffsetDateTime.now(), null);
-
-        User patched = new User(id, "PATCHED NEW NAME", "patch@mail.com", null, existing.getCreatedAt(), null);
-
         UserDTO dto = new UserDTO();
-        dto.setFullName("PATCHED NEW NAME");
+        dto.setFullName("Patched Name");
 
-        Mockito.when(userRepository.findById(id)).thenReturn(Optional.of(existing));
-        Mockito.when(userRepository.save(any(User.class))).thenReturn(patched);
+        UserDTO patched = new UserDTO();
+        patched.setId(id);
+        patched.setFullName("Patched Name");
+
+        Mockito.when(userService.patchUser(eq(id), any(UserDTO.class))).thenReturn(patched);
 
         mockMvc.perform(patch("/api/users/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.fullName").value("PATCHED NEW NAME"));
+                .andExpect(jsonPath("$.fullName").value("Patched Name"));
+
+        UUID nonExistent = UUID.randomUUID();
+        Mockito.when(userService.patchUser(eq(nonExistent), any(UserDTO.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        mockMvc.perform(patch("/api/users/{id}", nonExistent)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNotFound());
     }
 
-    // ---------- DELETE SUCCESS ----------
     @Test
-    void testDeleteSuccess() throws Exception {
+    void testDeleteUser() throws Exception {
         UUID id = UUID.randomUUID();
 
-        Mockito.when(userRepository.existsById(id)).thenReturn(true);
+        Mockito.doNothing().when(userService).deleteUser(id);
 
         mockMvc.perform(delete("/api/users/{id}", id))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
-        Mockito.verify(userRepository).deleteById(id);
-    }
-
-    // ---------- DELETE NOT FOUND ----------
-    @Test
-    void testDeleteNotFound() throws Exception {
-        UUID id = UUID.randomUUID();
-
-        Mockito.when(userRepository.existsById(id)).thenReturn(false);
-
-        mockMvc.perform(delete("/api/users/{id}", id))
-                .andExpect(status().is4xxClientError());
+        verify(userService).deleteUser(id);
     }
 }

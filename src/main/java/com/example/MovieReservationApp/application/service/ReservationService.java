@@ -10,7 +10,9 @@ import com.example.MovieReservationApp.domain.model.movie.Movie;
 import com.example.MovieReservationApp.domain.model.hall.Hall;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -28,11 +30,14 @@ public class ReservationService {
     private final UserRepository userRepository;
     private final ScreeningRepository screeningRepository;
 
+    // -------------------------------
+    // CREATE RESERVATION
+    // -------------------------------
     public ReservationDTO createReservation(UUID userId, UUID screeningId, List<UUID> seatIds, BigDecimal pricePerSeat) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         Screening screening = screeningRepository.findById(screeningId)
-                .orElseThrow(() -> new RuntimeException("Screening not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Screening not found"));
 
         Reservation reservation = new Reservation();
         reservation.setUser(user);
@@ -44,9 +49,9 @@ public class ReservationService {
 
         List<TicketDTO> tickets = seatIds.stream().map(seatId -> {
             Seat seat = seatRepository.findById(seatId)
-                    .orElseThrow(() -> new RuntimeException("Seat not found"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Seat not found"));
             if (!seat.getIsAvailable()) {
-                throw new RuntimeException("Seat " + seat.getNumber() + " in row " + seat.getRow() + " is already taken");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Seat " + seat.getNumber() + " in row " + seat.getRow() + " is already taken");
             }
             seat.setIsAvailable(false);
 
@@ -61,17 +66,101 @@ public class ReservationService {
             ticketDTO.setPrice(ticket.getPrice());
             ticketDTO.setSeatId(seat.getId());
             ticketDTO.setReservationId(reservation.getId());
-
             return ticketDTO;
         }).collect(Collectors.toList());
 
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(user.getId());
-        userDTO.setEmail(user.getEmail());
-        userDTO.setFullName(user.getFullName());
-        userDTO.setCreatedAt(user.getCreatedAt());
+        return mapReservationToDTO(reservation, tickets);
+    }
 
-        ScreeningDTO screeningDTO = mapScreeningToDTO(screening);
+    // -------------------------------
+    // GET ALL RESERVATIONS
+    // -------------------------------
+    public List<ReservationDTO> getAllReservations() {
+        return reservationRepository.findAll().stream()
+                .map(this::mapReservationToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // -------------------------------
+    // GET RESERVATION BY ID
+    // -------------------------------
+    public ReservationDTO getReservationById(UUID id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found"));
+        return mapReservationToDTO(reservation);
+    }
+
+    // -------------------------------
+    // GET RESERVATIONS BY USER
+    // -------------------------------
+    public List<ReservationDTO> getReservationsByUser(UUID userId) {
+        return reservationRepository.findByUser_Id(userId).stream()
+                .map(this::mapReservationToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // -------------------------------
+    // UPDATE COMPLET
+    // -------------------------------
+    public ReservationDTO updateReservation(UUID id, ReservationDTO dto) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found"));
+
+        reservation.setStatus(dto.getStatus());
+        reservation.setTotalPrice(dto.getTotalPrice());
+        reservationRepository.save(reservation);
+
+        return mapReservationToDTO(reservation);
+    }
+
+    // -------------------------------
+    // PATCH (UPDATE PARȚIAL)
+    // -------------------------------
+    public ReservationDTO patchReservation(UUID id, ReservationDTO dto) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found"));
+
+        if (dto.getStatus() != null) reservation.setStatus(dto.getStatus());
+        if (dto.getTotalPrice() != null) reservation.setTotalPrice(dto.getTotalPrice());
+
+        reservationRepository.save(reservation);
+        return mapReservationToDTO(reservation);
+    }
+
+    // -------------------------------
+    // DELETE
+    // -------------------------------
+    public void deleteReservation(UUID id) {
+        if (!reservationRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found");
+        }
+        reservationRepository.deleteById(id);
+    }
+
+    // -------------------------------
+    // HELPER METHODS: DTO MAPPING
+    // -------------------------------
+    private ReservationDTO mapReservationToDTO(Reservation reservation) {
+        List<TicketDTO> tickets = reservation.getTickets().stream()
+                .map(ticket -> {
+                    TicketDTO tDto = new TicketDTO();
+                    tDto.setId(ticket.getId());
+                    tDto.setSeatId(ticket.getSeat().getId());
+                    tDto.setReservationId(reservation.getId());
+                    tDto.setPrice(ticket.getPrice());
+                    return tDto;
+                }).collect(Collectors.toList());
+        return mapReservationToDTO(reservation, tickets);
+    }
+
+    private ReservationDTO mapReservationToDTO(Reservation reservation, List<TicketDTO> tickets) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(reservation.getUser().getId());
+        userDTO.setEmail(reservation.getUser().getEmail());
+        userDTO.setFullName(reservation.getUser().getFullName());
+        userDTO.setCreatedAt(reservation.getUser().getCreatedAt());
+
+        ScreeningDTO screeningDTO = mapScreeningToDTO(reservation.getScreening());
 
         ReservationDTO dto = new ReservationDTO();
         dto.setId(reservation.getId());
@@ -79,46 +168,8 @@ public class ReservationService {
         dto.setScreening(screeningDTO);
         dto.setCreatedAt(reservation.getCreatedAt());
         dto.setStatus(reservation.getStatus());
-        dto.setTotalPrice(pricePerSeat.multiply(BigDecimal.valueOf(seatIds.size())));
+        dto.setTotalPrice(reservation.getTotalPrice());
         dto.setTickets(tickets);
-
-        return dto;
-    }
-
-    public List<ReservationDTO> getReservationsByUser(UUID userId) {
-        return reservationRepository.findByUser_Id(userId).stream().map(reservation -> {
-            List<TicketDTO> tickets = reservation.getTickets().stream().map(ticket -> {
-                TicketDTO tDto = new TicketDTO();
-                tDto.setId(ticket.getId());
-                tDto.setSeatId(ticket.getSeat().getId());
-                tDto.setReservationId(reservation.getId());
-                tDto.setPrice(ticket.getPrice());
-                return tDto;
-            }).collect(Collectors.toList());
-
-            UserDTO userDTO = mapUserToDTO(reservation.getUser());
-            ScreeningDTO screeningDTO = mapScreeningToDTO(reservation.getScreening());
-
-            ReservationDTO dto = new ReservationDTO();
-            dto.setId(reservation.getId());
-            dto.setUser(userDTO);
-            dto.setScreening(screeningDTO);
-            dto.setCreatedAt(reservation.getCreatedAt());
-            dto.setStatus(reservation.getStatus());
-            dto.setTotalPrice(reservation.getTotalPrice());
-            dto.setTickets(tickets);
-
-            return dto;
-        }).collect(Collectors.toList());
-    }
-
-
-    private UserDTO mapUserToDTO(User user) {
-        UserDTO dto = new UserDTO();
-        dto.setId(user.getId());
-        dto.setEmail(user.getEmail());
-        dto.setFullName(user.getFullName());
-        dto.setCreatedAt(user.getCreatedAt());
         return dto;
     }
 

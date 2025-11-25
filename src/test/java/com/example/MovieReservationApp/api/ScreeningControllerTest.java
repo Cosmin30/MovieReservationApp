@@ -1,32 +1,28 @@
 package com.example.MovieReservationApp.api;
 
-import com.example.MovieReservationApp.application.dto.HallDTO;
-import com.example.MovieReservationApp.application.dto.MovieDTO;
 import com.example.MovieReservationApp.application.dto.ScreeningDTO;
-import com.example.MovieReservationApp.domain.model.hall.Hall;
-import com.example.MovieReservationApp.domain.model.movie.Movie;
-import com.example.MovieReservationApp.domain.model.screening.Screening;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.HallRepository;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.MovieRepository;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
-
+import com.example.MovieReservationApp.application.dto.MovieDTO;
+import com.example.MovieReservationApp.application.dto.HallDTO;
+import com.example.MovieReservationApp.application.dto.SeatDTO;
+import com.example.MovieReservationApp.application.service.ScreeningService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-
-import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -37,152 +33,127 @@ class ScreeningControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private ScreeningRepository screeningRepository;
-
-    @MockitoBean
-    private MovieRepository movieRepository;
-
-    @MockitoBean
-    private HallRepository hallRepository;
+    private ScreeningService screeningService;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
-    void testGetAll() throws Exception {
-        Movie movie = new Movie(UUID.randomUUID(), "MovieA", "Desc", 120, "Action", null, null);
-        Hall hall = new Hall(UUID.randomUUID(), 1, 100, "Hall A");
+    void testGetAllScreenings() throws Exception {
+        ScreeningDTO dto = new ScreeningDTO();
+        dto.setId(UUID.randomUUID());
+        dto.setStartTime(OffsetDateTime.now());
+        dto.setCapacity(100);
+        dto.setRoomNumber(1);
+        dto.setMovie(new MovieDTO());
+        dto.setHall(new HallDTO());
+        dto.setSeats(List.of());
 
-        Screening s1 = new Screening(UUID.randomUUID(), movie, OffsetDateTime.now(), 1, hall, 100, null);
-        Screening s2 = new Screening(UUID.randomUUID(), movie, OffsetDateTime.now(), 2, hall, 200, null);
-
-        Mockito.when(screeningRepository.findAll()).thenReturn(Arrays.asList(s1, s2));
+        Mockito.when(screeningService.getAllScreenings()).thenReturn(List.of(dto));
 
         mockMvc.perform(get("/api/screenings"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].roomNumber").value(1))
-                .andExpect(jsonPath("$[1].capacity").value(200));
+                .andExpect(jsonPath("$[0].capacity").value(100));
     }
 
     @Test
-    void testGetById() throws Exception {
+    void testGetScreeningById() throws Exception {
         UUID id = UUID.randomUUID();
+        ScreeningDTO dto = new ScreeningDTO();
+        dto.setId(id);
+        dto.setCapacity(150);
 
-        Movie movie = new Movie(UUID.randomUUID(), "Avatar", "Epic", 180, "Sci-Fi", null, null);
-        Hall hall = new Hall(UUID.randomUUID(), 2, 150, "VIP Hall");
-
-        Screening screening = new Screening(id, movie, OffsetDateTime.now(), 5, hall, 150, null);
-
-        Mockito.when(screeningRepository.findById(id)).thenReturn(Optional.of(screening));
+        Mockito.when(screeningService.getScreeningById(id)).thenReturn(dto);
 
         mockMvc.perform(get("/api/screenings/{id}", id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.roomNumber").value(5))
-                .andExpect(jsonPath("$.hall.id").value(hall.getId().toString()))
-                .andExpect(jsonPath("$.movie.id").value(movie.getId().toString()));
+                .andExpect(jsonPath("$.capacity").value(150));
     }
 
     @Test
-    void testCreate() throws Exception {
-        UUID movieId = UUID.randomUUID();
-        UUID hallId = UUID.randomUUID();
-
-        Movie movie = new Movie(movieId, "Test Movie", "Desc", 100, "Genre", null, null);
-        Hall hall = new Hall(hallId, 1, 200, "Hall X");
-
+    void testCreateScreening() throws Exception {
         ScreeningDTO dto = new ScreeningDTO();
-        dto.setMovie(new MovieDTO());
-        dto.getMovie().setId(movieId);
-
-        dto.setHall(new HallDTO());
-        dto.getHall().setId(hallId);
-
         dto.setStartTime(OffsetDateTime.now());
-        dto.setRoomNumber(3);
         dto.setCapacity(120);
 
-        Screening saved = new Screening(UUID.randomUUID(), movie, dto.getStartTime(), 3, hall, 120, null);
+        ScreeningDTO saved = new ScreeningDTO();
+        saved.setId(UUID.randomUUID());
+        saved.setCapacity(120);
 
-        Mockito.when(movieRepository.findById(movieId)).thenReturn(Optional.of(movie));
-        Mockito.when(hallRepository.findById(hallId)).thenReturn(Optional.of(hall));
-        Mockito.when(screeningRepository.save(any(Screening.class))).thenReturn(saved);
+        Mockito.when(screeningService.createScreening(any(ScreeningDTO.class))).thenReturn(saved);
 
         mockMvc.perform(post("/api/screenings")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.capacity").value(120))
-                .andExpect(jsonPath("$.movie.id").value(movieId.toString()));
+                .andExpect(jsonPath("$.capacity").value(120));
     }
 
     @Test
-    void testUpdate() throws Exception {
+    void testUpdateScreening() throws Exception {
         UUID id = UUID.randomUUID();
-        UUID movieId = UUID.randomUUID();
-        UUID hallId = UUID.randomUUID();
-
-        Movie movie = new Movie(movieId, "M", "D", 100, "G", null, null);
-        Hall hall = new Hall(hallId, 1, 100, "Hall Y");
-
-        Screening existing = new Screening(id, movie, OffsetDateTime.now(), 1, hall, 100, null);
-
-        Screening updated = new Screening(id, movie, OffsetDateTime.now(), 10, hall, 500, null);
-
         ScreeningDTO dto = new ScreeningDTO();
-        dto.setMovie(new MovieDTO());
-        dto.getMovie().setId(movieId);
+        dto.setCapacity(200);
 
-        dto.setHall(new HallDTO());
-        dto.getHall().setId(hallId);
+        ScreeningDTO updated = new ScreeningDTO();
+        updated.setId(id);
+        updated.setCapacity(200);
 
-        dto.setStartTime(updated.getStartTime());
-        dto.setRoomNumber(10);
-        dto.setCapacity(500);
-
-        Mockito.when(screeningRepository.findById(id)).thenReturn(Optional.of(existing));
-        Mockito.when(movieRepository.findById(movieId)).thenReturn(Optional.of(movie));
-        Mockito.when(hallRepository.findById(hallId)).thenReturn(Optional.of(hall));
-        Mockito.when(screeningRepository.save(any(Screening.class))).thenReturn(updated);
+        Mockito.when(screeningService.updateScreening(eq(id), any(ScreeningDTO.class))).thenReturn(updated);
 
         mockMvc.perform(put("/api/screenings/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.capacity").value(500))
-                .andExpect(jsonPath("$.roomNumber").value(10));
+                .andExpect(jsonPath("$.capacity").value(200));
+
+        UUID nonExistent = UUID.randomUUID();
+        Mockito.when(screeningService.updateScreening(eq(nonExistent), any(ScreeningDTO.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Screening not found"));
+
+        mockMvc.perform(put("/api/screenings/{id}", nonExistent)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    void testPatch() throws Exception {
+    void testPatchScreening() throws Exception {
         UUID id = UUID.randomUUID();
-
-        Movie movie = new Movie(UUID.randomUUID(), "T", "D", 90, "G", null, null);
-        Hall hall = new Hall(UUID.randomUUID(), 1, 300, "Hall P");
-
-        Screening existing = new Screening(id, movie, OffsetDateTime.now(), 2, hall, 200, null);
-
-        Screening patched = new Screening(id, movie, existing.getStartTime(), 5, hall, 200, null);
-
         ScreeningDTO dto = new ScreeningDTO();
-        dto.setRoomNumber(5);
+        dto.setCapacity(50);
 
-        Mockito.when(screeningRepository.findById(id)).thenReturn(Optional.of(existing));
-        Mockito.when(screeningRepository.save(any(Screening.class))).thenReturn(patched);
+        ScreeningDTO patched = new ScreeningDTO();
+        patched.setId(id);
+        patched.setCapacity(50);
+
+        Mockito.when(screeningService.patchScreening(eq(id), any(ScreeningDTO.class))).thenReturn(patched);
 
         mockMvc.perform(patch("/api/screenings/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.roomNumber").value(5));
+                .andExpect(jsonPath("$.capacity").value(50));
+
+        UUID nonExistent = UUID.randomUUID();
+        Mockito.when(screeningService.patchScreening(eq(nonExistent), any(ScreeningDTO.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Screening not found"));
+
+        mockMvc.perform(patch("/api/screenings/{id}", nonExistent)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    void testDelete() throws Exception {
+    void testDeleteScreening() throws Exception {
         UUID id = UUID.randomUUID();
 
-        mockMvc.perform(delete("/api/screenings/{id}", id))
-                .andExpect(status().isOk());
+        Mockito.doNothing().when(screeningService).deleteScreening(id);
 
-        Mockito.verify(screeningRepository).deleteById(id);
+        mockMvc.perform(delete("/api/screenings/{id}", id))
+                .andExpect(status().isNoContent());
+
+        verify(screeningService).deleteScreening(id);
     }
 }

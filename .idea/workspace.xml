@@ -4,13 +4,31 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="fixed entities + fixed repository tests">
+    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="fixed post put patch in reservation ,screening">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/SeatService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/HallController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/HallController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/MovieController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/MovieController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/PaymentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/PaymentController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/ReservationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/ReservationController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/ScreeningController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/ScreeningController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/SeatDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/SeatDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/SeatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/SeatController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/TicketController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/TicketController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/HallService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/HallService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/MovieService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/MovieService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/PaymentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/PaymentService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/ReservationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/ReservationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/ScreeningService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/ScreeningService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/TicketService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/TicketService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/HallControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/HallControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/MovieControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/MovieControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/PaymentControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/PaymentControllerTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/ReservationControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/ReservationControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/UserRepositoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/UserRepositoryTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/ScreeningControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/ScreeningControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/SeatControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/SeatControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/TicketControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/TicketControllerTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,39 +79,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.MovieReservationAppApplication.executor": "Run",
-    "JUnit.AuditServiceTest.executor": "Run",
-    "JUnit.ComputationServiceTest.executor": "Run",
-    "JUnit.HallControllerTest.executor": "Run",
-    "JUnit.HallRepositoryTest.executor": "Run",
-    "JUnit.MovieControllerTest.executor": "Run",
-    "JUnit.MovieRepositoryTest.executor": "Run",
-    "JUnit.MovieReservationAppApplicationTests.executor": "Run",
-    "JUnit.PaymentControllerTest.executor": "Run",
-    "JUnit.PaymentRepositoryTest.executor": "Run",
-    "JUnit.ReservationControllerTest.executor": "Run",
-    "JUnit.ReservationRepositoryTest.executor": "Run",
-    "JUnit.ScreeningControllerTest.executor": "Run",
-    "JUnit.ScreeningRepositoryTest.executor": "Run",
-    "JUnit.SeatControllerTest.executor": "Run",
-    "JUnit.SeatRepositoryTest.executor": "Run",
-    "JUnit.TicketControllerTest.executor": "Run",
-    "JUnit.TicketRepositoryTest.executor": "Run",
-    "JUnit.UserControllerTest.executor": "Run",
-    "JUnit.UserRepositoryTest.executor": "Run",
-    "JUnit.ValidationServiceTest.executor": "Run",
-    "JUnit.WorkflowServiceTest.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/denis/Desktop/MovieReservationApp",
-    "settings.editor.selected.configurable": "reference.settings.project.maven.repository.indices"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.MovieReservationAppApplication.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuditServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ComputationServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.HallControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.HallRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MovieControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MovieRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MovieReservationAppApplicationTests.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.PaymentControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.PaymentRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ReservationControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ReservationRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ScreeningControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ScreeningRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.SeatControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.SeatRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.TicketControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.TicketRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ValidationServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.WorkflowServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/denis/Desktop/MovieReservationApp&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.repository.indices&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="com.example.MovieReservationApp.api" />
@@ -316,7 +335,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763928789498</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="fixed post put patch in reservation screening">
+      <option name="closed" value="true" />
+      <created>1763930596362</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1763930596362</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -350,6 +377,7 @@
     <MESSAGE value="fixed controllers" />
     <MESSAGE value="added frontend" />
     <MESSAGE value="fixed entities + fixed repository tests" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed entities + fixed repository tests" />
+    <MESSAGE value="fixed post put patch in reservation screening" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed post put patch in reservation screening" />
   </component>
 </project>

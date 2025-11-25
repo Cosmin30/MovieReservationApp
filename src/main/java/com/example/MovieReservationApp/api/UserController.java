@@ -1,103 +1,50 @@
 package com.example.MovieReservationApp.api;
 
 import com.example.MovieReservationApp.application.dto.UserDTO;
-import com.example.MovieReservationApp.domain.model.user.User;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.UserRepository;
+import com.example.MovieReservationApp.application.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    private UserDTO toDTO(User user) {
-        UserDTO dto = new UserDTO();
-        dto.setId(user.getId());
-        dto.setFullName(user.getFullName());
-        dto.setEmail(user.getEmail());
-        dto.setCreatedAt(user.getCreatedAt());
-        return dto;
-    }
-
-    private User toEntity(UserDTO dto) {
-        User user = new User();
-        user.setId(dto.getId());
-        user.setFullName(dto.getFullName());
-        user.setEmail(dto.getEmail());
-        user.setCreatedAt(dto.getCreatedAt());
-        return user;
-    }
+    private final UserService userService;
 
     @GetMapping
-    public List<UserDTO> getAll() {
-        return userRepository.findAll()
-                .stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+    public List<UserDTO> getAllUsers() {
+        return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    public UserDTO getById(@PathVariable UUID id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return toDTO(user);
+    public UserDTO getUserById(@PathVariable UUID id) {
+        return userService.getUserById(id);
     }
 
     @PostMapping
-    public UserDTO create(@RequestBody UserDTO dto) {
-        User user = toEntity(dto);
-        user.setId(null);
-        user = userRepository.save(user);
-        return toDTO(user);
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserDTO createUser(@RequestBody UserDTO dto) {
+        return userService.createUser(dto);
     }
 
     @PutMapping("/{id}")
-    public UserDTO update(@PathVariable UUID id, @RequestBody UserDTO dto) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        user.setFullName(dto.getFullName());
-        user.setEmail(dto.getEmail());
-        user.setCreatedAt(dto.getCreatedAt());
-
-        user = userRepository.save(user);
-        return toDTO(user);
+    public UserDTO updateUser(@PathVariable UUID id, @RequestBody UserDTO dto) {
+        return userService.updateUser(id, dto);
     }
 
     @PatchMapping("/{id}")
-    public UserDTO patch(@PathVariable UUID id, @RequestBody UserDTO dto) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (dto.getFullName() != null) {
-            user.setFullName(dto.getFullName());
-        }
-        if (dto.getEmail() != null) {
-            user.setEmail(dto.getEmail());
-        }
-
-        if (dto.getCreatedAt() != null) {
-            user.setCreatedAt(dto.getCreatedAt());
-        }
-
-        user = userRepository.save(user);
-        return toDTO(user);
+    public UserDTO patchUser(@PathVariable UUID id, @RequestBody UserDTO dto) {
+        return userService.patchUser(id, dto);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id) {
-        if (!userRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-        }
-        userRepository.deleteById(id);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUser(@PathVariable UUID id) {
+        userService.deleteUser(id);
     }
 }

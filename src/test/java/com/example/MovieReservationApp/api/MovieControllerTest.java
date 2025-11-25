@@ -1,23 +1,21 @@
 package com.example.MovieReservationApp.api;
 
 import com.example.MovieReservationApp.application.dto.MovieDTO;
-import com.example.MovieReservationApp.domain.model.movie.Movie;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.MovieRepository;
+import com.example.MovieReservationApp.application.service.MovieService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -28,172 +26,159 @@ class MovieControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private MovieRepository movieRepository;
+    private MovieService movieService;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
     void testGetAll() throws Exception {
-        Movie m1 = new Movie();
-        m1.setTitle("Movie1");
-        m1.setDescription("Desc1");
-        m1.setDuration(120);
-        m1.setGenre("Action");
-        m1.setReleaseDate(LocalDate.of(2023, 1, 1));
+        MovieDTO m1 = new MovieDTO();
+        m1.setId(UUID.randomUUID());
+        m1.setTitle("Inception");
+        m1.setGenre("Sci-Fi");
+        m1.setDuration(148);
+        m1.setReleaseDate(LocalDate.of(2010, 7, 16));
 
-        Movie m2 = new Movie();
-        m2.setTitle("Movie2");
-        m2.setDescription("Desc2");
-        m2.setDuration(90);
-        m2.setGenre("Comedy");
-        m2.setReleaseDate(LocalDate.of(2023, 2, 1));
+        MovieDTO m2 = new MovieDTO();
+        m2.setId(UUID.randomUUID());
+        m2.setTitle("The Matrix");
+        m2.setGenre("Action");
+        m2.setDuration(136);
+        m2.setReleaseDate(LocalDate.of(1999, 3, 31));
 
-        Mockito.when(movieRepository.findAll()).thenReturn(Arrays.asList(m1, m2));
+        Mockito.when(movieService.getAllMovies()).thenReturn(List.of(m1, m2));
 
         mockMvc.perform(get("/api/movies"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("Movie1"))
-                .andExpect(jsonPath("$[1].genre").value("Comedy"));
+                .andExpect(jsonPath("$[0].title").value("Inception"))
+                .andExpect(jsonPath("$[1].genre").value("Action"));
     }
 
     @Test
     void testGetById() throws Exception {
         UUID id = UUID.randomUUID();
-        Movie movie = new Movie();
-        movie.setId(id);
-        movie.setTitle("Avatar");
-        movie.setDescription("Epic");
-        movie.setDuration(180);
-        movie.setGenre("Sci-Fi");
-        movie.setReleaseDate(LocalDate.of(2022, 12, 1));
 
-        Mockito.when(movieRepository.findById(id)).thenReturn(Optional.of(movie));
+        MovieDTO movie = new MovieDTO();
+        movie.setId(id);
+        movie.setTitle("Interstellar");
+        movie.setDescription("Space exploration");
+        movie.setGenre("Sci-Fi");
+        movie.setDuration(169);
+        movie.setReleaseDate(LocalDate.of(2014, 11, 7));
+
+        Mockito.when(movieService.getMovieById(id)).thenReturn(movie);
 
         mockMvc.perform(get("/api/movies/{id}", id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Avatar"))
-                .andExpect(jsonPath("$.duration").value(180));
+                .andExpect(jsonPath("$.title").value("Interstellar"))
+                .andExpect(jsonPath("$.duration").value(169));
     }
 
     @Test
     void testCreate() throws Exception {
         MovieDTO dto = new MovieDTO();
-        dto.setTitle("Test Movie");
-        dto.setDescription("Test Desc");
+        dto.setTitle("New Movie");
+        dto.setDescription("Test description");
         dto.setGenre("Drama");
-        dto.setDuration(110);
+        dto.setDuration(120);
         dto.setReleaseDate(LocalDate.of(2024, 1, 1));
 
-        Movie saved = new Movie();
+        MovieDTO saved = new MovieDTO();
         saved.setId(UUID.randomUUID());
-        saved.setTitle(dto.getTitle());
-        saved.setDescription(dto.getDescription());
-        saved.setGenre(dto.getGenre());
-        saved.setDuration(dto.getDuration());
-        saved.setReleaseDate(dto.getReleaseDate());
+        saved.setTitle("New Movie");
+        saved.setDescription("Test description");
+        saved.setGenre("Drama");
+        saved.setDuration(120);
+        saved.setReleaseDate(LocalDate.of(2024, 1, 1));
 
-        Mockito.when(movieRepository.save(any(Movie.class))).thenReturn(saved);
+        Mockito.when(movieService.createMovie(any(MovieDTO.class))).thenReturn(saved);
 
         mockMvc.perform(post("/api/movies")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.genre").value("Drama"))
-                .andExpect(jsonPath("$.duration").value(110));
+                .andExpect(jsonPath("$.title").value("New Movie"))
+                .andExpect(jsonPath("$.genre").value("Drama"));
     }
 
     @Test
     void testUpdate() throws Exception {
         UUID id = UUID.randomUUID();
 
-        Movie existing = new Movie();
-        existing.setId(id);
-        existing.setTitle("Old");
-        existing.setDescription("Old Desc");
-        existing.setDuration(90);
-        existing.setGenre("Horror");
-        existing.setReleaseDate(LocalDate.of(2023, 1, 1));
-
-        Movie updated = new Movie();
-        updated.setId(id);
-        updated.setTitle("New");
-        updated.setDescription("New Desc");
-        updated.setDuration(150);
-        updated.setGenre("Fantasy");
-        updated.setReleaseDate(LocalDate.of(2024, 5, 1));
-
         MovieDTO dto = new MovieDTO();
         dto.setId(id);
-        dto.setTitle("New");
-        dto.setDescription("New Desc");
-        dto.setGenre("Fantasy");
-        dto.setDuration(150);
-        dto.setReleaseDate(LocalDate.of(2024, 5, 1));
+        dto.setTitle("Updated Movie");
+        dto.setDescription("Updated description");
+        dto.setGenre("Thriller");
+        dto.setDuration(130);
+        dto.setReleaseDate(LocalDate.of(2024, 6, 15));
 
-        Mockito.when(movieRepository.findById(id)).thenReturn(Optional.of(existing));
-        Mockito.when(movieRepository.save(any(Movie.class))).thenReturn(updated);
+        MovieDTO updated = new MovieDTO();
+        updated.setId(id);
+        updated.setTitle("Updated Movie");
+        updated.setDescription("Updated description");
+        updated.setGenre("Thriller");
+        updated.setDuration(130);
+        updated.setReleaseDate(LocalDate.of(2024, 6, 15));
+
+        Mockito.when(movieService.updateMovie(eq(id), any(MovieDTO.class))).thenReturn(updated);
 
         mockMvc.perform(put("/api/movies/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("New"))
-                .andExpect(jsonPath("$.duration").value(150));
+                .andExpect(jsonPath("$.title").value("Updated Movie"))
+                .andExpect(jsonPath("$.genre").value("Thriller"));
     }
 
     @Test
     void testPatch() throws Exception {
         UUID id = UUID.randomUUID();
 
-        Movie existing = new Movie();
-        existing.setId(id);
-        existing.setTitle("Old Title");
-        existing.setDescription("Old Desc");
-        existing.setDuration(100);
-        existing.setGenre("Drama");
-        existing.setReleaseDate(LocalDate.of(2022, 8, 1));
-
-        Movie patched = new Movie();
-        patched.setId(id);
-        patched.setTitle("Patched Title");
-        patched.setDescription("Old Desc");
-        patched.setDuration(100);
-        patched.setGenre("Drama");
-        patched.setReleaseDate(LocalDate.of(2022, 8, 1));
-
         MovieDTO dto = new MovieDTO();
         dto.setTitle("Patched Title");
+        dto.setDuration(140);
 
-        Mockito.when(movieRepository.findById(id)).thenReturn(Optional.of(existing));
-        Mockito.when(movieRepository.save(any(Movie.class))).thenReturn(patched);
+        MovieDTO modified = new MovieDTO();
+        modified.setId(id);
+        modified.setTitle("Patched Title");
+        modified.setDescription("Original description");
+        modified.setGenre("Action");
+        modified.setDuration(140);
+        modified.setReleaseDate(LocalDate.of(2020, 5, 10));
+
+        Mockito.when(movieService.patchMovie(eq(id), any(MovieDTO.class))).thenReturn(modified);
 
         mockMvc.perform(patch("/api/movies/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Patched Title"));
+                .andExpect(jsonPath("$.title").value("Patched Title"))
+                .andExpect(jsonPath("$.duration").value(140));
     }
 
     @Test
     void testDeleteSuccess() throws Exception {
         UUID id = UUID.randomUUID();
 
-        Mockito.when(movieRepository.existsById(id)).thenReturn(true);
+        Mockito.doNothing().when(movieService).deleteMovie(id);
 
         mockMvc.perform(delete("/api/movies/{id}", id))
                 .andExpect(status().isOk());
 
-        Mockito.verify(movieRepository).deleteById(id);
+        Mockito.verify(movieService).deleteMovie(id);
     }
 
     @Test
     void testDeleteNotFound() throws Exception {
         UUID id = UUID.randomUUID();
 
-        Mockito.when(movieRepository.existsById(id)).thenReturn(false);
+        Mockito.doThrow(new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.NOT_FOUND, "Movie not found"))
+                .when(movieService).deleteMovie(id);
 
         mockMvc.perform(delete("/api/movies/{id}", id))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isNotFound());
     }
 }

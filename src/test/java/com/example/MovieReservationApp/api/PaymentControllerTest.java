@@ -1,26 +1,23 @@
 package com.example.MovieReservationApp.api;
 
 import com.example.MovieReservationApp.application.dto.PaymentDTO;
-import com.example.MovieReservationApp.domain.model.payment.Payment;
-import com.example.MovieReservationApp.domain.model.reservation.Reservation;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.PaymentRepository;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.ReservationRepository;
+import com.example.MovieReservationApp.application.service.PaymentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -31,187 +28,137 @@ class PaymentControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private PaymentRepository paymentRepository;
-
-    @MockitoBean
-    private ReservationRepository reservationRepository;
+    private PaymentService paymentService;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
-    void testGetAll() throws Exception {
-        Reservation reservation = new Reservation();
-        reservation.setId(UUID.randomUUID());
+    void testGetAllPayments() throws Exception {
+        PaymentDTO dto = new PaymentDTO();
+        dto.setId(UUID.randomUUID());
+        dto.setReservationId(UUID.randomUUID());
+        dto.setAmount(BigDecimal.valueOf(50.0));
+        dto.setStatus("PAID");
+        dto.setPaidAt(OffsetDateTime.now());
 
-        Payment p1 = new Payment();
-        p1.setId(UUID.randomUUID());
-        p1.setReservation(reservation);
-        p1.setStatus("PAID");
-        p1.setPaidAt(OffsetDateTime.now());
-        p1.setAmount(new BigDecimal("30.00"));
-
-        Payment p2 = new Payment();
-        p2.setId(UUID.randomUUID());
-        p2.setReservation(reservation);
-        p2.setStatus("PENDING");
-        p2.setPaidAt(OffsetDateTime.now());
-        p2.setAmount(new BigDecimal("45.00"));
-
-        Mockito.when(paymentRepository.findAll()).thenReturn(Arrays.asList(p1, p2));
+        Mockito.when(paymentService.getAllPayments()).thenReturn(List.of(dto));
 
         mockMvc.perform(get("/api/payments"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].status").value("PAID"))
-                .andExpect(jsonPath("$[1].amount").value(45.00));
+                .andExpect(jsonPath("$[0].amount").value(50.0))
+                .andExpect(jsonPath("$[0].status").value("PAID"));
     }
 
     @Test
-    void testGetById() throws Exception {
+    void testGetPaymentById() throws Exception {
         UUID id = UUID.randomUUID();
-        Reservation reservation = new Reservation();
-        reservation.setId(UUID.randomUUID());
 
-        Payment payment = new Payment();
-        payment.setId(id);
-        payment.setReservation(reservation);
-        payment.setStatus("PAID");
-        payment.setPaidAt(OffsetDateTime.now());
-        payment.setAmount(new BigDecimal("99.99"));
+        PaymentDTO dto = new PaymentDTO();
+        dto.setId(id);
+        dto.setReservationId(UUID.randomUUID());
+        dto.setAmount(BigDecimal.valueOf(75.0));
+        dto.setStatus("PENDING");
 
-        Mockito.when(paymentRepository.findById(id)).thenReturn(Optional.of(payment));
+        Mockito.when(paymentService.getPaymentById(id)).thenReturn(dto);
 
         mockMvc.perform(get("/api/payments/{id}", id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("PAID"))
-                .andExpect(jsonPath("$.amount").value(99.99));
+                .andExpect(jsonPath("$.amount").value(75.0))
+                .andExpect(jsonPath("$.status").value("PENDING"));
     }
 
     @Test
-    void testCreate() throws Exception {
-        UUID reservationId = UUID.randomUUID();
-
+    void testCreatePayment() throws Exception {
         PaymentDTO dto = new PaymentDTO();
-        dto.setAmount(new BigDecimal("50.00"));
-        dto.setPaidAt(OffsetDateTime.now());
-        dto.setStatus("PAID");
-        dto.setReservationId(reservationId);
+        dto.setReservationId(UUID.randomUUID());
+        dto.setAmount(BigDecimal.valueOf(100.0));
 
-        Reservation reservation = new Reservation();
-        reservation.setId(reservationId);
-
-        Payment saved = new Payment();
+        PaymentDTO saved = new PaymentDTO();
         saved.setId(UUID.randomUUID());
-        saved.setReservation(reservation);
-        saved.setStatus(dto.getStatus());
-        saved.setPaidAt(dto.getPaidAt());
+        saved.setReservationId(dto.getReservationId());
         saved.setAmount(dto.getAmount());
+        saved.setStatus("PAID");
+        saved.setPaidAt(OffsetDateTime.now());
 
-        Mockito.when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
-        Mockito.when(paymentRepository.save(any(Payment.class))).thenReturn(saved);
+        Mockito.when(paymentService.createPayment(any(PaymentDTO.class))).thenReturn(saved);
 
         mockMvc.perform(post("/api/payments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("PAID"))
-                .andExpect(jsonPath("$.amount").value(50.00));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.amount").value(100.0))
+                .andExpect(jsonPath("$.status").value("PAID"));
     }
 
     @Test
-    void testUpdate() throws Exception {
+    void testUpdatePayment() throws Exception {
         UUID id = UUID.randomUUID();
-        UUID reservationId = UUID.randomUUID();
-
-        Reservation reservation = new Reservation();
-        reservation.setId(reservationId);
-
-        Payment existing = new Payment();
-        existing.setId(id);
-        existing.setReservation(reservation);
-        existing.setStatus("PENDING");
-        existing.setPaidAt(OffsetDateTime.now());
-        existing.setAmount(new BigDecimal("10.00"));
-
-        Payment updated = new Payment();
-        updated.setId(id);
-        updated.setReservation(reservation);
-        updated.setStatus("PAID");
-        updated.setPaidAt(OffsetDateTime.now());
-        updated.setAmount(new BigDecimal("100.00"));
 
         PaymentDTO dto = new PaymentDTO();
-        dto.setId(id);
-        dto.setAmount(new BigDecimal("100.00"));
-        dto.setPaidAt(OffsetDateTime.now());
+        dto.setReservationId(UUID.randomUUID());
+        dto.setAmount(BigDecimal.valueOf(120.0));
         dto.setStatus("PAID");
-        dto.setReservationId(reservationId);
 
-        Mockito.when(paymentRepository.findById(id)).thenReturn(Optional.of(existing));
-        Mockito.when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
-        Mockito.when(paymentRepository.save(any(Payment.class))).thenReturn(updated);
+        PaymentDTO updated = new PaymentDTO();
+        updated.setId(id);
+        updated.setReservationId(dto.getReservationId());
+        updated.setAmount(dto.getAmount());
+        updated.setStatus(dto.getStatus());
+
+        Mockito.when(paymentService.updatePayment(eq(id), any(PaymentDTO.class))).thenReturn(updated);
 
         mockMvc.perform(put("/api/payments/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.amount").value(100.00))
+                .andExpect(jsonPath("$.amount").value(120.0))
                 .andExpect(jsonPath("$.status").value("PAID"));
     }
 
     @Test
-    void testPatch() throws Exception {
+    void testPatchPayment() throws Exception {
         UUID id = UUID.randomUUID();
 
-        Reservation reservation = new Reservation();
-        reservation.setId(UUID.randomUUID());
-
-        Payment existing = new Payment();
-        existing.setId(id);
-        existing.setReservation(reservation);
-        existing.setStatus("PENDING");
-        existing.setPaidAt(OffsetDateTime.now());
-        existing.setAmount(new BigDecimal("15.00"));
-
-        Payment patched = new Payment();
-        patched.setId(id);
-        patched.setReservation(reservation);
-        patched.setStatus("PAID");
-        patched.setPaidAt(existing.getPaidAt());
-        patched.setAmount(existing.getAmount());
-
         PaymentDTO dto = new PaymentDTO();
-        dto.setStatus("PAID");
+        dto.setAmount(BigDecimal.valueOf(150.0));
 
-        Mockito.when(paymentRepository.findById(id)).thenReturn(Optional.of(existing));
-        Mockito.when(paymentRepository.save(any(Payment.class))).thenReturn(patched);
+        PaymentDTO patched = new PaymentDTO();
+        patched.setId(id);
+        patched.setReservationId(UUID.randomUUID());
+        patched.setAmount(dto.getAmount());
+        patched.setStatus("PAID");
+
+        Mockito.when(paymentService.patchPayment(eq(id), any(PaymentDTO.class))).thenReturn(patched);
 
         mockMvc.perform(patch("/api/payments/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("PAID"));
+                .andExpect(jsonPath("$.amount").value(150.0));
     }
 
     @Test
-    void testDeleteSuccess() throws Exception {
+    void testDeletePayment() throws Exception {
         UUID id = UUID.randomUUID();
 
-        Mockito.when(paymentRepository.existsById(id)).thenReturn(true);
+        Mockito.doNothing().when(paymentService).deletePayment(id);
 
         mockMvc.perform(delete("/api/payments/{id}", id))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
-        Mockito.verify(paymentRepository).deleteById(id);
+        Mockito.verify(paymentService).deletePayment(id);
     }
 
     @Test
-    void testDeleteNotFound() throws Exception {
+    void testDeletePaymentNotFound() throws Exception {
         UUID id = UUID.randomUUID();
 
-        Mockito.when(paymentRepository.existsById(id)).thenReturn(false);
+        Mockito.doThrow(new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.NOT_FOUND, "Payment not found"))
+                .when(paymentService).deletePayment(id);
 
         mockMvc.perform(delete("/api/payments/{id}", id))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isNotFound());
     }
 }
