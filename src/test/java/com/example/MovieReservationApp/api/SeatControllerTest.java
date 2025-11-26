@@ -81,7 +81,7 @@ class SeatControllerTest {
         mockMvc.perform(post("/api/seats")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.number").value(3));
     }
 

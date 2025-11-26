@@ -46,7 +46,7 @@ class ReservationControllerTest {
         mockMvc.perform(get("/api/reservations"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].status").value("CREATED"))
-                .andExpect(jsonPath("$[0].totalPrice").value(100));
+                .andExpect(jsonPath("$[0].total_price").value(100));
     }
 
     @Test
@@ -77,7 +77,7 @@ class ReservationControllerTest {
         mockMvc.perform(get("/api/reservations/user/{userId}", userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].status").value("CREATED"))
-                .andExpect(jsonPath("$[0].totalPrice").value(100));
+                .andExpect(jsonPath("$[0].total_price").value(100));
     }
 
     @Test
@@ -103,17 +103,21 @@ class ReservationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("CREATED"))
-                .andExpect(jsonPath("$.totalPrice").value(50));
+                .andExpect(jsonPath("$.total_price").value(50));
 
         verify(reservationService).createReservation(eq(userId), eq(screeningId), anyList(), eq(price));
     }
 
     @Test
-    void testUpdateReservation() throws Exception {
+    void testUpdateReservation_Success() throws Exception {
         UUID id = UUID.randomUUID();
-        ReservationDTO dto = new ReservationDTO();
-        dto.setStatus("PAID");
-        dto.setTotalPrice(BigDecimal.valueOf(100));
+
+        String requestJson = """
+            {
+                "status": "PAID",
+                "total_price": 100
+            }
+            """;
 
         ReservationDTO updated = new ReservationDTO();
         updated.setId(id);
@@ -124,26 +128,42 @@ class ReservationControllerTest {
 
         mockMvc.perform(put("/api/reservations/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+                        .content(requestJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("PAID"))
-                .andExpect(jsonPath("$.totalPrice").value(100));
+                .andExpect(jsonPath("$.total_price").value(100));
+    }
 
-        UUID nonExistentId = UUID.randomUUID();
-        Mockito.when(reservationService.updateReservation(eq(nonExistentId), any(ReservationDTO.class)))
+    @Test
+    void testUpdateReservation_NotFound() throws Exception {
+        UUID id = UUID.randomUUID();
+
+        String requestJson = """
+            {
+                "status": "PAID",
+                "total_price": 100
+            }
+            """;
+
+        Mockito.when(reservationService.updateReservation(eq(id), any(ReservationDTO.class)))
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found"));
-
-        mockMvc.perform(put("/api/reservations/{id}", nonExistentId)
+        System.out.println("Request JSON: " + requestJson);
+        System.out.println("Content-Type: application/json");
+        mockMvc.perform(put("/api/reservations/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+                        .content(requestJson))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    void testPatchReservation() throws Exception {
+    void testPatchReservation_Success() throws Exception {
         UUID id = UUID.randomUUID();
-        ReservationDTO dto = new ReservationDTO();
-        dto.setStatus("CANCELLED");
+
+        String requestJson = """
+            {
+                "status": "CANCELLED"
+            }
+            """;
 
         ReservationDTO patched = new ReservationDTO();
         patched.setId(id);
@@ -153,17 +173,27 @@ class ReservationControllerTest {
 
         mockMvc.perform(patch("/api/reservations/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+                        .content(requestJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("CANCELLED"));
+    }
 
-        UUID nonExistentId = UUID.randomUUID();
-        Mockito.when(reservationService.patchReservation(eq(nonExistentId), any(ReservationDTO.class)))
+    @Test
+    void testPatchReservation_NotFound() throws Exception {
+        UUID id = UUID.randomUUID();
+
+        String requestJson = """
+            {
+                "status": "CANCELLED"
+            }
+            """;
+
+        Mockito.when(reservationService.patchReservation(eq(id), any(ReservationDTO.class)))
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found"));
 
-        mockMvc.perform(patch("/api/reservations/{id}", nonExistentId)
+        mockMvc.perform(patch("/api/reservations/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+                        .content(requestJson))
                 .andExpect(status().isNotFound());
     }
 

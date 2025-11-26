@@ -1,6 +1,7 @@
 package com.example.MovieReservationApp.domain.model.seat;
 
 import com.example.MovieReservationApp.domain.model.screening.Screening;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -24,6 +25,7 @@ public class Seat {
     @NotNull(message = "Screening cannot be null")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "screening_id")
+    @JsonBackReference(value = "screening-seats")
     private Screening screening;
 
     @NotBlank(message = "Row cannot be blank")

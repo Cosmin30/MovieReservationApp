@@ -9,6 +9,7 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "movies")
@@ -39,5 +40,6 @@ public class Movie {
     private LocalDate releaseDate;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference(value = "movie-screenings")
     private List<Screening> screenings;
 }

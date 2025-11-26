@@ -69,7 +69,7 @@ class TicketControllerTest {
         mockMvc.perform(post("/api/tickets")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.price").value(75));
     }
 

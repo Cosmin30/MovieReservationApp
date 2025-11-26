@@ -1,6 +1,7 @@
 package com.example.MovieReservationApp.domain.model.user;
 
 import com.example.MovieReservationApp.domain.model.reservation.Reservation;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -39,5 +40,6 @@ public class User {
     private OffsetDateTime createdAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference(value = "user-reservations")
     private List<Reservation> reservations;
 }

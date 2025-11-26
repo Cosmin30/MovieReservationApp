@@ -4,31 +4,29 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="fixed post put patch in reservation ,screening">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/SeatService.java" afterDir="false" />
+    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="fixed errors">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/HallController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/HallController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/MovieController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/MovieController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/PaymentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/PaymentController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/ReservationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/ReservationController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/ScreeningController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/ScreeningController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/SeatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/SeatController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/TicketController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/TicketController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/HallService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/HallService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/MovieService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/MovieService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/PaymentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/PaymentService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/ReservationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/ReservationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/ScreeningService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/ScreeningService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/TicketService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/TicketService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/HallControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/HallControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/MovieControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/MovieControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/PaymentControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/PaymentControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/HallDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/HallDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/MovieDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/MovieDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/PaymentDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/PaymentDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/ReservationDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/ReservationDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/ScreeningDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/ScreeningDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/SeatDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/SeatDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/TicketDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/TicketDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/UserDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/dto/UserDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/movie/Movie.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/movie/Movie.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/reservation/Reservation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/reservation/Reservation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/screening/Screening.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/screening/Screening.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/seat/Seat.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/seat/Seat.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/ticket/Ticket.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/ticket/Ticket.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/user/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/domain/model/user/User.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/ReservationControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/ReservationControllerTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/ScreeningControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/ScreeningControllerTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/SeatControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/SeatControllerTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/TicketControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/TicketControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/UserControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/api/UserControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/MovieRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/MovieRepositoryTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -343,7 +341,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763930596362</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="fixed errors">
+      <option name="closed" value="true" />
+      <created>1764098226936</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1764098226936</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -378,6 +384,7 @@
     <MESSAGE value="added frontend" />
     <MESSAGE value="fixed entities + fixed repository tests" />
     <MESSAGE value="fixed post put patch in reservation screening" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed post put patch in reservation screening" />
+    <MESSAGE value="fixed errors" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed errors" />
   </component>
 </project>

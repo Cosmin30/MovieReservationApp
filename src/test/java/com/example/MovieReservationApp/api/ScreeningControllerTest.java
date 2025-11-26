@@ -85,7 +85,7 @@ class ScreeningControllerTest {
         mockMvc.perform(post("/api/screenings")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.capacity").value(120));
     }
 

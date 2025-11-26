@@ -4,6 +4,8 @@ import com.example.MovieReservationApp.domain.model.payment.Payment;
 import com.example.MovieReservationApp.domain.model.screening.Screening;
 import com.example.MovieReservationApp.domain.model.ticket.Ticket;
 import com.example.MovieReservationApp.domain.model.user.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
@@ -30,6 +32,7 @@ public class Reservation {
     @NotNull(message = "User cannot be null")
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference(value = "user-reservations")
     private User user;
 
     @NotNull(message = "Screening cannot be null")
@@ -48,6 +51,7 @@ public class Reservation {
     private BigDecimal totalPrice;
 
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference(value = "reservation-tickets")
     private List<Ticket> tickets;
 
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)

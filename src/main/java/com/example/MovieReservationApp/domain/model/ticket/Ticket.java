@@ -2,6 +2,7 @@ package com.example.MovieReservationApp.domain.model.ticket;
 
 import com.example.MovieReservationApp.domain.model.reservation.Reservation;
 import com.example.MovieReservationApp.domain.model.seat.Seat;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
@@ -25,6 +26,7 @@ public class Ticket {
     @NotNull(message = "Reservation cannot be null")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_id", nullable = false)
+    @JsonBackReference(value = "reservation-tickets")
     private Reservation reservation;
 
     @NotNull(message = "Seat cannot be null")

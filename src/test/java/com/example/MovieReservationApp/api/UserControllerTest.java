@@ -68,7 +68,7 @@ class UserControllerTest {
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.email").value("new@example.com"));
     }
 
@@ -88,7 +88,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.fullName").value("Updated Name"));
+                .andExpect(jsonPath("$.full_name").value("Updated Name"));
 
         UUID nonExistent = UUID.randomUUID();
         Mockito.when(userService.updateUser(eq(nonExistent), any(UserDTO.class)))
@@ -116,7 +116,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.fullName").value("Patched Name"));
+                .andExpect(jsonPath("$.full_name").value("Patched Name"));
 
         UUID nonExistent = UUID.randomUUID();
         Mockito.when(userService.patchUser(eq(nonExistent), any(UserDTO.class)))
