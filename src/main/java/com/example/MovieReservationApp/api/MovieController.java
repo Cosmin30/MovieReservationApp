@@ -10,6 +10,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/movies")
+@CrossOrigin(origins = "http://localhost:4200")
 @RequiredArgsConstructor
 public class MovieController {
 
