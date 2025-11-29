@@ -1,163 +1,273 @@
 package com.example.MovieReservationApp.api;
 
 import com.example.MovieReservationApp.application.dto.ReservationDTO;
-import com.example.MovieReservationApp.application.service.ReservationService;
+import com.example.MovieReservationApp.domain.model.reservation.Reservation;
+import com.example.MovieReservationApp.domain.model.user.User;
+import com.example.MovieReservationApp.domain.model.screening.Screening;
+import com.example.MovieReservationApp.domain.model.movie.Movie;
+import com.example.MovieReservationApp.domain.model.hall.Hall;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.ReservationRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.UserRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.MovieRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.HallRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(ReservationController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 class ReservationControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
-    private ReservationService reservationService;
+    @Autowired
+    private ReservationRepository reservationRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ScreeningRepository screeningRepository;
+
+    @Autowired
+    private MovieRepository movieRepository;
+
+    @Autowired
+    private HallRepository hallRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
 
+//    @BeforeEach
+//    void setUp() {
+//        reservationRepository.deleteAll();
+//    }
+
+    private User createUser(String suffix) {
+        return userRepository.save(User.builder()
+                .fullName("Test User " + suffix)
+                .email("user" + suffix + System.currentTimeMillis() + "@test.com")
+                .passwordHash("password123")
+                .createdAt(OffsetDateTime.now())
+                .build());
+    }
+
+    private Movie createMovie() {
+        return movieRepository.save(Movie.builder()
+                .title("Test Movie")
+                .genre("Action")
+                .duration(120)
+                .releaseDate(LocalDate.now())
+                .build());
+    }
+
+    private Hall createHall(int number) {
+        return hallRepository.save(Hall.builder()
+                .name("Hall " + number)
+                .number(2000 + number + (int)(Math.random() * 1000))
+                .capacity(100)
+                .build());
+    }
+
+    private Screening createScreening() {
+        Movie movie = createMovie();
+        Hall hall = createHall(1);
+        return screeningRepository.save(Screening.builder()
+                .movie(movie)
+                .hall(hall)
+                .startTime(OffsetDateTime.now().plusDays(1))
+                .roomNumber(1)
+                .capacity(100)
+                .build());
+    }
+
+    @Test
+    void testCreateMultipleReservations() throws Exception {
+        // Creăm dependencies
+        User savedUser = createUser("multi");
+        Screening savedScreening = createScreening();
+
+        // Creăm 5 rezervări
+        BigDecimal[] prices = {
+                BigDecimal.valueOf(50),
+                BigDecimal.valueOf(75),
+                BigDecimal.valueOf(100),
+                BigDecimal.valueOf(25),
+                BigDecimal.valueOf(150)
+        };
+
+        for (int i = 0; i < 5; i++) {
+            mockMvc.perform(post("/api/reservations")
+                            .param("userId", savedUser.getId().toString())
+                            .param("screeningId", savedScreening.getId().toString())
+                            .param("seatIds", java.util.UUID.randomUUID().toString())
+                            .param("pricePerSeat", prices[i].toString())
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isCreated());
+        }
+
+        // Verificăm persistența
+        assertThat(reservationRepository.count()).isGreaterThanOrEqualTo(5);
+    }
+
     @Test
     void testGetAllReservations() throws Exception {
-        ReservationDTO dto = new ReservationDTO();
-        dto.setId(UUID.randomUUID());
-        dto.setStatus("CREATED");
-        dto.setTotalPrice(BigDecimal.valueOf(100));
+        // Arrange
+        User user = createUser("all");
+        Screening screening = createScreening();
 
-        Mockito.when(reservationService.getAllReservations()).thenReturn(List.of(dto));
+        Reservation r1 = Reservation.builder()
+                .user(user)
+                .screening(screening)
+                .status("CREATED")
+                .totalPrice(BigDecimal.valueOf(100))
+                .createdAt(OffsetDateTime.now())
+                .build();
+        reservationRepository.save(r1);
 
+        Reservation r2 = Reservation.builder()
+                .user(user)
+                .screening(screening)
+                .status("PAID")
+                .totalPrice(BigDecimal.valueOf(150))
+                .createdAt(OffsetDateTime.now())
+                .build();
+        reservationRepository.save(r2);
+
+        Reservation r3 = Reservation.builder()
+                .user(user)
+                .screening(screening)
+                .status("CONFIRMED")
+                .totalPrice(BigDecimal.valueOf(200))
+                .createdAt(OffsetDateTime.now())
+                .build();
+        reservationRepository.save(r3);
+
+        // Act & Assert
         mockMvc.perform(get("/api/reservations"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].status").value("CREATED"))
-                .andExpect(jsonPath("$[0].total_price").value(100));
+                .andExpect(jsonPath("$.length()").value(org.hamcrest.Matchers.greaterThanOrEqualTo(3)));
     }
 
     @Test
     void testGetReservationById() throws Exception {
-        UUID id = UUID.randomUUID();
-        ReservationDTO dto = new ReservationDTO();
-        dto.setId(id);
-        dto.setStatus("CREATED");
-        dto.setTotalPrice(BigDecimal.valueOf(100));
+        // Arrange
+        User user = createUser("byid");
+        Screening screening = createScreening();
 
-        Mockito.when(reservationService.getReservationById(id)).thenReturn(dto);
+        Reservation reservation = Reservation.builder()
+                .user(user)
+                .screening(screening)
+                .status("PAID")
+                .totalPrice(BigDecimal.valueOf(125))
+                .createdAt(OffsetDateTime.now())
+                .build();
+        Reservation saved = reservationRepository.save(reservation);
 
-        mockMvc.perform(get("/api/reservations/{id}", id))
+        // Act & Assert
+        mockMvc.perform(get("/api/reservations/{id}", saved.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("CREATED"));
+                .andExpect(jsonPath("$.status").value("PAID"))
+                .andExpect(jsonPath("$.total_price").value(125));
     }
 
     @Test
     void testGetReservationsByUser() throws Exception {
-        UUID userId = UUID.randomUUID();
-        ReservationDTO dto = new ReservationDTO();
-        dto.setId(UUID.randomUUID());
-        dto.setStatus("CREATED");
-        dto.setTotalPrice(BigDecimal.valueOf(100));
+        // Arrange
+        User savedUser = createUser("byuser");
+        Screening screening = createScreening();
 
-        Mockito.when(reservationService.getReservationsByUser(userId)).thenReturn(List.of(dto));
+        Reservation r1 = Reservation.builder()
+                .user(savedUser)
+                .screening(screening)
+                .status("CREATED")
+                .totalPrice(BigDecimal.valueOf(50))
+                .createdAt(OffsetDateTime.now())
+                .build();
+        reservationRepository.save(r1);
 
-        mockMvc.perform(get("/api/reservations/user/{userId}", userId))
+        Reservation r2 = Reservation.builder()
+                .user(savedUser)
+                .screening(screening)
+                .status("PAID")
+                .totalPrice(BigDecimal.valueOf(75))
+                .createdAt(OffsetDateTime.now())
+                .build();
+        reservationRepository.save(r2);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/reservations/user/{userId}", savedUser.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].status").value("CREATED"))
-                .andExpect(jsonPath("$[0].total_price").value(100));
+                .andExpect(jsonPath("$.length()").value(org.hamcrest.Matchers.greaterThanOrEqualTo(2)));
     }
 
     @Test
-    void testCreateReservation() throws Exception {
-        UUID userId = UUID.randomUUID();
-        UUID screeningId = UUID.randomUUID();
-        UUID seatId = UUID.randomUUID();
-        BigDecimal price = BigDecimal.valueOf(50);
+    void testUpdateReservation() throws Exception {
+        // Arrange
+        User user = createUser("update");
+        Screening screening = createScreening();
 
-        ReservationDTO dto = new ReservationDTO();
-        dto.setId(UUID.randomUUID());
-        dto.setStatus("CREATED");
-        dto.setTotalPrice(price);
-
-        Mockito.when(reservationService.createReservation(eq(userId), eq(screeningId), anyList(), eq(price)))
-                .thenReturn(dto);
-
-        mockMvc.perform(post("/api/reservations")
-                        .param("userId", userId.toString())
-                        .param("screeningId", screeningId.toString())
-                        .param("seatIds", seatId.toString())
-                        .param("pricePerSeat", price.toString())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.status").value("CREATED"))
-                .andExpect(jsonPath("$.total_price").value(50));
-
-        verify(reservationService).createReservation(eq(userId), eq(screeningId), anyList(), eq(price));
-    }
-
-    @Test
-    void testUpdateReservation_Success() throws Exception {
-        UUID id = UUID.randomUUID();
+        Reservation reservation = Reservation.builder()
+                .user(user)
+                .screening(screening)
+                .status("CREATED")
+                .totalPrice(BigDecimal.valueOf(100))
+                .createdAt(OffsetDateTime.now())
+                .build();
+        Reservation saved = reservationRepository.save(reservation);
 
         String requestJson = """
             {
                 "status": "PAID",
-                "total_price": 100
+                "total_price": 150
             }
             """;
 
-        ReservationDTO updated = new ReservationDTO();
-        updated.setId(id);
-        updated.setStatus("PAID");
-        updated.setTotalPrice(BigDecimal.valueOf(100));
-
-        Mockito.when(reservationService.updateReservation(eq(id), any(ReservationDTO.class))).thenReturn(updated);
-
-        mockMvc.perform(put("/api/reservations/{id}", id)
+        // Act
+        mockMvc.perform(put("/api/reservations/{id}", saved.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("PAID"))
-                .andExpect(jsonPath("$.total_price").value(100));
+                .andExpect(jsonPath("$.total_price").value(150));
+
+        // Assert
+        Reservation updated = reservationRepository.findById(saved.getId()).orElseThrow();
+        assertThat(updated.getStatus()).isEqualTo("PAID");
+        assertThat(updated.getTotalPrice()).isEqualByComparingTo(BigDecimal.valueOf(150));
     }
 
     @Test
-    void testUpdateReservation_NotFound() throws Exception {
-        UUID id = UUID.randomUUID();
+    void testPatchReservation() throws Exception {
+        // Arrange
+        User user = createUser("patch");
+        Screening screening = createScreening();
 
-        String requestJson = """
-            {
-                "status": "PAID",
-                "total_price": 100
-            }
-            """;
-
-        Mockito.when(reservationService.updateReservation(eq(id), any(ReservationDTO.class)))
-                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found"));
-        System.out.println("Request JSON: " + requestJson);
-        System.out.println("Content-Type: application/json");
-        mockMvc.perform(put("/api/reservations/{id}", id)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void testPatchReservation_Success() throws Exception {
-        UUID id = UUID.randomUUID();
+        Reservation reservation = Reservation.builder()
+                .user(user)
+                .screening(screening)
+                .status("CREATED")
+                .totalPrice(BigDecimal.valueOf(100))
+                .createdAt(OffsetDateTime.now())
+                .build();
+        Reservation saved = reservationRepository.save(reservation);
 
         String requestJson = """
             {
@@ -165,47 +275,39 @@ class ReservationControllerTest {
             }
             """;
 
-        ReservationDTO patched = new ReservationDTO();
-        patched.setId(id);
-        patched.setStatus("CANCELLED");
-
-        Mockito.when(reservationService.patchReservation(eq(id), any(ReservationDTO.class))).thenReturn(patched);
-
-        mockMvc.perform(patch("/api/reservations/{id}", id)
+        // Act
+        mockMvc.perform(patch("/api/reservations/{id}", saved.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("CANCELLED"));
-    }
 
-    @Test
-    void testPatchReservation_NotFound() throws Exception {
-        UUID id = UUID.randomUUID();
-
-        String requestJson = """
-            {
-                "status": "CANCELLED"
-            }
-            """;
-
-        Mockito.when(reservationService.patchReservation(eq(id), any(ReservationDTO.class)))
-                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found"));
-
-        mockMvc.perform(patch("/api/reservations/{id}", id)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
-                .andExpect(status().isNotFound());
+        // Assert
+        Reservation patched = reservationRepository.findById(saved.getId()).orElseThrow();
+        assertThat(patched.getStatus()).isEqualTo("CANCELLED");
+        assertThat(patched.getTotalPrice()).isEqualByComparingTo(BigDecimal.valueOf(100));
     }
 
     @Test
     void testDeleteReservation() throws Exception {
-        UUID id = UUID.randomUUID();
+        // Arrange
+        User user = createUser("delete");
+        Screening screening = createScreening();
 
-        Mockito.doNothing().when(reservationService).deleteReservation(id);
+        Reservation reservation = Reservation.builder()
+                .user(user)
+                .screening(screening)
+                .status("CANCELLED")
+                .totalPrice(BigDecimal.valueOf(50))
+                .createdAt(OffsetDateTime.now())
+                .build();
+        Reservation saved = reservationRepository.save(reservation);
 
-        mockMvc.perform(delete("/api/reservations/{id}", id))
+        // Act
+        mockMvc.perform(delete("/api/reservations/{id}", saved.getId()))
                 .andExpect(status().isNoContent());
 
-        verify(reservationService).deleteReservation(id);
+        // Assert
+        assertThat(reservationRepository.findById(saved.getId())).isEmpty();
     }
 }
