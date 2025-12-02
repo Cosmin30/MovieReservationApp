@@ -1,8 +1,10 @@
 package com.example.MovieReservationApp.infrastructure.persistence;
 
+import com.example.MovieReservationApp.domain.model.hall.Hall;
 import com.example.MovieReservationApp.domain.model.movie.Movie;
 import com.example.MovieReservationApp.domain.model.screening.Screening;
 import com.example.MovieReservationApp.domain.model.seat.Seat;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.HallRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.MovieRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.SeatRepository;
@@ -31,6 +33,8 @@ class SeatRepositoryTest {
 
     @Autowired
     private MovieRepository movieRepository;
+    @Autowired
+    private HallRepository hallRepository;
 
     private Screening screening1;
     private Screening screening2;
@@ -41,11 +45,18 @@ class SeatRepositoryTest {
 
     @BeforeEach
     void setup() {
-          seatRepository.deleteAll();
+        seatRepository.deleteAll();
         screeningRepository.deleteAll();
         movieRepository.deleteAll();
+        hallRepository.deleteAll();
 
-         Movie movie = new Movie();
+        Hall hall= new Hall();
+        hall.setName("Sala Fericirii");
+        hall.setNumber(7);
+        hall.setCapacity(120);
+        hallRepository.save(hall);
+
+        Movie movie = new Movie();
         movie.setTitle("Test Movie");
         movie.setDescription("Test Description");
         movie.setDuration(120);
@@ -55,13 +66,17 @@ class SeatRepositoryTest {
 
         screening1 = new Screening();
         screening1.setMovie(movie);
+        screening1.setRoomNumber(5);
         screening1.setStartTime(OffsetDateTime.now().plusDays(1));
+        screening1.setHall(hall);
         screening1.setCapacity(100);
 
         screening2 = new Screening();
         screening2.setMovie(movie);
         screening2.setStartTime(OffsetDateTime.now().plusDays(2));
         screening2.setCapacity(80);
+        screening2.setRoomNumber(3);
+        screening2.setHall(hall);
 
         screeningRepository.saveAll(List.of(screening1, screening2));
 

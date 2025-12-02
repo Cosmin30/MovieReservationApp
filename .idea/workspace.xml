@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="Create tests for controllers">
+    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="persistare teste in bd">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -61,15 +61,30 @@
     "Application.MovieReservationAppApplication.executor": "Run",
     "JUnit.AuditServiceTest.executor": "Run",
     "JUnit.ComputationServiceTest.executor": "Run",
+    "JUnit.HallControllerIntegrationTest.executor": "Run",
     "JUnit.HallControllerTest.executor": "Run",
     "JUnit.HallRepositoryTest.executor": "Run",
+    "JUnit.MovieControllerIntegrationTest.executor": "Run",
+    "JUnit.MovieControllerTest.executor": "Run",
     "JUnit.MovieRepositoryTest.executor": "Run",
     "JUnit.MovieReservationAppApplicationTests.executor": "Run",
+    "JUnit.PaymentControllerIntegrationTest.executor": "Run",
+    "JUnit.PaymentControllerTest.executor": "Run",
     "JUnit.PaymentRepositoryTest.executor": "Run",
+    "JUnit.ReservationControllerIntegrationTest.executor": "Run",
+    "JUnit.ReservationControllerTest.executor": "Run",
     "JUnit.ReservationRepositoryTest.executor": "Run",
+    "JUnit.ScreeningControllerIntegrationTest.executor": "Run",
+    "JUnit.ScreeningControllerTest.executor": "Run",
     "JUnit.ScreeningRepositoryTest.executor": "Run",
+    "JUnit.SeatControllerIntegrationTest.executor": "Run",
+    "JUnit.SeatControllerTest.executor": "Run",
     "JUnit.SeatRepositoryTest.executor": "Run",
+    "JUnit.TicketControllerIntegrationTest.executor": "Run",
+    "JUnit.TicketControllerTest.executor": "Run",
     "JUnit.TicketRepositoryTest.executor": "Run",
+    "JUnit.UserControllerIntegrationTest.executor": "Run",
+    "JUnit.UserControllerTest.executor": "Run",
     "JUnit.UserRepositoryTest.executor": "Run",
     "JUnit.ValidationServiceTest.executor": "Run",
     "JUnit.WorkflowServiceTest.executor": "Run",
@@ -77,8 +92,10 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/denis/Desktop/MovieReservationApp"
+    "last_opened_file_path": "C:/Users/denis/Desktop/MovieReservationApp",
+    "settings.editor.selected.configurable": "reference.settings.project.maven.repository.indices"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -287,15 +304,55 @@
       <option name="project" value="LOCAL" />
       <updated>1763909107748</updated>
     </task>
-    <task id="LOCAL-00025" summary="Create tests for controllers">
+    <task id="LOCAL-00025" summary="added frontend">
       <option name="closed" value="true" />
-      <created>1763910344893</created>
+      <created>1763922531956</created>
       <option name="number" value="00025" />
       <option name="presentableId" value="LOCAL-00025" />
       <option name="project" value="LOCAL" />
-      <updated>1763910344893</updated>
+      <updated>1763922531956</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="fixed entities + fixed repository tests">
+      <option name="closed" value="true" />
+      <created>1763928789498</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1763928789498</updated>
+    </task>
+    <task id="LOCAL-00027" summary="fixed post put patch in reservation screening">
+      <option name="closed" value="true" />
+      <created>1763930596362</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1763930596362</updated>
+    </task>
+    <task id="LOCAL-00028" summary="fixed errors">
+      <option name="closed" value="true" />
+      <created>1764098226936</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1764098226936</updated>
+    </task>
+    <task id="LOCAL-00029" summary="updates">
+      <option name="closed" value="true" />
+      <created>1764147497103</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1764147497103</updated>
+    </task>
+    <task id="LOCAL-00030" summary="persistare teste in bd">
+      <option name="closed" value="true" />
+      <created>1764411192334</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1764411192334</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -327,7 +384,12 @@
     <MESSAGE value="added dtos" />
     <MESSAGE value="added services" />
     <MESSAGE value="fixed controllers" />
-    <MESSAGE value="Create tests for controllers" />
-    <option name="LAST_COMMIT_MESSAGE" value="Create tests for controllers" />
+    <MESSAGE value="added frontend" />
+    <MESSAGE value="fixed entities + fixed repository tests" />
+    <MESSAGE value="fixed post put patch in reservation screening" />
+    <MESSAGE value="fixed errors" />
+    <MESSAGE value="updates" />
+    <MESSAGE value="persistare teste in bd" />
+    <option name="LAST_COMMIT_MESSAGE" value="persistare teste in bd" />
   </component>
 </project>

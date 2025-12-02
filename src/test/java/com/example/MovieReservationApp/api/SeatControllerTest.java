@@ -1,171 +1,315 @@
 package com.example.MovieReservationApp.api;
 
 import com.example.MovieReservationApp.application.dto.SeatDTO;
-import com.example.MovieReservationApp.domain.model.screening.Screening;
 import com.example.MovieReservationApp.domain.model.seat.Seat;
+import com.example.MovieReservationApp.domain.model.screening.Screening;
+import com.example.MovieReservationApp.domain.model.movie.Movie;
+import com.example.MovieReservationApp.domain.model.hall.Hall;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.SeatRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
-
+import com.example.MovieReservationApp.infrastructure.persistence.repository.MovieRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.HallRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(SeatController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 class SeatControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private SeatRepository seatRepository;
 
-    @MockBean
+    @Autowired
     private ScreeningRepository screeningRepository;
+
+    @Autowired
+    private MovieRepository movieRepository;
+
+    @Autowired
+    private HallRepository hallRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    // ---------- GET ALL ----------
+    // @BeforeEach - comentat pentru a păstra datele în BD
+    // void setUp() {
+    //     seatRepository.deleteAll();
+    // }
+
+    private Movie createMovie() {
+        return movieRepository.save(Movie.builder()
+                .title("Test Movie")
+                .genre("Action")
+                .duration(120)
+                .releaseDate(LocalDate.now())
+                .build());
+    }
+
+    private Hall createHall(int number) {
+        return hallRepository.save(Hall.builder()
+                .name("Hall " + number)
+                .number(5000 + number + (int)(Math.random() * 1000))
+                .capacity(100)
+                .build());
+    }
+
+    private Screening createScreening() {
+        Movie movie = createMovie();
+        Hall hall = createHall(1);
+        return screeningRepository.save(Screening.builder()
+                .movie(movie)
+                .hall(hall)
+                .startTime(OffsetDateTime.now().plusDays(1))
+                .roomNumber(1)
+                .capacity(100)
+                .build());
+    }
+
     @Test
-    void testGetAll() throws Exception {
-        Screening screening = new Screening();
-        screening.setId(UUID.randomUUID());
+    void testCreateMultipleSeats() throws Exception {
+        Screening screening = createScreening();
 
-        Seat s1 = new Seat(UUID.randomUUID(), screening, "A", 10, true);
-        Seat s2 = new Seat(UUID.randomUUID(), screening, "B", 20, false);
+        // Creăm 5 locuri diferite
+        String[] rows = {"A", "A", "B", "B", "C"};
+        int[] numbers = {1, 2, 3, 4, 5};
+        boolean[] availability = {true, true, false, true, false};
 
-        Mockito.when(seatRepository.findAll()).thenReturn(Arrays.asList(s1, s2));
+        for (int i = 0; i < 5; i++) {
+            SeatDTO dto = new SeatDTO();
+            dto.setScreeningId(screening.getId());
+            dto.setRow(rows[i]);
+            dto.setNumber(numbers[i]);
+            dto.setIsAvailable(availability[i]);
 
+            mockMvc.perform(post("/api/seats")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(dto)))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.row").value(rows[i]))
+                    .andExpect(jsonPath("$.number").value(numbers[i]))
+                    .andExpect(jsonPath("$.is_available").value(availability[i]));
+        }
+
+        // Verificăm persistența
+        assertThat(seatRepository.count()).isGreaterThanOrEqualTo(5);
+    }
+
+    @Test
+    void testGetSeatsByScreening() throws Exception {
+        Screening screening = createScreening();
+
+        // Creăm 3 locuri pentru același screening
+        Seat s1 = Seat.builder()
+                .screening(screening)
+                .row("A")
+                .number(1)
+                .isAvailable(true)
+                .build();
+        seatRepository.save(s1);
+
+        Seat s2 = Seat.builder()
+                .screening(screening)
+                .row("A")
+                .number(2)
+                .isAvailable(false)
+                .build();
+        seatRepository.save(s2);
+
+        Seat s3 = Seat.builder()
+                .screening(screening)
+                .row("B")
+                .number(1)
+                .isAvailable(true)
+                .build();
+        seatRepository.save(s3);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/seats/screening/{screeningId}", screening.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(org.hamcrest.Matchers.greaterThanOrEqualTo(3)));
+    }
+
+    @Test
+    void testGetAllSeats() throws Exception {
+        Screening screening = createScreening();
+
+        // Creăm 3 locuri
+        Seat s1 = Seat.builder()
+                .screening(screening)
+                .row("A")
+                .number(1)
+                .isAvailable(true)
+                .build();
+        seatRepository.save(s1);
+
+        Seat s2 = Seat.builder()
+                .screening(screening)
+                .row("A")
+                .number(2)
+                .isAvailable(false)
+                .build();
+        seatRepository.save(s2);
+
+        Seat s3 = Seat.builder()
+                .screening(screening)
+                .row("B")
+                .number(1)
+                .isAvailable(true)
+                .build();
+        seatRepository.save(s3);
+
+        // Act & Assert
         mockMvc.perform(get("/api/seats"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].row").value("A"))
-                .andExpect(jsonPath("$[1].number").value(20));
+                .andExpect(jsonPath("$.length()").value(org.hamcrest.Matchers.greaterThanOrEqualTo(3)));
     }
 
-    // ---------- GET BY ID ----------
     @Test
-    void testGetById() throws Exception {
-        UUID id = UUID.randomUUID();
+    void testGetSeatById() throws Exception {
+        Screening screening = createScreening();
 
-        Screening screening = new Screening();
-        screening.setId(UUID.randomUUID());
+        Seat seat = Seat.builder()
+                .screening(screening)
+                .row("C")
+                .number(10)
+                .isAvailable(true)
+                .build();
+        Seat saved = seatRepository.save(seat);
 
-        Seat seat = new Seat(id, screening, "C", 5, true);
-
-        Mockito.when(seatRepository.findById(id)).thenReturn(Optional.of(seat));
-
-        mockMvc.perform(get("/api/seats/{id}", id))
+        // Act & Assert
+        mockMvc.perform(get("/api/seats/{id}", saved.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.row").value("C"))
-                .andExpect(jsonPath("$.number").value(5))
-                .andExpect(jsonPath("$.screeningId").value(screening.getId().toString()));
+                .andExpect(jsonPath("$.number").value(10))
+                .andExpect(jsonPath("$.is_available").value(true));
     }
 
-    // ---------- CREATE ----------
     @Test
-    void testCreate() throws Exception {
-        UUID screeningId = UUID.randomUUID();
-
-        Screening screening = new Screening();
-        screening.setId(screeningId);
+    void testCreateSeat() throws Exception {
+        Screening screening = createScreening();
 
         SeatDTO dto = new SeatDTO();
-        dto.setRow("A");
-        dto.setNumber(15);
+        dto.setScreeningId(screening.getId());
+        dto.setRow("D");
+        dto.setNumber(5);
         dto.setIsAvailable(true);
-        dto.setScreeningId(screeningId);
 
-        Seat saved = new Seat(UUID.randomUUID(), screening, "A", 15, true);
-
-        Mockito.when(screeningRepository.findById(screeningId)).thenReturn(Optional.of(screening));
-        Mockito.when(seatRepository.save(any(Seat.class))).thenReturn(saved);
-
-        mockMvc.perform(post("/api/seats")
+        // Act
+        String response = mockMvc.perform(post("/api/seats")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.number").value(15))
-                .andExpect(jsonPath("$.row").value("A"));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.row").value("D"))
+                .andExpect(jsonPath("$.number").value(5))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        // Assert - verificăm persistența
+        SeatDTO created = objectMapper.readValue(response, SeatDTO.class);
+        Seat seatInDb = seatRepository.findById(created.getId()).orElse(null);
+
+        assertThat(seatInDb).isNotNull();
+        assertThat(seatInDb.getRow()).isEqualTo("D");
+        assertThat(seatInDb.getNumber()).isEqualTo(5);
+        assertThat(seatInDb.getIsAvailable()).isTrue();
     }
 
-    // ---------- UPDATE ----------
     @Test
-    void testUpdate() throws Exception {
-        UUID id = UUID.randomUUID();
-        UUID screeningId = UUID.randomUUID();
+    void testUpdateSeat() throws Exception {
+        Screening screening = createScreening();
 
-        Screening screening = new Screening();
-        screening.setId(screeningId);
-
-        Seat existing = new Seat(id, screening, "A", 10, true);
-
-        Seat updated = new Seat(id, screening, "Z", 99, false);
+        Seat seat = Seat.builder()
+                .screening(screening)
+                .row("E")
+                .number(1)
+                .isAvailable(true)
+                .build();
+        Seat saved = seatRepository.save(seat);
 
         SeatDTO dto = new SeatDTO();
-        dto.setRow("Z");
-        dto.setNumber(99);
+        dto.setRow("E");
+        dto.setNumber(2);
         dto.setIsAvailable(false);
-        dto.setScreeningId(screeningId);
 
-        Mockito.when(seatRepository.findById(id)).thenReturn(Optional.of(existing));
-        Mockito.when(screeningRepository.findById(screeningId)).thenReturn(Optional.of(screening));
-        Mockito.when(seatRepository.save(any(Seat.class))).thenReturn(updated);
-
-        mockMvc.perform(put("/api/seats/{id}", id)
+        // Act
+        mockMvc.perform(put("/api/seats/{id}", saved.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.row").value("Z"))
-                .andExpect(jsonPath("$.number").value(99))
-                .andExpect(jsonPath("$.isAvailable").value(false));
+                .andExpect(jsonPath("$.number").value(2))
+                .andExpect(jsonPath("$.is_available").value(false));
+
+        // Assert
+        Seat updated = seatRepository.findById(saved.getId()).orElseThrow();
+        assertThat(updated.getNumber()).isEqualTo(2);
+        assertThat(updated.getIsAvailable()).isFalse();
     }
 
-    // ---------- PATCH ----------
     @Test
-    void testPatch() throws Exception {
-        UUID id = UUID.randomUUID();
+    void testPatchSeat() throws Exception {
+        Screening screening = createScreening();
 
-        Screening screening = new Screening();
-        screening.setId(UUID.randomUUID());
-
-        Seat existing = new Seat(id, screening, "A", 10, true);
-        Seat patched = new Seat(id, screening, "A", 10, false);
+        Seat seat = Seat.builder()
+                .screening(screening)
+                .row("F")
+                .number(1)
+                .isAvailable(true)
+                .build();
+        Seat saved = seatRepository.save(seat);
 
         SeatDTO dto = new SeatDTO();
         dto.setIsAvailable(false);
 
-        Mockito.when(seatRepository.findById(id)).thenReturn(Optional.of(existing));
-        Mockito.when(seatRepository.save(any(Seat.class))).thenReturn(patched);
-
-        mockMvc.perform(patch("/api/seats/{id}", id)
+        // Act
+        mockMvc.perform(patch("/api/seats/{id}", saved.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.isAvailable").value(false));
+                .andExpect(jsonPath("$.is_available").value(false));
+
+        // Assert
+        Seat patched = seatRepository.findById(saved.getId()).orElseThrow();
+        assertThat(patched.getIsAvailable()).isFalse();
+        assertThat(patched.getRow()).isEqualTo("F"); // nu s-a modificat
+        assertThat(patched.getNumber()).isEqualTo(1); // nu s-a modificat
     }
 
-    // ---------- DELETE ----------
     @Test
-    void testDelete() throws Exception {
-        UUID id = UUID.randomUUID();
+    void testDeleteSeat() throws Exception {
+        Screening screening = createScreening();
 
-        mockMvc.perform(delete("/api/seats/{id}", id))
-                .andExpect(status().isOk());
+        Seat seat = Seat.builder()
+                .screening(screening)
+                .row("G")
+                .number(1)
+                .isAvailable(true)
+                .build();
+        Seat saved = seatRepository.save(seat);
 
-        Mockito.verify(seatRepository).deleteById(id);
+        // Act
+        mockMvc.perform(delete("/api/seats/{id}", saved.getId()))
+                .andExpect(status().isNoContent());
+
+        // Assert
+        assertThat(seatRepository.findById(saved.getId())).isEmpty();
     }
 }

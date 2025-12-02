@@ -1,188 +1,278 @@
 package com.example.MovieReservationApp.api;
 
-import com.example.MovieReservationApp.application.dto.HallDTO;
-import com.example.MovieReservationApp.application.dto.MovieDTO;
 import com.example.MovieReservationApp.application.dto.ScreeningDTO;
-import com.example.MovieReservationApp.domain.model.hall.Hall;
-import com.example.MovieReservationApp.domain.model.movie.Movie;
 import com.example.MovieReservationApp.domain.model.screening.Screening;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.HallRepository;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.MovieRepository;
+import com.example.MovieReservationApp.domain.model.movie.Movie;
+import com.example.MovieReservationApp.domain.model.hall.Hall;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
-
+import com.example.MovieReservationApp.infrastructure.persistence.repository.MovieRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.HallRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.*;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(ScreeningController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 class ScreeningControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private ScreeningRepository screeningRepository;
 
-    @MockBean
+    @Autowired
     private MovieRepository movieRepository;
 
-    @MockBean
+    @Autowired
     private HallRepository hallRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
 
+//    @BeforeEach
+//    void setUp() {
+//        screeningRepository.deleteAll();
+//        movieRepository.deleteAll();
+//        hallRepository.deleteAll();
+//    }
+
+    private Movie createMovie() {
+        return movieRepository.save(Movie.builder()
+                .title("Test Movie")
+                .genre("Action")
+                .duration(120)
+                .releaseDate(LocalDate.now())
+                .build());
+    }
+
+    private Hall createHall(int number) {
+        return hallRepository.save(Hall.builder()
+                .name("Hall " + number)
+                .number(3000 + number + (int)(Math.random() * 1000))
+                .capacity(150)
+                .build());
+    }
+
     @Test
-    void testGetAll() throws Exception {
-        Movie movie = new Movie(UUID.randomUUID(), "MovieA", "Desc", 120, "Action", null, null);
-        Hall hall = new Hall(UUID.randomUUID(), 1, 100, "Hall A");
+    void testCreateMultipleScreenings() throws Exception {
+        // Creăm dependencies
+        Movie savedMovie = createMovie();
+        Hall savedHall = createHall(1);
 
-        Screening s1 = new Screening(UUID.randomUUID(), movie, OffsetDateTime.now(), 1, hall, 100, null);
-        Screening s2 = new Screening(UUID.randomUUID(), movie, OffsetDateTime.now(), 2, hall, 200, null);
+        // Creăm 5 proiecții diferite
+        int[] capacities = {100, 120, 150, 80, 200};
+        int[] roomNumbers = {1, 2, 3, 4, 5};
 
-        Mockito.when(screeningRepository.findAll()).thenReturn(Arrays.asList(s1, s2));
+        for (int i = 0; i < 5; i++) {
+            ScreeningDTO dto = new ScreeningDTO();
+            dto.setStartTime(OffsetDateTime.now().plusDays(i + 1));
+            dto.setCapacity(capacities[i]);
+            dto.setRoomNumber(roomNumbers[i]);
 
+            mockMvc.perform(post("/api/screenings")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(dto)))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.capacity").value(capacities[i]))
+                    .andExpect(jsonPath("$.room_number").value(roomNumbers[i]));
+        }
+
+        // Verificăm persistența
+        assertThat(screeningRepository.count()).isGreaterThanOrEqualTo(5);
+    }
+
+    @Test
+    void testGetAllScreenings() throws Exception {
+        // Arrange - creăm 3 proiecții
+        Movie movie = createMovie();
+        Hall hall = createHall(1);
+
+        Screening s1 = Screening.builder()
+                .movie(movie)
+                .hall(hall)
+                .startTime(OffsetDateTime.now().plusDays(1))
+                .capacity(100)
+                .roomNumber(1)
+                .build();
+        screeningRepository.save(s1);
+
+        Screening s2 = Screening.builder()
+                .movie(movie)
+                .hall(hall)
+                .startTime(OffsetDateTime.now().plusDays(2))
+                .capacity(150)
+                .roomNumber(2)
+                .build();
+        screeningRepository.save(s2);
+
+        Screening s3 = Screening.builder()
+                .movie(movie)
+                .hall(hall)
+                .startTime(OffsetDateTime.now().plusDays(3))
+                .capacity(200)
+                .roomNumber(3)
+                .build();
+        screeningRepository.save(s3);
+
+        // Act & Assert
         mockMvc.perform(get("/api/screenings"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].roomNumber").value(1))
-                .andExpect(jsonPath("$[1].capacity").value(200));
+                .andExpect(jsonPath("$.length()").value(org.hamcrest.Matchers.greaterThanOrEqualTo(3)));
     }
 
     @Test
-    void testGetById() throws Exception {
-        UUID id = UUID.randomUUID();
+    void testGetScreeningById() throws Exception {
+        // Arrange
+        Movie movie = createMovie();
+        Hall hall = createHall(5);
 
-        Movie movie = new Movie(UUID.randomUUID(), "Avatar", "Epic", 180, "Sci-Fi", null, null);
-        Hall hall = new Hall(UUID.randomUUID(), 2, 150, "VIP Hall");
+        Screening screening = Screening.builder()
+                .movie(movie)
+                .hall(hall)
+                .startTime(OffsetDateTime.now().plusHours(5))
+                .capacity(180)
+                .roomNumber(5)
+                .build();
+        Screening saved = screeningRepository.save(screening);
 
-        Screening screening = new Screening(id, movie, OffsetDateTime.now(), 5, hall, 150, null);
-
-        Mockito.when(screeningRepository.findById(id)).thenReturn(Optional.of(screening));
-
-        mockMvc.perform(get("/api/screenings/{id}", id))
+        // Act & Assert
+        mockMvc.perform(get("/api/screenings/{id}", saved.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.roomNumber").value(5))
-                .andExpect(jsonPath("$.hall.id").value(hall.getId().toString()))
-                .andExpect(jsonPath("$.movie.id").value(movie.getId().toString()));
+                .andExpect(jsonPath("$.capacity").value(180))
+                .andExpect(jsonPath("$.room_number").value(5));
     }
 
     @Test
-    void testCreate() throws Exception {
-        UUID movieId = UUID.randomUUID();
-        UUID hallId = UUID.randomUUID();
-
-        Movie movie = new Movie(movieId, "Test Movie", "Desc", 100, "Genre", null, null);
-        Hall hall = new Hall(hallId, 1, 200, "Hall X");
-
+    void testCreateScreening() throws Exception {
+        // Arrange
         ScreeningDTO dto = new ScreeningDTO();
-        dto.setMovie(new MovieDTO());
-        dto.getMovie().setId(movieId);
-
-        dto.setHall(new HallDTO());
-        dto.getHall().setId(hallId);
-
-        dto.setStartTime(OffsetDateTime.now());
-        dto.setRoomNumber(3);
+        dto.setStartTime(OffsetDateTime.now().plusDays(1));
         dto.setCapacity(120);
+        dto.setRoomNumber(3);
 
-        Screening saved = new Screening(UUID.randomUUID(), movie, dto.getStartTime(), 3, hall, 120, null);
-
-        Mockito.when(movieRepository.findById(movieId)).thenReturn(Optional.of(movie));
-        Mockito.when(hallRepository.findById(hallId)).thenReturn(Optional.of(hall));
-        Mockito.when(screeningRepository.save(any(Screening.class))).thenReturn(saved);
-
+        // Act
         mockMvc.perform(post("/api/screenings")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.capacity").value(120))
-                .andExpect(jsonPath("$.movie.id").value(movieId.toString()));
+                .andExpect(jsonPath("$.room_number").value(3));
     }
 
     @Test
-    void testUpdate() throws Exception {
-        UUID id = UUID.randomUUID();
-        UUID movieId = UUID.randomUUID();
-        UUID hallId = UUID.randomUUID();
+    void testUpdateScreening() throws Exception {
+        // Arrange
+        Movie movie = createMovie();
+        Hall hall = createHall(1);
 
-        Movie movie = new Movie(movieId, "M", "D", 100, "G", null, null);
-        Hall hall = new Hall(hallId, 1, 100, "Hall Y");
-
-        Screening existing = new Screening(id, movie, OffsetDateTime.now(), 1, hall, 100, null);
-
-        Screening updated = new Screening(id, movie, OffsetDateTime.now(), 10, hall, 500, null);
+        Screening screening = Screening.builder()
+                .movie(movie)
+                .hall(hall)
+                .startTime(OffsetDateTime.now().plusDays(1))
+                .capacity(100)
+                .roomNumber(1)
+                .build();
+        Screening saved = screeningRepository.save(screening);
 
         ScreeningDTO dto = new ScreeningDTO();
-        dto.setMovie(new MovieDTO());
-        dto.getMovie().setId(movieId);
+        dto.setStartTime(OffsetDateTime.now().plusDays(2));
+        dto.setCapacity(200);
+        dto.setRoomNumber(2);
 
-        dto.setHall(new HallDTO());
-        dto.getHall().setId(hallId);
-
-        dto.setStartTime(updated.getStartTime());
-        dto.setRoomNumber(10);
-        dto.setCapacity(500);
-
-        Mockito.when(screeningRepository.findById(id)).thenReturn(Optional.of(existing));
-        Mockito.when(movieRepository.findById(movieId)).thenReturn(Optional.of(movie));
-        Mockito.when(hallRepository.findById(hallId)).thenReturn(Optional.of(hall));
-        Mockito.when(screeningRepository.save(any(Screening.class))).thenReturn(updated);
-
-        mockMvc.perform(put("/api/screenings/{id}", id)
+        // Act
+        mockMvc.perform(put("/api/screenings/{id}", saved.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.capacity").value(500))
-                .andExpect(jsonPath("$.roomNumber").value(10));
+                .andExpect(jsonPath("$.capacity").value(200))
+                .andExpect(jsonPath("$.room_number").value(2));
+
+        // Assert
+        Screening updated = screeningRepository.findById(saved.getId()).orElseThrow();
+        assertThat(updated.getCapacity()).isEqualTo(200);
+        assertThat(updated.getRoomNumber()).isEqualTo(2);
     }
 
     @Test
-    void testPatch() throws Exception {
-        UUID id = UUID.randomUUID();
+    void testPatchScreening() throws Exception {
+        // Arrange
+        Movie movie = createMovie();
+        Hall hall = createHall(1);
 
-        Movie movie = new Movie(UUID.randomUUID(), "T", "D", 90, "G", null, null);
-        Hall hall = new Hall(UUID.randomUUID(), 1, 300, "Hall P");
-
-        Screening existing = new Screening(id, movie, OffsetDateTime.now(), 2, hall, 200, null);
-
-        Screening patched = new Screening(id, movie, existing.getStartTime(), 5, hall, 200, null);
+        Screening screening = Screening.builder()
+                .movie(movie)
+                .hall(hall)
+                .startTime(OffsetDateTime.now().plusDays(1))
+                .capacity(100)
+                .roomNumber(1)
+                .build();
+        Screening saved = screeningRepository.save(screening);
 
         ScreeningDTO dto = new ScreeningDTO();
-        dto.setRoomNumber(5);
+        dto.setCapacity(150);
 
-        Mockito.when(screeningRepository.findById(id)).thenReturn(Optional.of(existing));
-        Mockito.when(screeningRepository.save(any(Screening.class))).thenReturn(patched);
-
-        mockMvc.perform(patch("/api/screenings/{id}", id)
+        // Act
+        mockMvc.perform(patch("/api/screenings/{id}", saved.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.roomNumber").value(5));
+                .andExpect(jsonPath("$.capacity").value(150));
+
+        // Assert
+        Screening patched = screeningRepository.findById(saved.getId()).orElseThrow();
+        assertThat(patched.getCapacity()).isEqualTo(150);
+        assertThat(patched.getRoomNumber()).isEqualTo(1);
     }
 
     @Test
-    void testDelete() throws Exception {
-        UUID id = UUID.randomUUID();
+    void testDeleteScreening() throws Exception {
+        // Arrange
+        Movie movie = createMovie();
+        Hall hall = createHall(7);
 
-        mockMvc.perform(delete("/api/screenings/{id}", id))
-                .andExpect(status().isOk());
+        Screening screening = Screening.builder()
+                .movie(movie)
+                .hall(hall)
+                .startTime(OffsetDateTime.now().plusDays(1))
+                .capacity(100)
+                .roomNumber(7)
+                .build();
+        Screening saved = screeningRepository.save(screening);
 
-        Mockito.verify(screeningRepository).deleteById(id);
+        // Act
+        mockMvc.perform(delete("/api/screenings/{id}", saved.getId()))
+                .andExpect(status().isNoContent());
+
+        // Assert
+        assertThat(screeningRepository.findById(saved.getId())).isEmpty();
+    }
+
+    @Test
+    void testUpdateScreeningNotFound() throws Exception {
+        // Arrange
+        java.util.UUID nonExistentId = java.util.UUID.randomUUID();
+        ScreeningDTO dto = new ScreeningDTO();
+        dto.setCapacity(100);
+
+        // Act & Assert
+        mockMvc.perform(put("/api/screenings/{id}", nonExistentId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNotFound());
     }
 }

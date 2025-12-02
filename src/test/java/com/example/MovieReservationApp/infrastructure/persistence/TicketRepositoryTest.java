@@ -1,5 +1,6 @@
 package com.example.MovieReservationApp.infrastructure.persistence;
 
+import com.example.MovieReservationApp.domain.model.hall.Hall;
 import com.example.MovieReservationApp.domain.model.movie.Movie;
 import com.example.MovieReservationApp.domain.model.reservation.Reservation;
 import com.example.MovieReservationApp.domain.model.screening.Screening;
@@ -33,6 +34,8 @@ class TicketRepositoryTest {
 
     @Autowired
     private SeatRepository seatRepository;
+    @Autowired
+    private HallRepository hallRepository;
 
     @Autowired
     private ScreeningRepository screeningRepository;
@@ -53,7 +56,7 @@ class TicketRepositoryTest {
     private Ticket ticket1;
     private Ticket ticket2;
     private Ticket ticket3;
-
+    private Hall hall1;
     @BeforeEach
     void setup() {
         ticketRepository.deleteAll();
@@ -62,6 +65,7 @@ class TicketRepositoryTest {
         screeningRepository.deleteAll();
         movieRepository.deleteAll();
         userRepository.deleteAll();
+        hallRepository.deleteAll();
 
         Movie movie = new Movie();
         movie.setTitle("Test Movie");
@@ -70,6 +74,12 @@ class TicketRepositoryTest {
         movie.setGenre("Action");
         movie.setReleaseDate(LocalDate.of(2024, 1, 1));
         movie = movieRepository.save(movie);
+
+        Hall hall1= new Hall();
+        hall1.setName("Sala Talentului");
+        hall1.setCapacity(140);
+        hall1.setNumber(11);
+        hallRepository.save(hall1);
 
         User user = new User();
         user.setEmail("test@example.com");
@@ -83,20 +93,21 @@ class TicketRepositoryTest {
         screening.setRoomNumber(1);
         screening.setStartTime(OffsetDateTime.now().plusDays(1));
         screening.setCapacity(100);
+        screening.setHall(hall1);
         screening = screeningRepository.save(screening);
 
         reservation1 = new Reservation();
         reservation1.setUser(user);
         reservation1.setScreening(screening);
         reservation1.setStatus("CONFIRMED");
-        reservation1.setTotalPrice(22.50);
+        reservation1.setTotalPrice(BigDecimal.valueOf(22.50));
         reservation1.setCreatedAt(OffsetDateTime.now());
 
         reservation2 = new Reservation();
         reservation2.setUser(user);
         reservation2.setScreening(screening);
         reservation2.setStatus("CONFIRMED");
-        reservation2.setTotalPrice(8.00);
+        reservation2.setTotalPrice(BigDecimal.valueOf(8.00));
         reservation2.setCreatedAt(OffsetDateTime.now());
 
         reservationRepository.saveAll(List.of(reservation1, reservation2));

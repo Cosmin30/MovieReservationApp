@@ -1,135 +1,61 @@
 package com.example.MovieReservationApp.api;
 
 import com.example.MovieReservationApp.application.dto.ReservationDTO;
-import com.example.MovieReservationApp.application.dto.UserDTO;
-import com.example.MovieReservationApp.application.dto.ScreeningDTO;
-import com.example.MovieReservationApp.domain.model.reservation.Reservation;
-import com.example.MovieReservationApp.domain.model.user.User;
-import com.example.MovieReservationApp.domain.model.screening.Screening;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.ReservationRepository;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.UserRepository;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
+import com.example.MovieReservationApp.application.service.ReservationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/reservations")
 @RequiredArgsConstructor
+@RequestMapping("/api/reservations")
 public class ReservationController {
 
-    private final ReservationRepository reservationRepository;
-    private final UserRepository userRepository;
-    private final ScreeningRepository screeningRepository;
+    private final ReservationService reservationService;
 
-    private ReservationDTO toDTO(Reservation reservation) {
-        ReservationDTO dto = new ReservationDTO();
-        dto.setId(reservation.getId());
-
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(reservation.getUser().getId());
-        dto.setUser(userDTO);
-
-        ScreeningDTO screeningDTO = new ScreeningDTO();
-        screeningDTO.setId(reservation.getScreening().getId());
-        dto.setScreening(screeningDTO);
-
-        dto.setCreatedAt(reservation.getCreatedAt());
-        dto.setStatus(reservation.getStatus());
-        dto.setTotalPrice(reservation.getTotalPrice());
-
-        return dto;
-    }
-
-    private Reservation toEntity(ReservationDTO dto) {
-        User user = userRepository.findById(dto.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        Screening screening = screeningRepository.findById(dto.getScreening().getId())
-                .orElseThrow(() -> new RuntimeException("Screening not found"));
-
-        Reservation reservation = new Reservation();
-        reservation.setId(dto.getId());
-        reservation.setUser(user);
-        reservation.setScreening(screening);
-        reservation.setCreatedAt(dto.getCreatedAt());
-        reservation.setStatus(dto.getStatus());
-        reservation.setTotalPrice(dto.getTotalPrice());
-
-        return reservation;
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ReservationDTO createReservation(@RequestParam UUID userId,
+                                            @RequestParam UUID screeningId,
+                                            @RequestParam List<UUID> seatIds,
+                                            @RequestParam BigDecimal pricePerSeat) {
+        return reservationService.createReservation(userId, screeningId, seatIds, pricePerSeat);
     }
 
     @GetMapping
-    public List<ReservationDTO> getAll() {
-        return reservationRepository.findAll()
-                .stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+    public List<ReservationDTO> getAllReservations() {
+        return reservationService.getAllReservations();
     }
 
     @GetMapping("/{id}")
-    public ReservationDTO getById(@PathVariable UUID id) {
-        Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Reservation not found"));
-        return toDTO(reservation);
+    public ReservationDTO getReservationById(@PathVariable UUID id) {
+        return reservationService.getReservationById(id);
     }
 
-    @PostMapping
-    public ReservationDTO create(@RequestBody ReservationDTO dto) {
-        Reservation reservation = toEntity(dto);
-        reservation.setId(null);
-        reservation = reservationRepository.save(reservation);
-        return toDTO(reservation);
+    @GetMapping("/user/{userId}")
+    public List<ReservationDTO> getReservationsByUser(@PathVariable UUID userId) {
+        return reservationService.getReservationsByUser(userId);
     }
 
     @PutMapping("/{id}")
-    public ReservationDTO update(@PathVariable UUID id, @RequestBody ReservationDTO dto) {
-        Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Reservation not found"));
-
-        User user = userRepository.findById(dto.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        Screening screening = screeningRepository.findById(dto.getScreening().getId())
-                .orElseThrow(() -> new RuntimeException("Screening not found"));
-
-        reservation.setUser(user);
-        reservation.setScreening(screening);
-        reservation.setCreatedAt(dto.getCreatedAt());
-        reservation.setStatus(dto.getStatus());
-        reservation.setTotalPrice(dto.getTotalPrice());
-
-        reservation = reservationRepository.save(reservation);
-        return toDTO(reservation);
+    public ReservationDTO updateReservation(@PathVariable UUID id,
+                                            @RequestBody ReservationDTO dto) {
+        return reservationService.updateReservation(id, dto);
     }
 
     @PatchMapping("/{id}")
-    public ReservationDTO patch(@PathVariable UUID id, @RequestBody ReservationDTO dto) {
-        Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Reservation not found"));
-
-        if (dto.getStatus() != null) {
-            reservation.setStatus(dto.getStatus());
-        }
-        if (dto.getCreatedAt() != null) {
-            reservation.setCreatedAt(dto.getCreatedAt());
-        }
-        if (dto.getTotalPrice() != null) {
-            reservation.setTotalPrice(dto.getTotalPrice());
-        }
-
-        reservation = reservationRepository.save(reservation);
-        return toDTO(reservation);
+    public ReservationDTO patchReservation(@PathVariable UUID id,
+                                           @RequestBody ReservationDTO dto) {
+        return reservationService.patchReservation(id, dto);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id) {
-        if (!reservationRepository.existsById(id)) {
-            throw new RuntimeException("Reservation not found");
-        }
-        reservationRepository.deleteById(id);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteReservation(@PathVariable UUID id) {
+        reservationService.deleteReservation(id);
     }
 }

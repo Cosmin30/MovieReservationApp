@@ -3,8 +3,13 @@ package com.example.MovieReservationApp.domain.model.reservation;
 import com.example.MovieReservationApp.domain.model.payment.Payment;
 import com.example.MovieReservationApp.domain.model.screening.Screening;
 import com.example.MovieReservationApp.domain.model.ticket.Ticket;
-import com.example.MovieReservationApp.domain.model.user.*;
+import com.example.MovieReservationApp.domain.model.user.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -17,42 +22,38 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Reservation {
 
     @Id
     @GeneratedValue
     private UUID id;
 
+    @NotNull(message = "User cannot be null")
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference(value = "user-reservations")
     private User user;
 
+    @NotNull(message = "Screening cannot be null")
     @ManyToOne
     @JoinColumn(name = "screening_id", nullable = false)
     private Screening screening;
 
     private OffsetDateTime createdAt;
 
+    @NotNull(message = "Status cannot be null")
+    @Size(min = 1, max = 50)
     private String status;
 
+    @NotNull(message = "Total price cannot be null")
+    @DecimalMin(value = "0.0", inclusive = true, message = "Total price must be >= 0")
     private BigDecimal totalPrice;
 
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference(value = "reservation-tickets")
     private List<Ticket> tickets;
 
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Payment> payments;
-
-    public void setUserId(UUID userId) {
-    }
-
-    public void setScreeningId(UUID screeningId) {
-    }
-
-    public void setTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
 }
-
-

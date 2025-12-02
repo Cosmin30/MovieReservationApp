@@ -3,61 +3,123 @@ package com.example.MovieReservationApp.api;
 import com.example.MovieReservationApp.application.dto.HallDTO;
 import com.example.MovieReservationApp.domain.model.hall.Hall;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.HallRepository;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(HallController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 class HallControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private HallRepository hallRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
 
+    @BeforeEach
+    void setUp() {
+        hallRepository.deleteAll();
+    }
+
     @Test
-    void testGetAll() throws Exception {
-        Hall h1 = new Hall(UUID.randomUUID(), 1, 100, "A");
-        Hall h2 = new Hall(UUID.randomUUID(), 2, 200, "B");
+    void testCreateMultipleHalls() throws Exception {
+        // Creăm 5 săli diferite
+        String[] hallNames = {"Sala Premium", "Sala VIP", "Sala IMAX", "Sala 4DX", "Sala Standard"};
+        int[] capacities = {150, 80, 300, 120, 200};
+        int[] numbers = {1, 2, 3, 4, 5};
 
-        Mockito.when(hallRepository.findAll()).thenReturn(Arrays.asList(h1, h2));
+        for (int i = 0; i < 5; i++) {
+            HallDTO dto = new HallDTO();
+            dto.setName(hallNames[i]);
+            dto.setNumber(numbers[i]);
+            dto.setCapacity(capacities[i]);
 
+            mockMvc.perform(post("/api/halls")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(dto)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.name").value(hallNames[i]))
+                    .andExpect(jsonPath("$.number").value(numbers[i]))
+                    .andExpect(jsonPath("$.capacity").value(capacities[i]));
+        }
+
+        // Verificăm că toate cele 5 săli au fost salvate în BD
+        assertThat(hallRepository.count()).isEqualTo(5);
+
+        // Verificăm că le putem citi toate
         mockMvc.perform(get("/api/halls"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].number").value(1))
-                .andExpect(jsonPath("$[1].capacity").value(200));
+                .andExpect(jsonPath("$.length()").value(5));
+    }
+
+    @Test
+    void testGetAll() throws Exception {
+        // Arrange - creăm 5 săli
+        Hall h1 = new Hall();
+        h1.setNumber(1);
+        h1.setCapacity(100);
+        h1.setName("Sala A");
+        hallRepository.save(h1);
+
+        Hall h2 = new Hall();
+        h2.setNumber(2);
+        h2.setCapacity(200);
+        h2.setName("Sala B");
+        hallRepository.save(h2);
+
+        Hall h3 = new Hall();
+        h3.setNumber(3);
+        h3.setCapacity(150);
+        h3.setName("Sala C");
+        hallRepository.save(h3);
+
+        Hall h4 = new Hall();
+        h4.setNumber(4);
+        h4.setCapacity(180);
+        h4.setName("Sala D");
+        hallRepository.save(h4);
+
+        Hall h5 = new Hall();
+        h5.setNumber(5);
+        h5.setCapacity(250);
+        h5.setName("Sala E");
+        hallRepository.save(h5);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/halls"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(5))
+                .andExpect(jsonPath("$[0].name").value("Sala A"))
+                .andExpect(jsonPath("$[1].capacity").value(200))
+                .andExpect(jsonPath("$[4].name").value("Sala E"));
     }
 
     @Test
     void testGetById() throws Exception {
-        UUID id = UUID.randomUUID();
-        Hall hall = new Hall(id, 5, 300, "VIP Room");
+        // Arrange
+        Hall hall = new Hall();
+        hall.setNumber(5);
+        hall.setCapacity(300);
+        hall.setName("VIP Room");
+        Hall saved = hallRepository.save(hall);
 
-        Mockito.when(hallRepository.findById(id)).thenReturn(Optional.of(hall));
-
-        mockMvc.perform(get("/api/halls/{id}", id))
+        // Act & Assert
+        mockMvc.perform(get("/api/halls/{id}", saved.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("VIP Room"))
                 .andExpect(jsonPath("$.capacity").value(300));
@@ -65,78 +127,113 @@ class HallControllerTest {
 
     @Test
     void testCreate() throws Exception {
-        HallDTO dto = new HallDTO(null, "Test Hall", 7, 250);
-        Hall saved = new Hall(UUID.randomUUID(), 7, 250, "Test Hall");
+        // Arrange
+        HallDTO dto = new HallDTO();
+        dto.setName("Test Hall");
+        dto.setNumber(7);
+        dto.setCapacity(250);
 
-        Mockito.when(hallRepository.save(any(Hall.class))).thenReturn(saved);
-
-        mockMvc.perform(post("/api/halls")
+        // Act
+        String response = mockMvc.perform(post("/api/halls")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.number").value(7))
-                .andExpect(jsonPath("$.capacity").value(250));
+                .andExpect(jsonPath("$.capacity").value(250))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        // Assert - verificăm persistența în BD
+        HallDTO created = objectMapper.readValue(response, HallDTO.class);
+        Hall hallInDb = hallRepository.findById(created.getId()).orElse(null);
+
+        assertThat(hallInDb).isNotNull();
+        assertThat(hallInDb.getName()).isEqualTo("Test Hall");
+        assertThat(hallInDb.getNumber()).isEqualTo(7);
+        assertThat(hallInDb.getCapacity()).isEqualTo(250);
     }
 
     @Test
     void testUpdate() throws Exception {
-        UUID id = UUID.randomUUID();
+        // Arrange
+        Hall hall = new Hall();
+        hall.setName("Sala");
+        hall.setNumber(8);
+        hall.setCapacity(300);
+        Hall saved = hallRepository.save(hall);
 
-        Hall existing = new Hall(id, 2, 100, "Old");
-        Hall updated = new Hall(id, 8, 400, "Updated");
+        HallDTO dto = new HallDTO();
+        dto.setName("Sala fericirii");
+        dto.setNumber(8);
+        dto.setCapacity(400);
 
-        HallDTO dto = new HallDTO(id, "Updated", 8, 400);
-
-        Mockito.when(hallRepository.findById(id)).thenReturn(Optional.of(existing));
-        Mockito.when(hallRepository.save(any(Hall.class))).thenReturn(updated);
-
-        mockMvc.perform(put("/api/halls/{id}", id)
+        // Act
+        mockMvc.perform(put("/api/halls/{id}", saved.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Updated"))
+                .andExpect(jsonPath("$.name").value("Sala fericirii"))
                 .andExpect(jsonPath("$.capacity").value(400));
+
+        // Assert - verificăm că s-a actualizat în BD
+        Hall updated = hallRepository.findById(saved.getId()).orElseThrow();
+        assertThat(updated.getName()).isEqualTo("Sala fericirii");
+        assertThat(updated.getCapacity()).isEqualTo(400);
     }
 
     @Test
     void testPatch() throws Exception {
-        UUID id = UUID.randomUUID();
+        // Arrange
+        Hall hall = new Hall();
+        hall.setName("Original");
+        hall.setNumber(3);
+        hall.setCapacity(150);
+        Hall saved = hallRepository.save(hall);
 
-        Hall existing = new Hall(id, 3, 120, "Old");
-        Hall modified = new Hall(id, 3, 200, "Patched");
+        HallDTO dto = new HallDTO();
+        dto.setName("Patched");
+        dto.setCapacity(200);
 
-        HallDTO dto = new HallDTO(null, "Patched", null, 200);
-
-        Mockito.when(hallRepository.findById(id)).thenReturn(Optional.of(existing));
-        Mockito.when(hallRepository.save(any(Hall.class))).thenReturn(modified);
-
-        mockMvc.perform(patch("/api/halls/{id}", id)
+        // Act
+        mockMvc.perform(patch("/api/halls/{id}", saved.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Patched"))
                 .andExpect(jsonPath("$.capacity").value(200));
+
+        // Assert - verificăm persistența
+        Hall patched = hallRepository.findById(saved.getId()).orElseThrow();
+        assertThat(patched.getName()).isEqualTo("Patched");
+        assertThat(patched.getCapacity()).isEqualTo(200);
+        assertThat(patched.getNumber()).isEqualTo(3); // nu s-a modificat
     }
 
     @Test
     void testDeleteSuccess() throws Exception {
-        UUID id = UUID.randomUUID();
+        // Arrange
+        Hall hall = new Hall();
+        hall.setName("To Delete");
+        hall.setNumber(10);
+        hall.setCapacity(100);
+        Hall saved = hallRepository.save(hall);
 
-        Mockito.when(hallRepository.existsById(id)).thenReturn(true);
-
-        mockMvc.perform(delete("/api/halls/{id}", id))
+        // Act
+        mockMvc.perform(delete("/api/halls/{id}", saved.getId()))
                 .andExpect(status().isOk());
 
-        Mockito.verify(hallRepository).deleteById(id);
+        // Assert - verificăm că s-a șters din BD
+        assertThat(hallRepository.findById(saved.getId())).isEmpty();
     }
 
     @Test
     void testDeleteNotFound() throws Exception {
-        UUID id = UUID.randomUUID();
+        // Arrange
+        java.util.UUID nonExistentId = java.util.UUID.randomUUID();
 
-        Mockito.when(hallRepository.existsById(id)).thenReturn(false);
-
-        mockMvc.perform(delete("/api/halls/{id}", id))
-                .andExpect(status().is4xxClientError());
+        // Act & Assert
+        mockMvc.perform(delete("/api/halls/{id}", nonExistentId))
+                .andExpect(status().isNotFound());
     }
 }

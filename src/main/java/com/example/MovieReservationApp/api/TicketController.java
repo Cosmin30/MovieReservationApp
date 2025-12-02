@@ -1,101 +1,55 @@
 package com.example.MovieReservationApp.api;
 
 import com.example.MovieReservationApp.application.dto.TicketDTO;
-import com.example.MovieReservationApp.domain.model.ticket.Ticket;
-import com.example.MovieReservationApp.domain.model.reservation.Reservation;
-import com.example.MovieReservationApp.domain.model.seat.Seat;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.TicketRepository;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.ReservationRepository;
-import com.example.MovieReservationApp.infrastructure.persistence.repository.SeatRepository;
+import com.example.MovieReservationApp.application.service.TicketService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/tickets")
+@RequiredArgsConstructor
 public class TicketController {
 
-    @Autowired
-    private TicketRepository ticketRepository;
-
-    @Autowired
-    private ReservationRepository reservationRepository;
-
-    @Autowired
-    private SeatRepository seatRepository;
-
-    private TicketDTO toDTO(Ticket ticket) {
-        TicketDTO dto = new TicketDTO();
-        dto.setId(ticket.getId());
-        dto.setPrice(ticket.getPrice());
-        dto.setReservationId(ticket.getReservation().getId());
-        dto.setSeatId(ticket.getSeat().getId());
-        return dto;
-    }
-
-    private Ticket toEntity(TicketDTO dto) {
-        Reservation reservation = reservationRepository.findById(dto.getReservationId())
-                .orElseThrow(() -> new RuntimeException("Reservation not found"));
-        Seat seat = seatRepository.findById(dto.getSeatId())
-                .orElseThrow(() -> new RuntimeException("Seat not found"));
-
-        Ticket ticket = new Ticket();
-        ticket.setId(dto.getId());
-        ticket.setReservation(reservation);
-        ticket.setSeat(seat);
-        ticket.setPrice(dto.getPrice());
-        return ticket;
-    }
+    private final TicketService ticketService;
 
     @GetMapping
-    public List<TicketDTO> getAll() {
-        return ticketRepository.findAll()
-                .stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+    public List<TicketDTO> getAllTickets() {
+        return ticketService.getAllTickets();
     }
 
     @GetMapping("/{id}")
-    public TicketDTO getById(@PathVariable UUID id) {
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ticket not found"));
-        return toDTO(ticket);
+    public TicketDTO getTicketById(@PathVariable UUID id) {
+        return ticketService.getTicketById(id);
+    }
+
+    @GetMapping("/reservation/{reservationId}")
+    public List<TicketDTO> getTicketsByReservation(@PathVariable UUID reservationId) {
+        return ticketService.getTicketsByReservation(reservationId);
     }
 
     @PostMapping
-    public TicketDTO create(@RequestBody TicketDTO dto) {
-        Ticket ticket = toEntity(dto);
-        ticket.setId(null);
-        ticket = ticketRepository.save(ticket);
-        return toDTO(ticket);
+    @ResponseStatus(HttpStatus.CREATED)
+    public TicketDTO createTicket(@RequestBody TicketDTO dto) {
+        return ticketService.createTicket(dto);
     }
 
     @PutMapping("/{id}")
-    public TicketDTO update(@PathVariable UUID id, @RequestBody TicketDTO dto) {
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+    public TicketDTO updateTicket(@PathVariable UUID id, @RequestBody TicketDTO dto) {
+        return ticketService.updateTicket(id, dto);
+    }
 
-        Reservation reservation = reservationRepository.findById(dto.getReservationId())
-                .orElseThrow(() -> new RuntimeException("Reservation not found"));
-        Seat seat = seatRepository.findById(dto.getSeatId())
-                .orElseThrow(() -> new RuntimeException("Seat not found"));
-
-        ticket.setReservation(reservation);
-        ticket.setSeat(seat);
-        ticket.setPrice(dto.getPrice());
-
-        ticket = ticketRepository.save(ticket);
-        return toDTO(ticket);
+    @PatchMapping("/{id}")
+    public TicketDTO patchTicket(@PathVariable UUID id, @RequestBody TicketDTO dto) {
+        return ticketService.patchTicket(id, dto);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id) {
-        if (!ticketRepository.existsById(id)) {
-            throw new RuntimeException("Ticket not found");
-        }
-        ticketRepository.deleteById(id);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteTicket(@PathVariable UUID id) {
+        ticketService.deleteTicket(id);
     }
 }

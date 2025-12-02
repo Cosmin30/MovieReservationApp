@@ -3,166 +3,331 @@ package com.example.MovieReservationApp.api;
 import com.example.MovieReservationApp.application.dto.PaymentDTO;
 import com.example.MovieReservationApp.domain.model.payment.Payment;
 import com.example.MovieReservationApp.domain.model.reservation.Reservation;
+import com.example.MovieReservationApp.domain.model.user.User;
+import com.example.MovieReservationApp.domain.model.screening.Screening;
+import com.example.MovieReservationApp.domain.model.movie.Movie;
+import com.example.MovieReservationApp.domain.model.hall.Hall;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.PaymentRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.ReservationRepository;
-
+import com.example.MovieReservationApp.infrastructure.persistence.repository.UserRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.MovieRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.HallRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(PaymentController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 class PaymentControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private PaymentRepository paymentRepository;
 
-    @MockBean
+    @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ScreeningRepository screeningRepository;
+
+    @Autowired
+    private MovieRepository movieRepository;
+
+    @Autowired
+    private HallRepository hallRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
 
+//    @BeforeEach
+//    void setUp() {
+//        paymentRepository.deleteAll();
+//        reservationRepository.deleteAll();
+//        screeningRepository.deleteAll();
+//        movieRepository.deleteAll();
+//        hallRepository.deleteAll();
+//        userRepository.deleteAll();
+//    }
+
+    private User createUser(String suffix) {
+        return userRepository.save(User.builder()
+                .fullName("Test User " + suffix)
+                .email("user" + suffix + System.currentTimeMillis() + "@test.com")
+                .passwordHash("password123")
+                .createdAt(OffsetDateTime.now())
+                .build());
+    }
+
+    private Movie createMovie() {
+        return movieRepository.save(Movie.builder()
+                .title("Test Movie")
+                .genre("Action")
+                .duration(120)
+                .releaseDate(LocalDate.now())
+                .build());
+    }
+
+    private Hall createHall(int number) {
+        return hallRepository.save(Hall.builder()
+                .name("Hall " + number)
+                .number(1000 + number + (int)(Math.random() * 1000))
+                .capacity(100)
+                .build());
+    }
+
+    private Screening createScreening() {
+        Movie movie = createMovie();
+        Hall hall = createHall(1);
+        return screeningRepository.save(Screening.builder()
+                .movie(movie)
+                .hall(hall)
+                .startTime(OffsetDateTime.now().plusDays(1))
+                .roomNumber(1)
+                .capacity(100)
+                .build());
+    }
+
+    private Reservation createReservation(String suffix) {
+        User user = createUser(suffix);
+        Screening screening = createScreening();
+        return reservationRepository.save(Reservation.builder()
+                .user(user)
+                .screening(screening)
+                .status("CREATED")
+                .totalPrice(BigDecimal.valueOf(250))
+                .createdAt(OffsetDateTime.now())
+                .build());
+    }
+
     @Test
-    void testGetAll() throws Exception {
-        Reservation reservation = new Reservation();
-        reservation.setId(UUID.randomUUID());
+    void testCreateMultiplePayments() throws Exception {
+        Reservation savedReservation = createReservation("multi");
 
-        Payment p1 = new Payment(UUID.randomUUID(), reservation, "PAID", OffsetDateTime.now(), new BigDecimal("30.00"));
-        Payment p2 = new Payment(UUID.randomUUID(), reservation, "PENDING", OffsetDateTime.now(), new BigDecimal("45.00"));
+        // Creăm 5 plăți diferite
+        String[] statuses = {"PAID", "PENDING", "PAID", "FAILED", "PAID"};
+        BigDecimal[] amounts = {
+                BigDecimal.valueOf(50.00),
+                BigDecimal.valueOf(75.50),
+                BigDecimal.valueOf(100.00),
+                BigDecimal.valueOf(25.75),
+                BigDecimal.valueOf(150.00)
+        };
 
-        Mockito.when(paymentRepository.findAll()).thenReturn(Arrays.asList(p1, p2));
+        for (int i = 0; i < 5; i++) {
+            PaymentDTO dto = new PaymentDTO();
+            dto.setReservationId(savedReservation.getId());
+            dto.setAmount(amounts[i]);
+            dto.setStatus(statuses[i]);
 
+            if (statuses[i].equals("PAID")) {
+                dto.setPaidAt(OffsetDateTime.now());
+            }
+
+            mockMvc.perform(post("/api/payments")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(dto)))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.amount").value(amounts[i].doubleValue()))
+                    .andExpect(jsonPath("$.status").value(statuses[i]));
+        }
+
+        // Verificăm că toate cele 5 plăți au fost salvate
+        assertThat(paymentRepository.count()).isGreaterThanOrEqualTo(5);
+    }
+
+    @Test
+    void testGetAllPayments() throws Exception {
+        // Arrange
+        Reservation savedReservation = createReservation("all");
+
+        // Creăm 3 plăți
+        Payment p1 = Payment.builder()
+                .reservation(savedReservation)
+                .amount(BigDecimal.valueOf(100))
+                .status("PAID")
+                .paidAt(OffsetDateTime.now())
+                .build();
+        paymentRepository.save(p1);
+
+        Payment p2 = Payment.builder()
+                .reservation(savedReservation)
+                .amount(BigDecimal.valueOf(200))
+                .status("PENDING")
+                .build();
+        paymentRepository.save(p2);
+
+        Payment p3 = Payment.builder()
+                .reservation(savedReservation)
+                .amount(BigDecimal.valueOf(50))
+                .status("FAILED")
+                .build();
+        paymentRepository.save(p3);
+
+        // Act & Assert
         mockMvc.perform(get("/api/payments"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].status").value("PAID"))
-                .andExpect(jsonPath("$[1].amount").value(45.00));
+                .andExpect(jsonPath("$.length()").value(org.hamcrest.Matchers.greaterThanOrEqualTo(3)));
     }
 
     @Test
-    void testGetById() throws Exception {
-        UUID id = UUID.randomUUID();
-        Reservation reservation = new Reservation();
-        reservation.setId(UUID.randomUUID());
+    void testGetPaymentById() throws Exception {
+        // Arrange
+        Reservation savedReservation = createReservation("byid");
 
-        Payment payment = new Payment(id, reservation, "PAID", OffsetDateTime.now(), new BigDecimal("99.99"));
+        Payment payment = Payment.builder()
+                .reservation(savedReservation)
+                .amount(BigDecimal.valueOf(75.50))
+                .status("PAID")
+                .paidAt(OffsetDateTime.now())
+                .build();
+        Payment saved = paymentRepository.save(payment);
 
-        Mockito.when(paymentRepository.findById(id)).thenReturn(Optional.of(payment));
-
-        mockMvc.perform(get("/api/payments/{id}", id))
+        // Act & Assert
+        mockMvc.perform(get("/api/payments/{id}", saved.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("PAID"))
-                .andExpect(jsonPath("$.amount").value(99.99));
-    }
-
-    @Test
-    void testCreate() throws Exception {
-        UUID reservationId = UUID.randomUUID();
-
-        PaymentDTO dto = new PaymentDTO(null, new BigDecimal("50.00"), OffsetDateTime.now(), "PAID", reservationId);
-
-        Reservation reservation = new Reservation();
-        reservation.setId(reservationId);
-
-        Payment saved = new Payment(UUID.randomUUID(), reservation, "PAID", dto.getPaidAt(), dto.getAmount());
-
-        Mockito.when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
-        Mockito.when(paymentRepository.save(any(Payment.class))).thenReturn(saved);
-
-        mockMvc.perform(post("/api/payments")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("PAID"))
-                .andExpect(jsonPath("$.amount").value(50.00));
-    }
-
-    @Test
-    void testUpdate() throws Exception {
-        UUID id = UUID.randomUUID();
-        UUID reservationId = UUID.randomUUID();
-
-        Reservation reservation = new Reservation();
-        reservation.setId(reservationId);
-
-        Payment existing = new Payment(id, reservation, "PENDING", OffsetDateTime.now(), new BigDecimal("10.00"));
-        Payment updated = new Payment(id, reservation, "PAID", OffsetDateTime.now(), new BigDecimal("100.00"));
-
-        PaymentDTO dto = new PaymentDTO(id, new BigDecimal("100.00"), OffsetDateTime.now(), "PAID", reservationId);
-
-        Mockito.when(paymentRepository.findById(id)).thenReturn(Optional.of(existing));
-        Mockito.when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
-        Mockito.when(paymentRepository.save(any(Payment.class))).thenReturn(updated);
-
-        mockMvc.perform(put("/api/payments/{id}", id)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.amount").value(100.00))
+                .andExpect(jsonPath("$.amount").value(75.50))
                 .andExpect(jsonPath("$.status").value("PAID"));
     }
 
     @Test
-    void testPatch() throws Exception {
-        UUID id = UUID.randomUUID();
+    void testCreatePayment() throws Exception {
+        // Arrange
+        Reservation savedReservation = createReservation("create");
 
-        Reservation reservation = new Reservation();
-        reservation.setId(UUID.randomUUID());
+        PaymentDTO dto = new PaymentDTO();
+        dto.setReservationId(savedReservation.getId());
+        dto.setAmount(BigDecimal.valueOf(150.00));
+        dto.setStatus("PAID");
+        dto.setPaidAt(OffsetDateTime.now());
 
-        Payment existing = new Payment(id, reservation, "PENDING", OffsetDateTime.now(), new BigDecimal("15.00"));
-        Payment patched = new Payment(id, reservation, "PAID", existing.getPaidAt(), new BigDecimal("15.00"));
+        // Act
+        String response = mockMvc.perform(post("/api/payments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.amount").value(150.00))
+                .andExpect(jsonPath("$.status").value("PAID"))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
-        PaymentDTO dto = new PaymentDTO(null, null, null, "PAID", null);
+        // Assert - verificăm persistența
+        PaymentDTO created = objectMapper.readValue(response, PaymentDTO.class);
+        Payment paymentInDb = paymentRepository.findById(created.getId()).orElse(null);
 
-        Mockito.when(paymentRepository.findById(id)).thenReturn(Optional.of(existing));
-        Mockito.when(paymentRepository.save(any(Payment.class))).thenReturn(patched);
+        assertThat(paymentInDb).isNotNull();
+        assertThat(paymentInDb.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(150.00));
+        assertThat(paymentInDb.getStatus()).isEqualTo("PAID");
+    }
 
-        mockMvc.perform(patch("/api/payments/{id}", id)
+    @Test
+    void testUpdatePayment() throws Exception {
+        // Arrange
+        Reservation savedReservation = createReservation("update");
+
+        Payment payment = Payment.builder()
+                .reservation(savedReservation)
+                .amount(BigDecimal.valueOf(100))
+                .status("PENDING")
+                .build();
+        Payment saved = paymentRepository.save(payment);
+
+        PaymentDTO dto = new PaymentDTO();
+        dto.setReservationId(savedReservation.getId());
+        dto.setAmount(BigDecimal.valueOf(120));
+        dto.setStatus("PAID");
+        dto.setPaidAt(OffsetDateTime.now());
+
+        // Act
+        mockMvc.perform(put("/api/payments/{id}", saved.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.amount").value(120.00))
+                .andExpect(jsonPath("$.status").value("PAID"));
+
+        // Assert
+        Payment updated = paymentRepository.findById(saved.getId()).orElseThrow();
+        assertThat(updated.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(120));
+        assertThat(updated.getStatus()).isEqualTo("PAID");
+    }
+
+    @Test
+    void testPatchPayment() throws Exception {
+        // Arrange
+        Reservation savedReservation = createReservation("patch");
+
+        Payment payment = Payment.builder()
+                .reservation(savedReservation)
+                .amount(BigDecimal.valueOf(100))
+                .status("PENDING")
+                .build();
+        Payment saved = paymentRepository.save(payment);
+
+        PaymentDTO dto = new PaymentDTO();
+        dto.setStatus("PAID");
+
+        // Act
+        mockMvc.perform(patch("/api/payments/{id}", saved.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("PAID"));
+
+        // Assert
+        Payment patched = paymentRepository.findById(saved.getId()).orElseThrow();
+        assertThat(patched.getStatus()).isEqualTo("PAID");
+        assertThat(patched.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(100));
     }
 
     @Test
-    void testDeleteSuccess() throws Exception {
-        UUID id = UUID.randomUUID();
+    void testDeletePayment() throws Exception {
+        // Arrange
+        Reservation savedReservation = createReservation("delete");
 
-        Mockito.when(paymentRepository.existsById(id)).thenReturn(true);
+        Payment payment = Payment.builder()
+                .reservation(savedReservation)
+                .amount(BigDecimal.valueOf(50))
+                .status("CANCELLED")
+                .build();
+        Payment saved = paymentRepository.save(payment);
 
-        mockMvc.perform(delete("/api/payments/{id}", id))
-                .andExpect(status().isOk());
+        // Act
+        mockMvc.perform(delete("/api/payments/{id}", saved.getId()))
+                .andExpect(status().isNoContent());
 
-        Mockito.verify(paymentRepository).deleteById(id);
+        // Assert
+        assertThat(paymentRepository.findById(saved.getId())).isEmpty();
     }
 
     @Test
-    void testDeleteNotFound() throws Exception {
-        UUID id = UUID.randomUUID();
+    void testDeletePaymentNotFound() throws Exception {
+        // Arrange
+        java.util.UUID nonExistentId = java.util.UUID.randomUUID();
 
-        Mockito.when(paymentRepository.existsById(id)).thenReturn(false);
-
-        mockMvc.perform(delete("/api/payments/{id}", id))
-                .andExpect(status().is4xxClientError());
+        // Act & Assert
+        mockMvc.perform(delete("/api/payments/{id}", nonExistentId))
+                .andExpect(status().isNotFound());
     }
 }

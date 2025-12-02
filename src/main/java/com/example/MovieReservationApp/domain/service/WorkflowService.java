@@ -40,7 +40,7 @@ public class WorkflowService {
         Reservation reservation = new Reservation();
         reservation.setUser(user);
         reservation.setScreening(screening);
-        reservation.setTotalPrice(totalPrice);
+        reservation.setTotalPrice(BigDecimal.valueOf(totalPrice));
         reservation.setStatus("CREATED");
         reservation.setCreatedAt(OffsetDateTime.now());
         Reservation savedReservation = reservationRepository.save(reservation);
