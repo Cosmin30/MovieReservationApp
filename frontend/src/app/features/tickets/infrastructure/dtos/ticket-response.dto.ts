@@ -1,2 +1,5 @@
-export class TicketResponse {
+import { TicketDTO } from './ticket.dto';
+
+export interface TicketResponseDTO {
+  ticket: TicketDTO;
 }

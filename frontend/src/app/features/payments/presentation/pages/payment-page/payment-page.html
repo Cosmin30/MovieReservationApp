@@ -1,1 +1,9 @@
-<p>payment-page works!</p>
+<div class="container mt-4">
+  
+  <app-payment-form (onPay)="pay($event)"></app-payment-form>
+
+  <div class="mt-4" *ngIf="payment">
+    <app-payment-summary [payment]="payment"></app-payment-summary>
+  </div>
+
+</div>

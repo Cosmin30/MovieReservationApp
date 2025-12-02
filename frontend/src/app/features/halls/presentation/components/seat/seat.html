@@ -1,1 +1,11 @@
-<p>seat works!</p>
+<button
+  class="btn seat-box"
+  [ngClass]="{
+    'available': seat?.status === 'AVAILABLE',
+    'reserved': seat?.status === 'RESERVED',
+    'unavailable': seat?.status === 'UNAVAILABLE'
+  }"
+  (click)="selectSeat()"
+>
+  {{ seat?.row }}-{{ seat?.number }}
+</button>

@@ -1,1 +1,25 @@
-<p>screening-card works!</p>
+<div class="card shadow-sm screening-card">
+  <div class="card-body">
+    
+    <h5 class="card-title">{{ screening.movie.title }}</h5>
+    
+    <p class="text-muted mb-1">
+      Sala: {{ screening.hall.name }} ({{ screening.roomNumber }})
+    </p>
+
+    <p class="mb-1">
+      <strong>Ora:</strong>
+      {{ screening.startTime | date:'short' }}
+    </p>
+
+    <p>
+      <strong>Locuri:</strong> {{ screening.capacity }}
+    </p>
+
+    <button class="btn btn-primary w-100"
+            [routerLink]="['/screenings', screening.id]">
+      Detalii
+    </button>
+
+  </div>
+</div>

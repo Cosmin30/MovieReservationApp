@@ -1,2 +1,4 @@
-export class PaymentStatus {
+export interface PaymentStatusDTO {
+  id: string;
+  status: string;
 }

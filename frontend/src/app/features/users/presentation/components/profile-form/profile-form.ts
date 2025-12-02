@@ -1,11 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-profile-form',
-  imports: [],
   templateUrl: './profile-form.html',
-  styleUrl: './profile-form.css',
+  styleUrls: ['./profile-form.css']
 })
-export class ProfileForm {
+export class ProfileFormComponent {
 
+  @Input() form: any = {};
+  @Output() onUpdate = new EventEmitter<any>();
+
+  submit() {
+    this.onUpdate.emit(this.form);
+  }
 }

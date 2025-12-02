@@ -1,14 +1,18 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
-import { HallsRoutingModule } from './halls-routing-module';
-
+import { HallLayout } from './presentation/components/hall-layout/hall-layout';
+import { Seat } from './presentation/components/seat/seat';
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    HallLayout,
+    Seat
+  ],
   imports: [
     CommonModule,
-    HallsRoutingModule
+    RouterModule
   ]
 })
-export class HallsModule { }
+export class HallsModule {}

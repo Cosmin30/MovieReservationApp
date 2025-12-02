@@ -1,1 +1,8 @@
-<p>seat-grid works!</p>
+<div class="d-flex flex-wrap gap-2 justify-content-center">
+  <button *ngFor="let s of seats"
+          class="btn seat-box"
+          [ngClass]="{ 'available': s.available, 'unavailable': !s.available }"
+          (click)="toggleSeat(s)">
+    {{ s.row }}-{{ s.number }}
+  </button>
+</div>

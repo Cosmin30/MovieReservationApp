@@ -1,11 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-payment-form',
-  imports: [],
   templateUrl: './payment-form.html',
-  styleUrl: './payment-form.css',
+  styleUrls: ['./payment-form.css']
 })
-export class PaymentForm {
+export class PaymentFormComponent {
 
+  @Output() onPay = new EventEmitter<any>();
+
+  form = {
+    amount: 0,
+    reservationId: ''
+  };
+
+  submit() {
+    this.onPay.emit(this.form);
+  }
 }

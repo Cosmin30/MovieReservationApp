@@ -1,11 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-seat-selection',
-  imports: [],
   templateUrl: './seat-selection.html',
-  styleUrl: './seat-selection.css',
+  styleUrls: ['./seat-selection.css']
 })
-export class SeatSelection {
+export class SeatSelectionComponent {
 
+  @Input() seats: any[] = [];
+  selectedSeats: any[] = [];
+
+  selectSeat(seat: any) {
+    if (!this.selectedSeats.includes(seat)) {
+      this.selectedSeats.push(seat);
+    }
+  }
 }

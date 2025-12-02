@@ -1,1 +1,22 @@
-<p>register-form works!</p>
+<form (ngSubmit)="submit()" class="card p-4 shadow-sm">
+
+  <h4>Înregistrare</h4>
+
+  <div class="mb-3">
+    <label class="form-label">Nume complet</label>
+    <input class="form-control" [(ngModel)]="form.fullName" name="fullName" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Email</label>
+    <input class="form-control" [(ngModel)]="form.email" name="email" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Parola</label>
+    <input type="password" class="form-control" [(ngModel)]="form.password" name="password" required>
+  </div>
+
+  <button class="btn btn-success w-100">Creează cont</button>
+
+</form>

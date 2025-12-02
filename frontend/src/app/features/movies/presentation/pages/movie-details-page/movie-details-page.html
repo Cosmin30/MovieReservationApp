@@ -1,1 +1,18 @@
-<p>movie-details-page works!</p>
+<div class="container mt-4">
+  <div class="card shadow-sm p-4">
+    <h2>{{ movie?.title }}</h2>
+    <p class="text-muted">{{ movie?.genre }}</p>
+
+    <p>{{ movie?.description }}</p>
+
+    <p>
+      <strong>Durată:</strong> {{ movie?.duration }} minute
+    </p>
+
+    <p>
+      <strong>Lansare:</strong> {{ movie?.releaseDate }}
+    </p>
+
+    <button class="btn btn-secondary mt-3" (click)="goBack()">Înapoi</button>
+  </div>
+</div>

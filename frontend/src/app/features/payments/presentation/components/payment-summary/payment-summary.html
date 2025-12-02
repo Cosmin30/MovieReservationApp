@@ -1,1 +1,12 @@
-<p>payment-summary works!</p>
+<div class="card shadow-sm p-4">
+  <h4 class="mb-3">Rezumat Plată</h4>
+
+  <p><strong>Status:</strong> {{ payment?.status }}</p>
+  <p><strong>Suma:</strong> {{ payment?.amount }} RON</p>
+  <p><strong>Plătit la:</strong> {{ payment?.paidAt || 'N/A' }}</p>
+  <p><strong>ID Rezervare:</strong> {{ payment?.reservationId }}</p>
+
+  <button class="btn btn-secondary mt-3 w-100" (click)="goBack()">
+    Înapoi
+  </button>
+</div>

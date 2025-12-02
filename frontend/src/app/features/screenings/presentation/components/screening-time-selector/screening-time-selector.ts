@@ -1,11 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-screening-time-selector',
-  imports: [],
   templateUrl: './screening-time-selector.html',
-  styleUrl: './screening-time-selector.css',
+  styleUrls: ['./screening-time-selector.css']
 })
-export class ScreeningTimeSelector {
+export class ScreeningTimeSelectorComponent {
 
+  @Input() screenings: any[] = [];
+  @Output() onSelected = new EventEmitter<any>();
+
+  select(s: any) {
+    this.onSelected.emit(s);
+  }
 }

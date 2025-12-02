@@ -1,14 +1,20 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
-import { ScreeningsRoutingModule } from './screenings-routing-module';
-
+import { ScreeningCardComponent } from './presentation/components/screening-card/screening-card';
+import { ScreeningListComponent } from './presentation/components/screening-list/screening-list';
+import { ScreeningTimeSelectorComponent } from './presentation/components/screening-time-selector/screening-time-selector';
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    ScreeningCardComponent,
+    ScreeningListComponent,
+    ScreeningTimeSelectorComponent
+  ],
   imports: [
     CommonModule,
-    ScreeningsRoutingModule
+    RouterModule
   ]
 })
-export class ScreeningsModule { }
+export class ScreeningsModule {}

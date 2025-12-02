@@ -1,1 +1,15 @@
-<p>ticket-card works!</p>
+<div class="card shadow-sm ticket-card">
+  <div class="card-body">
+
+    <h5 class="card-title">Bilet #{{ ticket.id }}</h5>
+
+    <p><strong>Preț:</strong> {{ ticket.price }} RON</p>
+    <p><strong>Loc:</strong> {{ ticket.seatId }}</p>
+
+    <a class="btn btn-primary w-100"
+       [routerLink]="['/tickets', ticket.id]">
+      Detalii Bilet
+    </a>
+
+  </div>
+</div>

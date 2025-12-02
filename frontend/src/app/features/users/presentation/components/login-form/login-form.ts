@@ -1,11 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-login-form',
-  imports: [],
   templateUrl: './login-form.html',
-  styleUrl: './login-form.css',
+  styleUrls: ['./login-form.css']
 })
-export class LoginForm {
+export class LoginFormComponent {
 
+  @Output() onLogin = new EventEmitter<any>();
+
+  form = {
+    email: '',
+    password: ''
+  };
+
+  submit() {
+    this.onLogin.emit(this.form);
+  }
 }

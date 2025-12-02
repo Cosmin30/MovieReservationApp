@@ -1,1 +1,5 @@
-<p>movie-search works!</p>
+<div class="input-group shadow-sm mb-3">
+  <input class="form-control" placeholder="Caută film..." 
+         (input)="onSearch($event.target.value)" />
+  <button class="btn btn-primary">Caută</button>
+</div>

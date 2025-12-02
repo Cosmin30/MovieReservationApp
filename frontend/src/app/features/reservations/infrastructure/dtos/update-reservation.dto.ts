@@ -1,2 +1,4 @@
-export class UpdateReservation {
+export interface UpdateReservationDTO {
+  status?: string;
+  totalPrice?: number;
 }

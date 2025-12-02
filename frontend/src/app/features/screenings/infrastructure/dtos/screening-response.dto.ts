@@ -1,2 +1,5 @@
-export class ScreeningResponse {
+import { ScreeningDTO } from './screening.dto';
+
+export interface ScreeningResponseDTO {
+  screening: ScreeningDTO;
 }

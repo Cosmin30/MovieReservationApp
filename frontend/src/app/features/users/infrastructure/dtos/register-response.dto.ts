@@ -1,2 +1,3 @@
-export class RegisterResponse {
+export interface RegisterResponseDTO {
+  userId: string;
 }

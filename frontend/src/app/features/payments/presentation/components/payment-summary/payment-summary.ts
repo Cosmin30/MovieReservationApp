@@ -1,11 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-payment-summary',
-  imports: [],
   templateUrl: './payment-summary.html',
-  styleUrl: './payment-summary.css',
+  styleUrls: ['./payment-summary.css']
 })
-export class PaymentSummary {
+export class PaymentSummaryComponent {
+  @Input() payment: any;
 
+  goBack() {
+    history.back();
+  }
 }

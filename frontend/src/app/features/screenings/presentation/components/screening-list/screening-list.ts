@@ -1,11 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-screening-list',
-  imports: [],
   templateUrl: './screening-list.html',
-  styleUrl: './screening-list.css',
+  styleUrls: ['./screening-list.css']
 })
-export class ScreeningList {
-
+export class ScreeningListComponent {
+  @Input() screenings: any[] = [];
 }

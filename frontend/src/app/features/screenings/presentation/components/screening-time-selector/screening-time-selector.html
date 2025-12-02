@@ -1,1 +1,11 @@
-<p>screening-time-selector works!</p>
+<div class="card shadow-sm p-3">
+  <h5>Selectează ora</h5>
+
+  <div class="d-flex gap-2 flex-wrap mt-2">
+    <button *ngFor="let s of screenings"
+            class="btn btn-outline-primary time-btn"
+            (click)="select(s)">
+      {{ s.startTime | date:'shortTime' }}
+    </button>
+  </div>
+</div>

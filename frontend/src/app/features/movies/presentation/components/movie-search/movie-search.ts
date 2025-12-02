@@ -1,11 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-movie-search',
-  imports: [],
   templateUrl: './movie-search.html',
-  styleUrl: './movie-search.css',
+  styleUrls: ['./movie-search.css']
 })
-export class MovieSearch {
+export class MovieSearchComponent {
+  @Output() searchEvent = new EventEmitter<string>();
 
+  onSearch(value: string) {
+    this.searchEvent.emit(value);
+  }
 }

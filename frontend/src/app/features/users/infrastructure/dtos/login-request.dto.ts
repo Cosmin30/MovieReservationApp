@@ -1,2 +1,4 @@
-export class LoginRequest {
+export interface LoginRequestDTO {
+  email: string;
+  password: string;
 }

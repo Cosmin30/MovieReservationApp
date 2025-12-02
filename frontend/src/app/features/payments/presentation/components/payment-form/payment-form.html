@@ -1,1 +1,21 @@
-<p>payment-form works!</p>
+<div class="card shadow-sm p-4">
+  <h4 class="mb-3">Plata Rezervării</h4>
+
+  <form (ngSubmit)="submit()">
+
+    <div class="mb-3">
+      <label class="form-label">Sumă</label>
+      <input type="number" class="form-control" [(ngModel)]="form.amount" name="amount" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">ID Rezervare</label>
+      <input class="form-control" [(ngModel)]="form.reservationId" name="reservationId" required>
+    </div>
+
+    <button class="btn btn-success w-100">
+      Plătește
+    </button>
+
+  </form>
+</div>
