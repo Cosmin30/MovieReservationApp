@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="persistare teste in bd">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/app.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/app.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/app.ts" afterDir="false" />
-    </list>
+    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="frontend core and shared" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -354,7 +350,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764411192334</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="frontend core and shared">
+      <option name="closed" value="true" />
+      <created>1764702811525</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1764702811525</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -392,6 +396,7 @@
     <MESSAGE value="fixed errors" />
     <MESSAGE value="updates" />
     <MESSAGE value="persistare teste in bd" />
-    <option name="LAST_COMMIT_MESSAGE" value="persistare teste in bd" />
+    <MESSAGE value="frontend core and shared" />
+    <option name="LAST_COMMIT_MESSAGE" value="frontend core and shared" />
   </component>
 </project>
