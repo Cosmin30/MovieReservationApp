@@ -1,1 +1,15 @@
-<p>confirmation-dialog works!</p>
+<div class="modal-backdrop" *ngIf="visible"></div>
+
+<div class="modal-container" *ngIf="visible">
+  <div class="modal-card">
+
+    <h4>{{ title }}</h4>
+    <p>{{ message }}</p>
+
+    <div class="buttons">
+      <button class="btn btn-secondary" (click)="cancel()">Anulează</button>
+      <button class="btn btn-danger" (click)="confirm()">Confirmă</button>
+    </div>
+
+  </div>
+</div>

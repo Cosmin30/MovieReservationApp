@@ -1,10 +1,23 @@
-import { Directive } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, OnInit, Output } from '@angular/core';
 
 @Directive({
-  selector: '[appLazyLoad]'
+  selector: '[lazyLoad]',
+  standalone: true
 })
-export class LazyLoad {
+export class LazyLoadDirective implements OnInit {
 
-  constructor() { }
+  @Output() lazyLoad = new EventEmitter<void>();
 
+  constructor(private el: ElementRef) {}
+
+  ngOnInit() {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        this.lazyLoad.emit();
+        observer.disconnect();
+      }
+    });
+
+    observer.observe(this.el.nativeElement);
+  }
 }

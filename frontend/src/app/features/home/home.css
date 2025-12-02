@@ -1,0 +1,11 @@
+.card {
+  border-radius: 12px;
+}
+
+.card-title {
+  font-weight: 600;
+}
+
+.lead {
+  color: #666;
+}

@@ -1,11 +1,18 @@
 import { Component } from '@angular/core';
+import { NgFor } from '@angular/common';
 
 @Component({
   selector: 'app-notification',
-  imports: [],
+  standalone: true,
+  imports: [NgFor],
   templateUrl: './notification.html',
-  styleUrl: './notification.css',
+  styleUrls: ['./notification.css']
 })
-export class Notification {
+export class NotificationComponent {
+
+  messages: { type: string; text: string }[] = [
+    // exemplu de test:
+    // { type: 'success', text: 'Test notificare!' }
+  ];
 
 }
