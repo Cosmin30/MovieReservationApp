@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { User } from '../../features/users/domain/models/user.model';
+import { UserModel } from '../../features/users/domain/models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -9,7 +9,7 @@ export class AuthService {
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:8080/api';
 
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  private currentUserSubject = new BehaviorSubject<UserModel | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
 
   constructor() {
@@ -17,7 +17,7 @@ export class AuthService {
   }
 
   login(email: string, password: string) {
-    return this.http.post<User>(`${this.apiUrl}/auth/login`, { email, password })
+    return this.http.post<UserModel>(`${this.apiUrl}/auth/login`, { email, password })
       .subscribe(user => {
         this.currentUserSubject.next(user);
         localStorage.setItem('user', JSON.stringify(user));
@@ -30,7 +30,7 @@ export class AuthService {
       this.currentUserSubject.next(JSON.parse(saved));
     }
 
-    this.http.get<User>(`${this.apiUrl}/users/me`).subscribe({
+    this.http.get<UserModel>(`${this.apiUrl}/users/me`).subscribe({
       next: user => {
         this.currentUserSubject.next(user);
         localStorage.setItem('user', JSON.stringify(user));
@@ -44,7 +44,7 @@ export class AuthService {
     this.currentUserSubject.next(null);
   }
 
-  getCurrentUser(): User | null {
+  getCurrentUser(): UserModel | null {
     return this.currentUserSubject.value;
   }
 
