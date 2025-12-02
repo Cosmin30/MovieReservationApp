@@ -1,0 +1,20 @@
+.seat-box {
+  width: 55px;
+  height: 55px;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.available {
+  background-color: #28a745;
+}
+
+.reserved {
+  background-color: #6c757d;
+}
+
+.unavailable {
+  background-color: #dc3545;
+}

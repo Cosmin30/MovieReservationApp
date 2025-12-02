@@ -1,11 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-reservation-card',
-  imports: [],
   templateUrl: './reservation-card.html',
-  styleUrl: './reservation-card.css',
+  styleUrls: ['./reservation-card.css']
 })
-export class ReservationCard {
-
+export class ReservationCardComponent {
+  @Input() reservation: any;
 }

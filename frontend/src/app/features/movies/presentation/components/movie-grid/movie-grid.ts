@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { MovieModel } from '../../../domain/models/movie.model';
 
 @Component({
   selector: 'app-movie-grid',
-  imports: [],
   templateUrl: './movie-grid.html',
-  styleUrl: './movie-grid.css',
+  styleUrls: ['./movie-grid.css']
 })
-export class MovieGrid {
-
+export class MovieGridComponent {
+  @Input() movies: MovieModel[] = [];
 }

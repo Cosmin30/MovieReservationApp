@@ -1,1 +1,18 @@
-<p>movies-list-page works!</p>
+<div class="container mt-4">
+
+  <app-movie-search (searchEvent)="search($event)"></app-movie-search>
+
+  <div class="row">
+    <div class="col-md-3">
+      <app-movie-filters 
+        (onFilter)="filter($event)"
+        (onGenreFilter)="filterGenre($event)">
+      </app-movie-filters>
+    </div>
+
+    <div class="col-md-9">
+      <app-movie-grid [movies]="movies"></app-movie-grid>
+    </div>
+  </div>
+
+</div>

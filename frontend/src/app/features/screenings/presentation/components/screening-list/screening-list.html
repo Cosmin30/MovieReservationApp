@@ -1,1 +1,3 @@
-<p>screening-list works!</p>
+<div class="d-flex flex-column gap-3">
+  <app-screening-card *ngFor="let s of screenings" [screening]="s"></app-screening-card>
+</div>

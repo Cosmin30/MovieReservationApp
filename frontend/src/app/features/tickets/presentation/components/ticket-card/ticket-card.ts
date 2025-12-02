@@ -1,11 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-ticket-card',
-  imports: [],
   templateUrl: './ticket-card.html',
-  styleUrl: './ticket-card.css',
+  styleUrls: ['./ticket-card.css']
 })
-export class TicketCard {
-
+export class TicketCardComponent {
+  @Input() ticket: any;
 }

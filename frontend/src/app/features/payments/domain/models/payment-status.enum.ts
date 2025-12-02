@@ -1,2 +1,5 @@
-export class PaymentStatus {
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  FAILED = 'FAILED'
 }

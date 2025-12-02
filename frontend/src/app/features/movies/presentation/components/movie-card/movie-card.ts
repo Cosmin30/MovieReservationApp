@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { MovieModel } from '../../../domain/models/movie.model';
 
 @Component({
   selector: 'app-movie-card',
-  imports: [],
   templateUrl: './movie-card.html',
-  styleUrl: './movie-card.css',
+  styleUrls: ['./movie-card.css']
 })
-export class MovieCard {
-
+export class MovieCardComponent {
+  @Input() movie!: MovieModel;
 }

@@ -1,0 +1,15 @@
+.movie-card {
+  width: 300px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.movie-card img {
+  height: 350px;
+  object-fit: cover;
+}
+
+.description {
+  height: 60px;
+  overflow: hidden;
+}

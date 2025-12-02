@@ -1,14 +1,18 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
-import { TicketsRoutingModule } from './tickets-routing-module';
-
+import { TicketCardComponent } from './presentation/components/ticket-card/ticket-card';
+import { TicketDetailsComponent } from './presentation/components/ticket-details/ticket-details';
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    TicketCardComponent,
+    TicketDetailsComponent
+  ],
   imports: [
     CommonModule,
-    TicketsRoutingModule
+    RouterModule
   ]
 })
-export class TicketsModule { }
+export class TicketsModule {}

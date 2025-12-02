@@ -1,2 +1,4 @@
-export class LoginResponse {
+export interface LoginResponseDTO {
+  token: string;
+  userId: string;
 }

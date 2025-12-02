@@ -1,1 +1,33 @@
-<p>hall-layout works!</p>
+<div class="container mt-4">
+
+  <!-- Hall header card -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h2 class="mb-3">{{ hall?.name }} (Sala {{ hall?.number }})</h2>
+
+      <p><strong>Capacitate:</strong> {{ hall?.capacity }} locuri</p>
+
+      <button class="btn btn-secondary mt-2" (click)="goBack()">
+        Înapoi
+      </button>
+    </div>
+  </div>
+
+  <!-- Seats layout -->
+  <div class="card shadow-sm">
+    <div class="card-header">
+      <h5 class="m-0">Locuri</h5>
+    </div>
+
+    <div class="card-body d-flex flex-wrap justify-content-center gap-2">
+
+      <!-- Seat component (repetabil) -->
+      <app-seat
+        *ngFor="let seat of seats"
+        [seat]="seat">
+      </app-seat>
+
+    </div>
+  </div>
+
+</div>

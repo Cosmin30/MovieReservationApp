@@ -1,2 +1,4 @@
-export class CreatePayment {
+export interface CreatePaymentDTO {
+  amount: number;
+  reservationId: string;
 }

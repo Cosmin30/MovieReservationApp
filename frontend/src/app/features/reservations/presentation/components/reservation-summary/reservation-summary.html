@@ -1,1 +1,14 @@
-<p>reservation-summary works!</p>
+<div class="card shadow-sm p-4">
+  <h4 class="mb-3">Rezumat rezervare</h4>
+
+  <p><strong>Status:</strong> {{ reservation?.status }}</p>
+  <p><strong>Total:</strong> {{ reservation?.totalPrice }} RON</p>
+  <p><strong>Creată la:</strong> {{ reservation?.createdAt }}</p>
+
+  <h5 class="mt-4">Bilete:</h5>
+  <ul>
+    <li *ngFor="let t of reservation?.tickets">
+      Loc {{ t.seat.row }}-{{ t.seat.number }}
+    </li>
+  </ul>
+</div>

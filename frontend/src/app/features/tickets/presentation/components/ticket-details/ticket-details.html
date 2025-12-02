@@ -1,1 +1,18 @@
-<p>ticket-details works!</p>
+<div class="card shadow-sm p-4">
+  <h4 class="mb-3">Detalii Bilet</h4>
+
+  <p><strong>ID:</strong> {{ ticket?.id }}</p>
+  <p><strong>Preț:</strong> {{ ticket?.price }} RON</p>
+  <p><strong>Rezervare:</strong> {{ ticket?.reservationId }}</p>
+  <p><strong>Loc:</strong> {{ ticket?.seatId }}</p>
+
+  <button class="btn btn-secondary mt-3 w-100"
+          (click)="goBack()">
+    Înapoi
+  </button>
+
+  <button class="btn btn-success mt-2 w-100"
+          (click)="downloadTicket()">
+    Descarcă bilet
+  </button>
+</div>

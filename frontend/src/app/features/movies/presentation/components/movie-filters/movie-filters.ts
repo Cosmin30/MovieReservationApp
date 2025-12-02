@@ -1,11 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-movie-filters',
-  imports: [],
   templateUrl: './movie-filters.html',
-  styleUrl: './movie-filters.css',
+  styleUrls: ['./movie-filters.css']
 })
-export class MovieFilters {
+export class MovieFiltersComponent {
 
+  genres = ['Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi'];
+
+  @Output() onFilter = new EventEmitter<string>();
+  @Output() onGenreFilter = new EventEmitter<string>();
+
+  filter(value: string) {
+    this.onFilter.emit(value);
+  }
+
+  filterGenre(value: string) {
+    this.onGenreFilter.emit(value);
+  }
 }

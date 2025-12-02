@@ -1,1 +1,9 @@
-<p>my-reservations-page works!</p>
+<div class="container mt-4">
+
+  <h3 class="mb-4">Rezervările mele</h3>
+
+  <div *ngFor="let r of reservations">
+    <app-reservation-card [reservation]="r"></app-reservation-card>
+  </div>
+
+</div>

@@ -1,11 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-seat-grid',
-  imports: [],
   templateUrl: './seat-grid.html',
-  styleUrl: './seat-grid.css',
+  styleUrls: ['./seat-grid.css']
 })
-export class SeatGrid {
+export class SeatGridComponent {
+  @Input() seats: any[] = [];
+  @Output() seatSelected = new EventEmitter<any>();
 
+  toggleSeat(seat: any) {
+    if (!seat.available) return;
+    this.seatSelected.emit(seat);
+  }
 }

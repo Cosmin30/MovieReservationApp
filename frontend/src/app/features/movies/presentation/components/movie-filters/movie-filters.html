@@ -1,1 +1,11 @@
-<p>movie-filters works!</p>
+<div class="card p-3 mb-3 shadow-sm">
+  <h5 class="mb-3">Filtre</h5>
+
+  <input class="form-control mb-2" placeholder="Caută după titlu..." 
+         (input)="filter($event.target.value)" />
+
+  <select class="form-select" (change)="filterGenre($event.target.value)">
+    <option value="">Toate genurile</option>
+    <option *ngFor="let g of genres" [value]="g">{{ g }}</option>
+  </select>
+</div>

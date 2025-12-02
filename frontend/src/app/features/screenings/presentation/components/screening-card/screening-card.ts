@@ -1,11 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-screening-card',
-  imports: [],
   templateUrl: './screening-card.html',
-  styleUrl: './screening-card.css',
+  styleUrls: ['./screening-card.css']
 })
-export class ScreeningCard {
-
+export class ScreeningCardComponent {
+  @Input() screening: any;
 }

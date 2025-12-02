@@ -1,1 +1,16 @@
-<p>reservation-page works!</p>
+<div class="container mt-4">
+
+  <h3 class="mb-4">Rezervare</h3>
+
+  <app-seat-selection 
+      [seats]="availableSeats">
+  </app-seat-selection>
+
+  <div class="mt-4">
+    <app-reservation-summary 
+        *ngIf="reservation" 
+        [reservation]="reservation">
+    </app-reservation-summary>
+  </div>
+
+</div>
