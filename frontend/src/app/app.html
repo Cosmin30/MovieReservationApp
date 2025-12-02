@@ -1,56 +1,22 @@
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container">
-    <a class="navbar-brand" href="#">MovieReservationApp</a>
+<!-- HEADER GLOBAL -->
+<app-header></app-header>
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+<!-- NOTIFICATION MESSAGES (toast-style) -->
+<app-notification></app-notification>
 
-    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-      <ul class="navbar-nav">
-        <li class="nav-item"><a class="nav-link active" href="#">Acasă</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Filme</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Despre</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
+<!-- GLOBAL ERROR MESSAGE -->
+<app-error-message></app-error-message>
 
-<!-- HERO -->
-<div class="bg-primary text-white text-center py-5 mt-4">
-  <div class="container">
-    <h1 class="mb-3">Bine ai venit!</h1>
-    <p class="lead">Rezervă bilete rapid și simplu</p>
-  </div>
-</div>
+<!-- GLOBAL LOADING SPINNER -->
+<app-loading-spinner></app-loading-spinner>
 
-<!-- MOVIE LIST (static example) -->
-<div class="container my-5">
-  <h2 class="text-center mb-4">Filme Disponibile</h2>
+<!-- MAIN ROUTER CONTENT -->
+<main class="container mt-4 mb-5">
+  <router-outlet></router-outlet>
+</main>
 
-  <div class="row g-4">
+<!-- CONFIRMATION DIALOG (ALWAYS PRESENT) -->
+<app-confirmation-dialog></app-confirmation-dialog>
 
-    <div class="col-sm-6 col-md-4 col-lg-3">
-      <div class="card h-100">
-        <img src="https://m.media-amazon.com/images/I/51CP55uF0lL._AC_UF1000,1000_QL80_.jpg" 
-             class="card-img-top" style="height: 230px; object-fit: cover;">
-        <div class="card-body">
-          <h5 class="card-title">Film Exemplu</h5>
-          <p class="card-text">Descriere scurtă a filmului.</p>
-          <button class="btn btn-primary w-100">Rezervă</button>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- FOOTER -->
-<footer class="bg-dark text-white py-4 mt-5">
-  <div class="container text-center">
-    <p class="mb-1">&copy; 2025 MovieReservationApp</p>
-    <small>Rezervă bilete rapid și simplu!</small>
-  </div>
-</footer>
+<!-- FOOTER GLOBAL -->
+<app-footer></app-footer>

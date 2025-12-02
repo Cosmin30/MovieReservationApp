@@ -1,1 +1,5 @@
-<p>notification works!</p>
+<div class="notification-container">
+  <div *ngFor="let msg of messages" class="alert alert-{{msg.type}}">
+    {{ msg.text }}
+  </div>
+</div>

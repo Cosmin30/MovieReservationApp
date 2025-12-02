@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-loading-spinner',
-  imports: [],
+  standalone: true,
+  imports: [NgIf],
   templateUrl: './loading-spinner.html',
-  styleUrl: './loading-spinner.css',
+  styleUrls: ['./loading-spinner.css']
 })
-export class LoadingSpinner {
-
+export class LoadingSpinnerComponent {
+  isLoading = false; // poate fi legat la un LoadingService
 }

@@ -1,0 +1,8 @@
+.app-footer {
+  background: #1e2327; /* dark grey / near black */
+  color: #fff;
+  padding: 15px 0;
+  margin-top: auto;       /* împinge footerul jos */
+  width: 100%;
+  text-align: center;
+}

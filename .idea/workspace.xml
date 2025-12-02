@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="persistare teste in bd">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="frontend core and shared" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -21,6 +19,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -31,7 +30,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/Cosmin30/MovieReservationApp&quot;,
-    &quot;accountId&quot;: &quot;5294650a-473f-41d3-9b36-e5108248b954&quot;
+    &quot;accountId&quot;: &quot;69c33dfe-35da-40f8-b806-b4a597769227&quot;
   }
 }</component>
   <component name="JpbToolWindowState">
@@ -101,13 +100,6 @@
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="com.example.MovieReservationApp.api" />
     </key>
-  </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.27397.103" />
-      </set>
-    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -358,13 +350,13 @@
       <option name="project" value="LOCAL" />
       <updated>1764411192334</updated>
     </task>
-    <task id="LOCAL-00031" summary="Create tests for controllers">
+    <task id="LOCAL-00031" summary="frontend core and shared">
       <option name="closed" value="true" />
-      <created>1764697529195</created>
+      <created>1764702811525</created>
       <option name="number" value="00031" />
       <option name="presentableId" value="LOCAL-00031" />
       <option name="project" value="LOCAL" />
-      <updated>1764697529195</updated>
+      <updated>1764702811525</updated>
     </task>
     <option name="localTasksCounter" value="32" />
     <servers />
@@ -404,7 +396,7 @@
     <MESSAGE value="fixed errors" />
     <MESSAGE value="updates" />
     <MESSAGE value="persistare teste in bd" />
-    <MESSAGE value="Create tests for controllers" />
-    <option name="LAST_COMMIT_MESSAGE" value="Create tests for controllers" />
+    <MESSAGE value="frontend core and shared" />
+    <option name="LAST_COMMIT_MESSAGE" value="frontend core and shared" />
   </component>
 </project>

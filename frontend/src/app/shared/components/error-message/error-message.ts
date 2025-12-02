@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-error-message',
-  imports: [],
+  standalone: true,
+  imports: [NgIf],
   templateUrl: './error-message.html',
-  styleUrl: './error-message.css',
+  styleUrls: ['./error-message.css']
 })
-export class ErrorMessage {
-
+export class ErrorMessageComponent {
+  errorMessage: string | null = null;
 }
