@@ -20,14 +20,10 @@ public class CustomUserDetails implements UserDetails {
     }
 
     @Override
-    public String getPassword() {
-        return user.getPasswordHash();
-    }
+    public String getPassword() { return user.getPasswordHash(); }
 
     @Override
-    public String getUsername() {
-        return user.getEmail();
-    }
+    public String getUsername() { return user.getEmail(); }
 
     @Override
     public boolean isAccountNonExpired() { return true; }

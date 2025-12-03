@@ -1,10 +1,9 @@
 <form (ngSubmit)="submit()" class="card p-4 shadow-sm">
-
   <h4>Înregistrare</h4>
 
   <div class="mb-3">
     <label class="form-label">Nume complet</label>
-    <input class="form-control" [(ngModel)]="form.fullName" name="fullName" required>
+    <input class="form-control" [(ngModel)]="form.fullName" name="name" required>
   </div>
 
   <div class="mb-3">
@@ -18,5 +17,4 @@
   </div>
 
   <button class="btn btn-success w-100">Creează cont</button>
-
 </form>

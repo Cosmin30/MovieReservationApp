@@ -1,10 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+
+import { SeatSelectionComponent } from '../../components/seat-selection/seat-selection';
+import { ReservationSummaryComponent } from '../../components/reservation-summary/reservation-summary';
 import { GetAvailableSeatsService } from '../../../application/use-cases/get-available-seats-service';
 import { GetReservationByIdService } from '../../../application/use-cases/get-reservation-by-id-service';
 
 @Component({
   selector: 'app-reservation-page',
+  standalone: true,
+  imports: [
+    SeatSelectionComponent,
+    ReservationSummaryComponent
+  ],
   templateUrl: './reservation-page.html',
   styleUrls: ['./reservation-page.css']
 })

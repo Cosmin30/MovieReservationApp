@@ -1,11 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-seat',
-  imports: [],
+  standalone: true,    // must stay standalone
+  imports: [CommonModule], // pentru *ngIf, *ngFor, [ngClass]
   templateUrl: './seat.html',
-  styleUrl: './seat.css',
+  styleUrls: ['./seat.css']
 })
-export class Seat {
+export class SeatComponent {
+  @Input() seat: any;
 
+  selectSeat() {
+    console.log('Seat selected', this.seat);
+  }
 }

@@ -8,15 +8,14 @@ import { PaymentSummaryComponent } from './presentation/components/payment-summa
 import { PaymentPage } from './presentation/pages/payment-page/payment-page';
 
 @NgModule({
-  declarations: [
-    PaymentFormComponent,
-    PaymentSummaryComponent,
-    PaymentPage
-  ],
+  declarations: [], 
   imports: [
     CommonModule,
     FormsModule,
-    RouterModule
+    RouterModule,
+    PaymentFormComponent,       
+    PaymentSummaryComponent,
+    PaymentPage
   ]
 })
 export class PaymentsModule {}

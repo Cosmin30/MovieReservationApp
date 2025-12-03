@@ -1,16 +1,16 @@
 <div class="card shadow-sm movie-card">
-  <img [src]="movie.imageUrl" class="card-img-top" alt="{{ movie.title }}">
+  <img [src]="imageUrl" class="card-img-top" alt="{{ movie.title }}">
 
   <div class="card-body">
     <h5 class="card-title">{{ movie.title }}</h5>
-    <p class="text-muted">{{ movie.genre }}</p>
+    <p class="text-muted">{{ genre }}</p>
 
     <p class="card-text description">
       {{ movie.description }}
     </p>
 
-    <a [routerLink]="['/movies', movie.id]" class="btn btn-primary w-100">
+    <button [routerLink]="['/movies', movie.id]" class="btn btn-primary w-100">
       Detalii
-    </a>
+    </button>
   </div>
 </div>

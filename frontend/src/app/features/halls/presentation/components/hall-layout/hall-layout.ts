@@ -1,11 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { SeatComponent } from '../seat/seat';
 
 @Component({
   selector: 'app-hall-layout',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, SeatComponent], 
   templateUrl: './hall-layout.html',
-  styleUrl: './hall-layout.css',
+  styleUrls: ['./hall-layout.css']
 })
-export class HallLayout {
+export class HallLayoutComponent {
+  @Input() hall: any;
+  @Input() seats: any[] = [];
 
+  goBack() {
+    window.history.back();
+  }
 }

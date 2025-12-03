@@ -1,8 +1,11 @@
 import { Component, Input } from '@angular/core';
 import { MovieModel } from '../../../domain/models/movie.model';
-
+import { CommonModule } from '@angular/common';
+import { MovieCardComponent } from '../movie-card/movie-card';
 @Component({
   selector: 'app-movie-grid',
+  standalone: true,
+  imports: [CommonModule, MovieCardComponent],
   templateUrl: './movie-grid.html',
   styleUrls: ['./movie-grid.css']
 })
