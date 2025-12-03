@@ -1,25 +1,160 @@
-<div class="card shadow-sm screening-card">
-  <div class="card-body">
+<div *ngIf="screening && !isLoading" class="card screening-card h-100">
+  <div class="card-body d-flex flex-column">
     
-    <h5 class="card-title">{{ screening.movie.title }}</h5>
-    
-    <p class="text-muted mb-1">
-      Sala: {{ screening.hall.name }} ({{ screening.roomNumber }})
-    </p>
+    <!-- Movie Title -->
+    <h5 class="card-title movie-title mb-3">{{ screening.movie?.title }}</h5>
 
-    <p class="mb-1">
-      <strong>Ora:</strong>
-      {{ screening.startTime | date:'short' }}
-    </p>
+    <!-- Hall Info -->
+    <div class="card-text">
+      <strong><i class="fas fa-building"></i> Sala:</strong>
+      <span>{{ screening.hall?.name }}</span>
+    </div>
 
-    <p>
-      <strong>Locuri:</strong> {{ screening.capacity }}
-    </p>
+    <!-- Time Info -->
+    <div class="card-text">
+      <strong><i class="fas fa-clock"></i> Ora:</strong>
+      <span>{{ screening.startTime | date:'short' }}</span>
+    </div>
 
-    <button class="btn btn-primary w-100"
-            [routerLink]="['/screenings', screening.id]">
-      Detalii
-    </button>
+    <!-- Seats Info -->
+    <div class="card-text">
+      <strong><i class="fas fa-chair"></i> Locuri:</strong>
+      <span class="badge bg-success">{{ getAvailableSeatsCount() }} disponibile</span>
+    </div>
 
+    <!-- Buttons -->
+    <div class="d-grid gap-2 mt-auto">
+      <button class="btn btn-primary w-100"
+              [routerLink]="['/screenings', screening.id]">
+        <i class="fas fa-info-circle"></i> Detalii & Rezervare
+      </button>
+      <button *ngIf="authService.isAdmin()" 
+              class="btn btn-danger btn-sm w-100"
+              (click)="deleteScreening.emit(screening.id)"
+              title="Șterge proiecție">
+        <i class="fas fa-trash"></i> Șterge Proiecție
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Loading State (Full Page) -->
+<div *ngIf="isLoading" class="container mt-4">
+  <div class="alert alert-info">
+    <div class="spinner-border spinner-border-sm me-2" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    Se încarcă detaliile proiecției...
+  </div>
+</div>
+
+<!-- Error State (Full Page) -->
+<div *ngIf="error && !isLoading" class="container mt-4">
+  <div class="alert alert-danger">
+    {{ error }}
+  </div>
+</div>
+
+<!-- Screening Details (Full Page) -->
+<div *ngIf="screening && !isLoading && isDetailPage" class="container mt-4">
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card shadow">
+        <div class="card-body">
+          <h2 class="card-title mb-4">{{ screening.movie?.title }}</h2>
+
+          <div class="screening-details">
+            <div class="detail-item mb-3">
+              <label class="text-muted"><i class="fas fa-building"></i> Sala:</label>
+              <p class="fs-5">{{ screening.hall?.name }} (Sala {{ screening.roomNumber }})</p>
+            </div>
+
+            <div class="detail-item mb-3">
+              <label class="text-muted"><i class="fas fa-calendar-alt"></i> Data și ora proiecției:</label>
+              <p class="fs-5">{{ screening.startTime | date:'full' }}</p>
+            </div>
+
+            <div class="detail-item mb-3">
+              <label class="text-muted"><i class="fas fa-users"></i> Capacitate totală:</label>
+              <p class="fs-5">{{ screening.capacity }} locuri</p>
+            </div>
+
+            <div class="detail-item mb-3">
+              <label class="text-muted"><i class="fas fa-check-circle text-success"></i> Locuri disponibile:</label>
+              <p class="fs-5 text-success">
+                <strong>{{ getAvailableSeatsCount() }}</strong>
+              </p>
+            </div>
+
+            <div class="detail-item mb-3">
+              <label class="text-muted"><i class="fas fa-times-circle text-danger"></i> Locuri rezervate:</label>
+              <p class="fs-5 text-danger">
+                <strong>{{ getReservedSeatsCount() }}</strong>
+              </p>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-secondary" 
+                    routerLink="/screenings">
+              <i class="fas fa-arrow-left"></i> Înapoi la Proiecții
+            </button>
+            <button *ngIf="authService.isAdmin()" 
+                    class="btn btn-danger"
+                    (click)="deleteScreening.emit(screening.id)">
+              <i class="fas fa-trash"></i> Șterge Proiecție
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar - Reservation -->
+    <div class="col-lg-4">
+      <div class="card shadow sticky-top" style="top: 20px;">
+        <div class="card-body">
+          <h5 class="card-title mb-3">Rezervare</h5>
+          
+          <div class="mb-3">
+            <label class="form-label"><strong>Film:</strong></label>
+            <p class="form-text">{{ screening.movie?.title }}</p>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label"><strong>Sala:</strong></label>
+            <p class="form-text">{{ screening.hall?.name }}</p>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label"><strong>Data:</strong></label>
+            <p class="form-text">{{ screening.startTime | date:'short' }}</p>
+          </div>
+
+          <div class="mb-4 p-3 bg-success bg-opacity-10 rounded">
+            <p class="text-center text-success mb-0">
+              <strong>{{ getAvailableSeatsCount() }} locuri disponibile</strong>
+            </p>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button class="btn btn-lg btn-primary"
+                    [routerLink]="['/reservations/new']"
+                    [queryParams]="{ screeningId: screening.id }">
+              <i class="fas fa-ticket-alt"></i> Crează Rezervare
+            </button>
+            <button *ngIf="authService.isAdmin()" 
+                    class="btn btn-danger"
+                    (click)="deleteScreening.emit(screening.id)">
+              <i class="fas fa-trash"></i> Șterge Proiecție
+            </button>
+          </div>
+
+          <p class="small text-muted mt-3 text-center">
+            Selectează locurile și cumpără bilete în pagina următoare.
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { ReservationApiService } from '../../infrastructure/adapters/reservation-api-service';
 import { ReservationState } from '../state/reservation-state.state';
 
@@ -12,9 +14,11 @@ export class GetUserReservationsService {
     private state: ReservationState
   ) {}
 
-  execute(userId: string) {
-    this.api.getReservationsByUser(userId).subscribe(res => {
-      this.state.setReservations(res);
-    });
+  execute(userId: string): Observable<any[]> {
+    return this.api.getReservationsByUser(userId).pipe(
+      tap(res => {
+        this.state.setReservations(res);
+      })
+    );
   }
 }

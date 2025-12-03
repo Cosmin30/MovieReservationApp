@@ -1,5 +1,5 @@
 // seat-selection.component.ts
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SeatGridComponent } from '../seat-grid/seat-grid';
 
@@ -12,11 +12,19 @@ import { SeatGridComponent } from '../seat-grid/seat-grid';
 })
 export class SeatSelectionComponent {
   @Input() seats: any[] = [];
-  selectedSeats: any[] = [];
+  @Output() selectedSeatsChanged = new EventEmitter<any[]>();
+
+  get selectedSeats(): any[] {
+    return this.seats.filter(seat => seat.isSelected);
+  }
 
   selectSeat(seat: any) {
-    if (!this.selectedSeats.includes(seat)) {
-      this.selectedSeats.push(seat);
-    }
+    // Emit the updated list of selected seats
+    this.selectedSeatsChanged.emit(this.selectedSeats);
+  }
+
+  deselectAll() {
+    this.seats.forEach(seat => seat.isSelected = false);
+    this.selectedSeatsChanged.emit(this.selectedSeats);
   }
 }

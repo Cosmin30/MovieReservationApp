@@ -5,12 +5,16 @@ import com.example.MovieReservationApp.domain.model.hall.Hall;
 import com.example.MovieReservationApp.domain.model.movie.Movie;
 import com.example.MovieReservationApp.domain.model.screening.Screening;
 import com.example.MovieReservationApp.domain.model.seat.Seat;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.HallRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.SeatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -20,6 +24,8 @@ import java.util.stream.Collectors;
 public class ScreeningService {
 
     private final ScreeningRepository screeningRepository;
+    private final SeatRepository seatRepository;
+    private final HallRepository hallRepository;
 
     public List<ScreeningDTO> getAllScreenings() {
         return screeningRepository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
@@ -31,11 +37,44 @@ public class ScreeningService {
         return toDTO(screening);
     }
 
+    @Transactional
     public ScreeningDTO createScreening(ScreeningDTO dto) {
         Screening screening = toEntity(dto);
         screening.setId(null);
         screening = screeningRepository.save(screening);
+        
+        // Create seats automatically based on hall capacity
+        if (screening.getHall() != null) {
+            Hall hall = hallRepository.findById(screening.getHall().getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Hall not found"));
+            
+            int capacity = hall.getCapacity() != null ? hall.getCapacity() : screening.getCapacity();
+            createSeatsForScreening(screening, capacity);
+        }
+        
         return toDTO(screening);
+    }
+    
+    private void createSeatsForScreening(Screening screening, int capacity) {
+        List<Seat> seats = new ArrayList<>();
+        int seatsPerRow = 10; // Default seats per row
+        int numRows = (int) Math.ceil((double) capacity / seatsPerRow);
+        
+        int seatNumber = 1;
+        for (int row = 1; row <= numRows; row++) {
+            int seatsInThisRow = Math.min(seatsPerRow, capacity - (row - 1) * seatsPerRow);
+            for (int seat = 1; seat <= seatsInThisRow; seat++) {
+                Seat newSeat = Seat.builder()
+                        .screening(screening)
+                        .row(String.valueOf(row))
+                        .number(seatNumber++)
+                        .isAvailable(true)
+                        .build();
+                seats.add(newSeat);
+            }
+        }
+        
+        seatRepository.saveAll(seats);
     }
 
     public ScreeningDTO updateScreening(UUID id, ScreeningDTO dto) {

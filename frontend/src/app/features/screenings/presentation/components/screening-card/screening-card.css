@@ -2,3 +2,156 @@
   width: 100%;
   border-radius: 12px;
 }
+
+/* Container styling */
+.container {
+  max-width: 1200px;
+}
+
+/* Detail items styling */
+.screening-details {
+  padding: 1.5rem 0;
+}
+
+.detail-item {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-left: 4px solid #007bff;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.detail-item:hover {
+  background-color: #e7f1ff;
+  border-left-color: #0056b3;
+  transform: translateX(5px);
+}
+
+.detail-item label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #666;
+}
+
+.detail-item p {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+  color: #333;
+}
+
+/* Card styling */
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+.card-title {
+  color: #1a1a1a;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
+  border-bottom: 3px solid #007bff;
+  padding-bottom: 1rem;
+}
+
+/* Button styling */
+.btn-primary {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  transform: translateY(-2px);
+}
+
+/* Sticky sidebar */
+.sticky-top {
+  top: 20px;
+  border-radius: 12px;
+}
+
+/* Success background */
+.bg-success {
+  background-color: #28a745 !important;
+}
+
+.bg-opacity-10 {
+  --bs-bg-opacity: 0.1;
+}
+
+/* Form text styling */
+.form-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.form-text {
+  color: #666;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Grid layout */
+.d-grid {
+  gap: 0.75rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .sticky-top {
+    top: auto;
+    position: relative;
+    margin-top: 2rem;
+  }
+  
+  .detail-item {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .card-body {
+    padding: 1.5rem;
+  }
+  
+  .card-title {
+    font-size: 1.5rem;
+  }
+  
+  .detail-item {
+    padding: 0.75rem;
+  }
+}

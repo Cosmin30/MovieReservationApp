@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { CacheService } from '../../../../core/services/cache-service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,14 +9,23 @@ export class MovieApiService {
 
   private baseUrl = 'http://localhost:8080/api/movies';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private cache: CacheService
+  ) {}
 
   getAllMovies() {
-    return this.http.get<any[]>(this.baseUrl);
+    return this.cache.getOrFetch(
+      'all_movies',
+      () => this.http.get<any[]>(this.baseUrl)
+    );
   }
 
   getMovieById(id: string) {
-    return this.http.get<any>(`${this.baseUrl}/${id}`);
+    return this.cache.getOrFetch(
+      `movie_${id}`,
+      () => this.http.get<any>(`${this.baseUrl}/${id}`)
+    );
   }
 
   createMovie(dto: any) {

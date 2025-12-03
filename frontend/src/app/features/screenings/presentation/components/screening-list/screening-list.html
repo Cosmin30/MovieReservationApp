@@ -1,3 +1,36 @@
-<div class="d-flex flex-column gap-3">
-  <app-screening-card *ngFor="let s of screenings" [screening]="s"></app-screening-card>
+<div class="container mt-5 mb-5">
+
+  <h1 class="page-title mb-4"><i class="fas fa-calendar-alt"></i> Proiecții Disponibile</h1>
+
+  <!-- Success Alert -->
+  <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="fas fa-check-circle"></i> {{ success }}
+    <button type="button" class="btn-close" (click)="success = null"></button>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="fas fa-exclamation-circle"></i> <strong>Eroare!</strong> {{ error }}
+    <button type="button" class="btn-close" (click)="error = null"></button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p class="mt-3">Se încarcă proiecțiile...</p>
+  </div>
+
+  <!-- Screening Cards Grid -->
+  <div *ngIf="!loading && screenings?.length" class="row">
+    <div class="col-md-6 col-lg-4 mb-4" *ngFor="let screening of screenings">
+      <app-screening-card [screening]="screening" (deleteScreening)="onDeleteScreening($event)"></app-screening-card>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !screenings?.length" class="empty-state">
+    <p><i class="fas fa-film"></i> Nu există proiecții disponibile în acest moment.</p>
+    <small class="text-muted">Revino mai târziu pentru mai multe opțiuni.</small>
+  </div>
+
 </div>

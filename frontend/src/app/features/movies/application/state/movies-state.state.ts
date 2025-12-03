@@ -13,4 +13,9 @@ export class MoviesState {
   setMovies(movies: MovieModel[]) {
     this.moviesSubject.next(movies);
   }
+
+  clearCache() {
+    // Clear movies state
+    this.moviesSubject.next([]);
+  }
 }

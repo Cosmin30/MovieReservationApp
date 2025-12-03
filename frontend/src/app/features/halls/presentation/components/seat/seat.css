@@ -1,20 +1,51 @@
 .seat-box {
-  width: 55px;
-  height: 55px;
-  border-radius: 8px;
+  width: 50px;
+  height: 50px;
+  border-radius: 6px;
   color: white;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px;
+}
+
+.seat-box:hover:not(:disabled) {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.seat-box:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .available {
-  background-color: #28a745;
+  background-color: #10b981; /* Verde modern */
+  border-color: #059669;
+}
+
+.available:hover:not(:disabled) {
+  background-color: #059669;
 }
 
 .reserved {
-  background-color: #6c757d;
+  background-color: #ef4444; /* Roșu pentru ocupate */
+  border-color: #dc2626;
 }
 
 .unavailable {
-  background-color: #dc3545;
+  background-color: #6b7280; /* Gri pentru indisponibile */
+  border-color: #4b5563;
+}
+
+.selected {
+  background-color: #3b82f6 !important; /* Albastru pentru selectate */
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  transform: scale(1.05);
 }

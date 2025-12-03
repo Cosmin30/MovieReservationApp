@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -10,8 +10,13 @@ import { CommonModule } from '@angular/common';
 })
 export class SeatComponent {
   @Input() seat: any;
+  @Output() seatToggled = new EventEmitter<any>();
 
   selectSeat() {
-    console.log('Seat selected', this.seat);
+    if (this.seat?.status !== 'AVAILABLE') {
+      return;
+    }
+    this.seat.isSelected = !this.seat.isSelected;
+    this.seatToggled.emit(this.seat);
   }
 }

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { CacheService } from '../../../../core/services/cache-service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,14 +9,23 @@ export class HallApiService {
 
   private baseUrl = 'http://localhost:8080/api/halls';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private cache: CacheService
+  ) {}
 
   getAllHalls() {
-    return this.http.get<any[]>(this.baseUrl);
+    return this.cache.getOrFetch(
+      'all_halls',
+      () => this.http.get<any[]>(this.baseUrl)
+    );
   }
 
   getHallById(id: string) {
-    return this.http.get<any>(`${this.baseUrl}/${id}`);
+    return this.cache.getOrFetch(
+      `hall_${id}`,
+      () => this.http.get<any>(`${this.baseUrl}/${id}`)
+    );
   }
 
   createHall(dto: any) {
@@ -35,6 +45,7 @@ export class HallApiService {
   }
 
   getHallLayout(id: string) {
+    // Don't cache layout - it may require authentication and can change
     return this.http.get(`${this.baseUrl}/${id}/layout`);
   }
 }

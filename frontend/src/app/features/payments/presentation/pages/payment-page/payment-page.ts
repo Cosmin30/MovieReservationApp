@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { CreatePaymentService } from '../../../application/use-cases/create-payment-service';
 import { PaymentFormComponent } from '../../components/payment-form/payment-form';
 import { PaymentSummaryComponent } from '../../components/payment-summary/payment-summary';
@@ -17,14 +19,26 @@ import { PaymentSummaryComponent } from '../../components/payment-summary/paymen
     PaymentSummaryComponent
   ]
 })
-export class PaymentPage {
+export class PaymentPage implements OnInit, OnDestroy {
   payment: any = null;
+  private destroy$ = new Subject<void>();
 
   constructor(private createPayment: CreatePaymentService) {}
 
+  ngOnInit() {}
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   pay(form: any) {
-    this.createPayment.execute(form).subscribe(p => {
-      this.payment = p;
-    });
+    this.createPayment.execute(form)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: p => {
+          this.payment = p;
+        }
+      });
   }
 }

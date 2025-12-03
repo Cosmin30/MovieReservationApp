@@ -1,0 +1,29 @@
+<div class="seats-stats card p-3 mb-4 bg-light">
+  <h6 class="mb-3">Starea locurilor</h6>
+  <div class="row text-center">
+    <div class="col-md-3">
+      <div class="stat-item">
+        <span class="stat-value text-success">{{ availableCount }}</span>
+        <small class="d-block text-muted">Disponibile</small>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-item">
+        <span class="stat-value text-danger">{{ reservedCount }}</span>
+        <small class="d-block text-muted">Rezervate</small>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-item">
+        <span class="stat-value text-secondary">{{ unavailableCount }}</span>
+        <small class="d-block text-muted">Indisponibile</small>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-item">
+        <span class="stat-value text-primary">{{ totalSeats }}</span>
+        <small class="d-block text-muted">Total</small>
+      </div>
+    </div>
+  </div>
+</div>

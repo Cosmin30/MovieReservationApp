@@ -1,12 +1,12 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { DatePipe } from '@angular/common'; // add this import
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-screening-time-selector',
   templateUrl: './screening-time-selector.html',
   styleUrls: ['./screening-time-selector.css'],
   standalone: true, 
-  imports: [DatePipe] 
+  imports: [CommonModule] 
 })
 export class ScreeningTimeSelectorComponent {
   @Input() screenings: any[] = [];

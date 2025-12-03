@@ -3,9 +3,11 @@
   [ngClass]="{
     'available': seat?.status === 'AVAILABLE',
     'reserved': seat?.status === 'RESERVED',
-    'unavailable': seat?.status === 'UNAVAILABLE'
+    'unavailable': seat?.status === 'UNAVAILABLE',
+    'selected': seat?.isSelected
   }"
   (click)="selectSeat()"
+  [disabled]="seat?.status !== 'AVAILABLE'"
 >
   {{ seat?.row }}-{{ seat?.number }}
 </button>

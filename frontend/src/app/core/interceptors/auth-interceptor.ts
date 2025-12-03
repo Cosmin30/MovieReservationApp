@@ -1,21 +1,21 @@
 import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { AuthService } from '../auth/auth-service';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const authService = inject(AuthService);
-  const token = authService.getToken();
+  const platformId = inject(PLATFORM_ID);
+  
+  // Only add auth in browser context
+  if (isPlatformBrowser(platformId)) {
+    const token = localStorage.getItem('token');
 
-  console.log('AuthInterceptor -> request URL:', req.url);
-  console.log('AuthInterceptor -> token:', token);
-
-  if (token) {
-    req = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    console.log('AuthInterceptor -> Authorization header set');
+    if (token && token.trim()) {
+      req = req.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token.trim()}`
+        }
+      });
+    }
   }
 
   return next(req);

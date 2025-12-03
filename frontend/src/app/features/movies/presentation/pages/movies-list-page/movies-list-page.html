@@ -1,5 +1,16 @@
 <div class="container mt-4">
 
+  <!-- Alerts -->
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="fas fa-exclamation-circle"></i> {{ error }}
+    <button type="button" class="btn-close" (click)="error = null"></button>
+  </div>
+
+  <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="fas fa-check-circle"></i> {{ success }}
+    <button type="button" class="btn-close" (click)="success = null"></button>
+  </div>
+
   <app-movie-search (searchEvent)="search($event)"></app-movie-search>
 
   <div class="row">
@@ -11,7 +22,7 @@
     </div>
 
     <div class="col-md-9">
-      <app-movie-grid [movies]="movies"></app-movie-grid>
+      <app-movie-grid [movies]="movies" (deleteMovie)="onDeleteMovie($event)"></app-movie-grid>
     </div>
   </div>
 

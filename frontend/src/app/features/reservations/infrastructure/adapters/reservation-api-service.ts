@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { CacheService } from '../../../../core/services/cache-service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,10 @@ export class ReservationApiService {
 
   private baseUrl = 'http://localhost:8080/api/reservations';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private cache: CacheService
+  ) {}
 
   createReservation(userId: string, screeningId: string, seatIds: string[], pricePerSeat: number) {
     return this.http.post(this.baseUrl, null, {
@@ -30,7 +34,10 @@ export class ReservationApiService {
   }
 
   getReservationsByUser(userId: string) {
-    return this.http.get<any[]>(`${this.baseUrl}/user/${userId}`);
+    return this.cache.getOrFetch(
+      `reservations_user_${userId}`,
+      () => this.http.get<any[]>(`${this.baseUrl}/user/${userId}`)
+    );
   }
 
   updateReservation(id: string, dto: any) {
@@ -46,8 +53,7 @@ export class ReservationApiService {
   }
 
   getAvailableSeats(screeningId: string) {
-    return this.http.get(`${this.baseUrl}/available-seats`, {
-      params: { screeningId }
-    });
+    // Use seats endpoint instead - it returns all seats for a screening
+    return this.http.get(`http://localhost:8080/api/seats/screening/${screeningId}`);
   }
 }

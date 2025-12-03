@@ -57,17 +57,27 @@ export class AuthService {
     if (!token) return;
 
     this.http
-      .get<UserModel>(`${this.apiUrl}/users/me`, {
+      .get<any>(`${this.apiUrl}/users/me`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       .subscribe({
-        next: user => {
+        next: response => {
+          const user: UserModel = {
+            id: response.id,
+            email: response.email,
+            fullName: response.full_name,
+            createdAt: response.created_at,
+            reservations: response.reservations
+          };
+          
+          console.log('👤 User loaded:', user);
           this.currentUserSubject.next(user);
           if (this.isBrowser()) {
             localStorage.setItem('user', JSON.stringify(user));
           }
         },
-        error: () => {
+        error: (err) => {
+          console.error('❌ Failed to load user profile:', err);
           this.logout();
         }
       });
@@ -97,5 +107,9 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     return !!this.getToken();
+  }
+
+  isAdmin(): boolean {
+    return this.getRole() === 'ADMIN';
   }
 }

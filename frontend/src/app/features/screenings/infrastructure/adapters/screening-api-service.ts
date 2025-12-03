@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { CacheService } from '../../../../core/services/cache-service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,18 +9,30 @@ export class ScreeningApiService {
 
   private baseUrl = 'http://localhost:8080/api/screenings';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private cache: CacheService
+  ) {}
 
   getAllScreenings() {
-    return this.http.get<any[]>(this.baseUrl);
+    return this.cache.getOrFetch(
+      'all_screenings',
+      () => this.http.get<any[]>(this.baseUrl)
+    );
   }
 
   getScreeningById(id: string) {
-    return this.http.get<any>(`${this.baseUrl}/${id}`);
+    return this.cache.getOrFetch(
+      `screening_${id}`,
+      () => this.http.get<any>(`${this.baseUrl}/${id}`)
+    );
   }
 
   getScreeningsByMovie(movieId: string) {
-    return this.http.get<any[]>(`${this.baseUrl}?movieId=${movieId}`);
+    return this.cache.getOrFetch(
+      `screenings_movie_${movieId}`,
+      () => this.http.get<any[]>(`${this.baseUrl}?movieId=${movieId}`)
+    );
   }
 
   createScreening(dto: any) {

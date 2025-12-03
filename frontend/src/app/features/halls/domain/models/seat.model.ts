@@ -3,4 +3,5 @@ export interface SeatModel {
   row: number;
   number: number;
   status: 'AVAILABLE' | 'RESERVED' | 'UNAVAILABLE';
+  isSelected?: boolean;
 }
