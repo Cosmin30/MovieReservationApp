@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -25,6 +25,7 @@ export class MyReservationsPage implements OnInit, OnDestroy {
   isLoading = true;
   error: string | null = null;
   private destroy$ = new Subject<void>();
+  private cdr = inject(ChangeDetectorRef);
 
   constructor(
     private state: ReservationState,
@@ -36,8 +37,10 @@ export class MyReservationsPage implements OnInit, OnDestroy {
     this.state.reservations$
       .pipe(takeUntil(this.destroy$))
       .subscribe(res => {
-        this.reservations = res;
+        this.reservations = res || [];
         this.isLoading = false;
+        // Force change detection
+        this.cdr.detectChanges();
       });
 
     this.authService.currentUser$
@@ -63,11 +66,14 @@ export class MyReservationsPage implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.isLoading = false;
+          // Force change detection
+          this.cdr.detectChanges();
         },
         error: (err: any) => {
           console.error('Error loading reservations:', err);
           this.error = 'Nu am putut încărca rezervările.';
           this.isLoading = false;
+          this.cdr.detectChanges();
         }
       });
   }

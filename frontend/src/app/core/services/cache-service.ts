@@ -20,10 +20,11 @@ export class CacheService {
   ): Observable<T> {
     // Return cached observable if exists and it has data
     const cached = this.cache.get(key);
+    
     if (cached && cached.data !== null) {
       return cached.observable;
     }
-
+    
     // Fetch and cache new data
     const request$ = fetcher().pipe(
       tap(data => {

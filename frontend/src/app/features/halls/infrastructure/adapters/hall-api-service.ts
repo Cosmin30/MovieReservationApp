@@ -28,6 +28,10 @@ export class HallApiService {
     );
   }
 
+  clearHallCache(id: string): void {
+    this.cache.clear(`hall_${id}`);
+  }
+
   createHall(dto: any) {
     return this.http.post(this.baseUrl, dto);
   }
@@ -47,5 +51,9 @@ export class HallApiService {
   getHallLayout(id: string) {
     // Don't cache layout - it may require authentication and can change
     return this.http.get(`${this.baseUrl}/${id}/layout`);
+  }
+
+  clearCache(): void {
+    this.cache.clear('all_halls');
   }
 }

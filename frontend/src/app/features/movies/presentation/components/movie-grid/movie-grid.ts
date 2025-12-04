@@ -13,4 +13,8 @@ export class MovieGridComponent {
   @Input() movies: MovieModel[] = [];
   @Output() deleteMovie = new EventEmitter<string>();
   @Output() editMovie = new EventEmitter<string>();
+
+  trackByMovieId(index: number, movie: MovieModel): string {
+    return movie?.id || index.toString();
+  }
 }

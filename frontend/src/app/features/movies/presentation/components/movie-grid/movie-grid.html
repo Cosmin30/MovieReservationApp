@@ -1,5 +1,5 @@
 <div class="d-flex flex-wrap gap-3 justify-content-start">
-  <app-movie-card *ngFor="let movie of movies" 
+  <app-movie-card *ngFor="let movie of movies; trackBy: trackByMovieId" 
                   [movie]="movie"
                   (deleteMovie)="deleteMovie.emit($event)"
                   (editMovie)="editMovie.emit($event)"></app-movie-card>

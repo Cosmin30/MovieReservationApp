@@ -1,15 +1,18 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Subject, of, EMPTY } from 'rxjs';
+import { takeUntil, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import QRCode from 'qrcode';
 
 import { SeatSelectionComponent } from '../../components/seat-selection/seat-selection';
 import { GetAvailableSeatsService } from '../../../application/use-cases/get-available-seats-service';
 import { CreateReservationService } from '../../../application/use-cases/create-reservation-service';
 import { AuthService } from '../../../../../core/auth/auth-service';
 import { GetScreeningByIdService } from '../../../../screenings/application/use-cases/get-screening-by-id-service';
+import { GetReservationByIdService } from '../../../application/use-cases/get-reservation-by-id-service';
+import { ReservationApiService } from '../../../infrastructure/adapters/reservation-api-service';
 
 @Component({
   selector: 'app-reservation-page',
@@ -17,6 +20,7 @@ import { GetScreeningByIdService } from '../../../../screenings/application/use-
   imports: [
     CommonModule,
     FormsModule,
+    RouterModule,
     SeatSelectionComponent
   ],
   templateUrl: './reservation-page.html',
@@ -44,9 +48,15 @@ export class ReservationPage implements OnInit, OnDestroy {
   isLoadingSeats = true;
   isLoadingScreening = true;
   isCreatingReservation = false;
+  isLoadingReservation = false;
   error: string | null = null;
   success: string | null = null;
+  isExistingReservation = false;
+  qrCodeDataUrl: string | null = null;
   private destroy$ = new Subject<void>();
+  private cdr = inject(ChangeDetectorRef);
+  private lastScreeningId: string | null = null;
+  private lastReservationId: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -54,19 +64,72 @@ export class ReservationPage implements OnInit, OnDestroy {
     private getSeats: GetAvailableSeatsService,
     private createReservation: CreateReservationService,
     private authService: AuthService,
-    private getScreeningById: GetScreeningByIdService
+    private getScreeningById: GetScreeningByIdService,
+    private getReservationById: GetReservationByIdService,
+    private reservationApi: ReservationApiService
   ) {}
 
   ngOnInit() {
-    this.screeningId = this.route.snapshot.queryParamMap.get('screeningId')!;
-
-    if (!this.screeningId) {
-      this.error = 'Nu a fost selectată nicio proiecție';
-      return;
+    // Check if we're viewing an existing reservation (route param :id) or creating a new one (query param screeningId)
+    const reservationId = this.route.snapshot.paramMap.get('id');
+    
+    if (reservationId) {
+      // Existing reservation - load reservation details (exactly like MovieDetailsPage)
+      this.isExistingReservation = true;
+      this.isLoadingReservation = true;
+      // Clear cache for this specific reservation
+      this.reservationApi.clearReservationCache(reservationId);
+      
+      this.getReservationById.execute(reservationId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (reservation: any) => {
+            // Normalize reservation data
+            this.reservation = {
+              ...reservation,
+              totalPrice: reservation.totalPrice || reservation.total_price || 0,
+              tickets: (reservation.tickets || []).map((ticket: any) => ({
+                ...ticket,
+                seat: ticket.seat ? {
+                  row: ticket.seat.row || ticket.seat.rowNumber || ticket.seat.row_number || 'N/A',
+                  number: ticket.seat.number || ticket.seat.seatNumber || ticket.seat.seat_number || 'N/A'
+                } : null
+              }))
+            };
+            this.isLoadingReservation = false;
+            // Load screening from reservation
+            if (reservation.screening) {
+              this.screening = reservation.screening;
+              this.screeningId = reservation.screening.id;
+            }
+            // Generate QR code
+            this.generateQRCode();
+            // Force change detection
+            this.cdr.detectChanges();
+          },
+          error: (err: any) => {
+            console.error('Error loading reservation:', err);
+            this.error = 'Nu am putut încărca detaliile rezervării. Te rugăm să reîmprospătezi pagina.';
+            this.isLoadingReservation = false;
+            // Force change detection
+            this.cdr.detectChanges();
+          }
+        });
+    } else {
+      // New reservation - check query params for screeningId
+      this.isExistingReservation = false;
+      const screeningId = this.route.snapshot.queryParamMap.get('screeningId');
+      
+      if (screeningId) {
+        this.screeningId = screeningId;
+        this.error = null;
+        // Load screening details first, seats will be loaded after screening is loaded
+        this.loadScreeningDetails();
+      } else {
+        this.error = 'Nu a fost selectată nicio proiecție';
+        this.cdr.detectChanges();
+      }
     }
-
-    // Load screening details first, seats will be loaded after screening is loaded
-    this.loadScreeningDetails();
   }
 
   ngOnDestroy(): void {
@@ -82,8 +145,6 @@ export class ReservationPage implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
-          console.log('Raw screening response:', res);
-          
           // Normalize snake_case to camelCase if needed
           this.screening = {
             ...res,
@@ -104,12 +165,10 @@ export class ReservationPage implements OnInit, OnDestroy {
             hall: res.hall || null
           };
           
-          console.log('Normalized screening:', this.screening);
-          console.log('Screening seats count:', this.screening.seats?.length || 0);
-          console.log('Available seats:', this.getAvailableSeatsCount());
-          console.log('Reserved seats:', this.getReservedSeatsCount());
-          
           this.isLoadingScreening = false;
+          
+          // Force change detection
+          this.cdr.detectChanges();
           
           // Load seats after screening is loaded
           this.loadAvailableSeats();
@@ -118,6 +177,7 @@ export class ReservationPage implements OnInit, OnDestroy {
           console.error('Error loading screening details:', err);
           this.error = 'Nu am putut încărca detaliile proiecției. Te rugăm să reîmprospătezi pagina.';
           this.isLoadingScreening = false;
+          this.cdr.detectChanges();
         }
       });
   }
@@ -153,6 +213,8 @@ export class ReservationPage implements OnInit, OnDestroy {
         isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true)
       }));
       this.isLoadingSeats = false;
+      // Force change detection
+      this.cdr.detectChanges();
       return;
     }
 
@@ -175,6 +237,8 @@ export class ReservationPage implements OnInit, OnDestroy {
           }));
           
           this.isLoadingSeats = false;
+          // Force change detection
+          this.cdr.detectChanges();
         },
         error: (err: any) => {
           console.error('Error loading seats:', err);
@@ -193,6 +257,7 @@ export class ReservationPage implements OnInit, OnDestroy {
             this.error = 'Nu am putut încărca locurile disponibile. Te rugăm să reîmprospătezi pagina.';
             this.isLoadingSeats = false;
           }
+          this.cdr.detectChanges();
         }
       });
   }
@@ -299,5 +364,41 @@ export class ReservationPage implements OnInit, OnDestroy {
     };
     this.error = null;
     this.success = null;
+  }
+
+  generateQRCode() {
+    if (!this.reservation) return;
+
+    // Create QR code data with reservation information
+    const qrData = JSON.stringify({
+      reservationId: this.reservation.id,
+      userId: this.reservation.user?.id || this.reservation.userId,
+      screeningId: this.reservation.screening?.id || this.reservation.screeningId,
+      movie: this.reservation.screening?.movie?.title || 'N/A',
+      hall: this.reservation.screening?.hall?.name || 'N/A',
+      date: this.reservation.screening?.startTime || this.reservation.screening?.start_time || 'N/A',
+      totalPrice: this.reservation.totalPrice || 0,
+      status: this.reservation.status || 'N/A',
+      tickets: this.reservation.tickets?.map((t: any) => ({
+        seat: `${t.seat?.row || 'N/A'}-${t.seat?.number || 'N/A'}`
+      })) || []
+    });
+
+    // Generate QR code as data URL
+    QRCode.toDataURL(qrData, {
+      width: 300,
+      margin: 2,
+      color: {
+        dark: '#000000',
+        light: '#FFFFFF'
+      }
+    })
+      .then((url: string) => {
+        this.qrCodeDataUrl = url;
+        this.cdr.detectChanges();
+      })
+      .catch((err: any) => {
+        console.error('Error generating QR code:', err);
+      });
   }
 }

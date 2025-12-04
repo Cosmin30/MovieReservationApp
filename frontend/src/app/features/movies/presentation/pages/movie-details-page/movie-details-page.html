@@ -1,18 +1,199 @@
-<div class="container mt-4">
-  <div class="card shadow-sm p-4">
-    <h2>{{ movie?.title }}</h2>
-    <p class="text-muted">{{ movie?.genre }}</p>
+<div class="movie-details-page">
+  <div class="container-fluid px-4 py-5">
+    
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-container text-center py-5">
+      <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3">Se încarcă detaliile filmului...</p>
+    </div>
 
-    <p>{{ movie?.description }}</p>
+    <!-- Error State -->
+    <div *ngIf="error && !isLoading" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+      <strong><i class="fas fa-exclamation-triangle"></i> Eroare:</strong> {{ error }}
+      <button type="button" class="btn-close" (click)="error = null"></button>
+    </div>
 
-    <p>
-      <strong>Durată:</strong> {{ movie?.duration }} minute
-    </p>
+    <!-- Movie Details -->
+    <div *ngIf="!isLoading && movie" class="row g-4">
+      
+      <!-- Left: Movie Info -->
+      <div class="col-lg-8">
+        <div class="card shadow-lg border-0 mb-4">
+          <div class="card-body p-4">
+            
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-start mb-4">
+              <div>
+                <h1 class="movie-title mb-2">{{ movie.title }}</h1>
+                <div class="movie-meta mb-3">
+                  <span class="badge bg-primary me-2">{{ movie.genre }}</span>
+                  <span class="text-muted">
+                    <i class="fas fa-clock"></i> {{ formatDuration(movie.duration) }}
+                  </span>
+                </div>
+              </div>
+              <button class="btn btn-outline-secondary" (click)="goBack()">
+                <i class="fas fa-arrow-left"></i> Înapoi
+              </button>
+            </div>
 
-    <p>
-      <strong>Lansare:</strong> {{ movie?.releaseDate }}
-    </p>
+            <!-- Description -->
+            <div class="movie-description mb-4">
+              <h3 class="section-title mb-3"><i class="fas fa-info-circle"></i> Descriere</h3>
+              <p class="description-text">{{ movie.description || 'Nu există descriere disponibilă.' }}</p>
+            </div>
 
-    <button class="btn btn-secondary mt-3" (click)="goBack()">Înapoi</button>
+            <!-- Details Grid -->
+            <div class="details-grid">
+              <div class="detail-item">
+                <div class="detail-icon">
+                  <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="detail-content">
+                  <label class="detail-label">Data lansării</label>
+                  <p class="detail-value">
+                    <span *ngIf="movie.releaseDate">{{ formatDate(movie.releaseDate) }}</span>
+                    <span *ngIf="!movie.releaseDate" class="text-muted">N/A</span>
+                  </p>
+                </div>
+              </div>
+
+              <div class="detail-item">
+                <div class="detail-icon">
+                  <i class="fas fa-clock"></i>
+                </div>
+                <div class="detail-content">
+                  <label class="detail-label">Durată</label>
+                  <p class="detail-value">{{ formatDuration(movie.duration) }}</p>
+                </div>
+              </div>
+
+              <div class="detail-item">
+                <div class="detail-icon">
+                  <i class="fas fa-film"></i>
+                </div>
+                <div class="detail-content">
+                  <label class="detail-label">Gen</label>
+                  <p class="detail-value">{{ movie.genre }}</p>
+                </div>
+              </div>
+
+              <div class="detail-item">
+                <div class="detail-icon">
+                  <i class="fas fa-ticket-alt"></i>
+                </div>
+                <div class="detail-content">
+                  <label class="detail-label">Proiecții disponibile</label>
+                  <p class="detail-value">{{ screenings.length }}</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Quick Info Card -->
+      <div class="col-lg-4">
+        <div class="card shadow-lg border-0 sticky-top">
+          <div class="card-body p-4">
+            <h3 class="section-title mb-4"><i class="fas fa-info-circle"></i> Informații Rapide</h3>
+            
+            <div class="quick-info">
+              <div class="quick-item mb-3">
+                <strong><i class="fas fa-film"></i> Titlu:</strong>
+                <p class="mb-0">{{ movie.title }}</p>
+              </div>
+              
+              <div class="quick-item mb-3">
+                <strong><i class="fas fa-tags"></i> Gen:</strong>
+                <p class="mb-0">{{ movie.genre }}</p>
+              </div>
+              
+              <div class="quick-item mb-3">
+                <strong><i class="fas fa-clock"></i> Durată:</strong>
+                <p class="mb-0">{{ formatDuration(movie.duration) }}</p>
+              </div>
+              
+              <div class="quick-item mb-3">
+                <strong><i class="fas fa-calendar"></i> Lansare:</strong>
+                <p class="mb-0">
+                  <span *ngIf="movie.releaseDate">{{ formatDate(movie.releaseDate) }}</span>
+                  <span *ngIf="!movie.releaseDate" class="text-muted">N/A</span>
+                </p>
+              </div>
+              
+              <div class="quick-item">
+                <strong><i class="fas fa-video"></i> Proiecții:</strong>
+                <p class="mb-0">{{ screenings.length }} disponibile</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Screenings Section -->
+    <div *ngIf="!isLoading && movie" class="row mt-4">
+      <div class="col-12">
+        <div class="card shadow-lg border-0">
+          <div class="card-header bg-gradient-primary text-white">
+            <h3 class="mb-0"><i class="fas fa-calendar-alt"></i> Proiecții Disponibile</h3>
+          </div>
+          <div class="card-body p-4">
+            
+            <!-- Loading Screenings -->
+            <div *ngIf="isLoadingScreenings" class="text-center py-3">
+              <div class="spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="mt-2 mb-0">Se încarcă proiecțiile...</p>
+            </div>
+
+            <!-- No Screenings -->
+            <div *ngIf="!isLoadingScreenings && screenings.length === 0" class="text-center py-5">
+              <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+              <p class="text-muted">Nu există proiecții disponibile pentru acest film.</p>
+            </div>
+
+            <!-- Screenings Grid -->
+            <div *ngIf="!isLoadingScreenings && screenings.length > 0" class="screenings-grid">
+              <div *ngFor="let screening of screenings" class="screening-card">
+                <div class="screening-header">
+                  <h5 class="screening-title">
+                    <i class="fas fa-building"></i> {{ screening.hall?.name || 'Sala N/A' }}
+                  </h5>
+                </div>
+                <div class="screening-body">
+                  <div class="screening-info">
+                    <div class="info-row">
+                      <i class="fas fa-calendar-alt"></i>
+                      <span>{{ (screening.startTime || screening.start_time) | date:'dd MMM yyyy' }}</span>
+                    </div>
+                    <div class="info-row">
+                      <i class="fas fa-clock"></i>
+                      <span>{{ (screening.startTime || screening.start_time) | date:'HH:mm' }}</span>
+                    </div>
+                    <div class="info-row">
+                      <i class="fas fa-door-open"></i>
+                      <span>Sala {{ screening.roomNumber || screening.room_number || 'N/A' }}</span>
+                    </div>
+                  </div>
+                  <button class="btn btn-primary w-100 mt-3" 
+                          [routerLink]="['/screenings', screening.id]">
+                    <i class="fas fa-ticket-alt"></i> Rezervă Bilete
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>

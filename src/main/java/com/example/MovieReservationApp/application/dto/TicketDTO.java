@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonPropertyOrder({"id", "price", "reservationId", "seatId"})
+@JsonPropertyOrder({"id", "price", "reservationId", "seatId", "seat"})
 public class TicketDTO {
     @JsonProperty("id")
     private UUID id;
@@ -23,4 +23,8 @@ public class TicketDTO {
 
     @JsonProperty("seat_id")
     private UUID seatId;
+
+    @JsonProperty("seat")
+    @JsonIgnoreProperties({"screening", "screeningId"})
+    private SeatDTO seat;
 }

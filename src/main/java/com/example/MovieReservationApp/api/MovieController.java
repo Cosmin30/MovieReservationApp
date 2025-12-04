@@ -43,6 +43,8 @@ public class MovieController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable UUID id) {
+        System.out.println("🔍 [MOVIE CONTROLLER] DELETE request received for movie ID: " + id);
         movieService.deleteMovie(id);
+        System.out.println("✅ [MOVIE CONTROLLER] Movie deleted successfully");
     }
 }

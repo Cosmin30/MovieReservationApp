@@ -28,8 +28,8 @@
   </div>
 
   <!-- Halls Grid -->
-  <div *ngIf="!isLoading && halls.length > 0" class="row g-4">
-    <div *ngFor="let hall of halls" class="col-lg-4 col-md-6">
+  <div *ngIf="!isLoading && halls && halls.length > 0" class="row g-4">
+    <div *ngFor="let hall of halls; trackBy: trackByHallId" class="col-lg-4 col-md-6">
       <div class="card hall-card h-100 shadow-sm">
         <div class="card-body d-flex flex-column">
           <!-- Hall Icon & Name -->

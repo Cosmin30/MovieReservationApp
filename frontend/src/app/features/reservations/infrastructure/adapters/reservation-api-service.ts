@@ -30,7 +30,14 @@ export class ReservationApiService {
   }
 
   getReservationById(id: string) {
-    return this.http.get<any>(`${this.baseUrl}/${id}`);
+    return this.cache.getOrFetch(
+      `reservation_${id}`,
+      () => this.http.get<any>(`${this.baseUrl}/${id}`)
+    );
+  }
+
+  clearReservationCache(id: string): void {
+    this.cache.clear(`reservation_${id}`);
   }
 
   getReservationsByUser(userId: string) {

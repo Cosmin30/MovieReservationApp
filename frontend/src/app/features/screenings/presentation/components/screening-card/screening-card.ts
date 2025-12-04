@@ -1,11 +1,12 @@
-import { Component, Input, OnInit, OnDestroy, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, Output, EventEmitter, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, switchMap, distinctUntilChanged } from 'rxjs/operators';
 import { GetScreeningByIdService } from '../../../application/use-cases/get-screening-by-id-service';
 import { AuthService } from '../../../../../core/auth/auth-service';
 import { SeatGridComponent } from '../../../../reservations/presentation/components/seat-grid/seat-grid';
+import { ScreeningApiService } from '../../../infrastructure/adapters/screening-api-service';
 
 @Component({
   selector: 'app-screening-card',
@@ -22,10 +23,13 @@ export class ScreeningCardComponent implements OnInit, OnDestroy {
   isDetailPage = false;
   authService = inject(AuthService);
   private destroy$ = new Subject<void>();
+  private cdr = inject(ChangeDetectorRef);
+  private lastScreeningId: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
-    private getScreeningById: GetScreeningByIdService
+    private getScreeningById: GetScreeningByIdService,
+    private screeningApi: ScreeningApiService
   ) {}
 
   ngOnInit() {
@@ -33,8 +37,56 @@ export class ScreeningCardComponent implements OnInit, OnDestroy {
     const screeningId = this.route.snapshot.paramMap.get('id');
     if (screeningId && !this.screening) {
       this.isDetailPage = true;
-      this.isLoading = true; // Set true here when loading detail
-      this.loadScreening(screeningId);
+      
+      // Clear cache for this specific screening
+      if (screeningId) {
+        this.screeningApi.clearScreeningCache(screeningId);
+      }
+      
+      // Subscribe to route parameter changes to reload when screeningId changes
+      this.route.paramMap
+        .pipe(
+          switchMap(params => {
+            const id = params.get('id');
+            // Skip if same ID as last time
+            if (id && id !== this.lastScreeningId) {
+              this.lastScreeningId = id;
+              this.isLoading = true;
+              this.error = null;
+              return this.getScreeningById.execute(id);
+            }
+            return [];
+          }),
+          distinctUntilChanged(),
+          takeUntil(this.destroy$)
+        )
+        .subscribe({
+          next: (res: any) => {
+            // Normalize snake_case to camelCase if needed
+            this.screening = {
+              ...res,
+              startTime: res.startTime || res.start_time,
+              roomNumber: res.roomNumber || res.room_number,
+              // Normalize seats if they exist
+              seats: res.seats ? res.seats.map((seat: any) => ({
+                ...seat,
+                isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true),
+                status: this.getSeatStatus(seat),
+                isSelected: false,
+                row: seat.row || String(seat.rowNumber) || '0',
+                number: seat.number || seat.seatNumber || 0
+              })) : []
+            };
+            this.isLoading = false;
+            // Force change detection
+            this.cdr.detectChanges();
+          },
+          error: (err: any) => {
+            this.error = 'Failed to load screening details';
+            this.isLoading = false;
+            this.cdr.detectChanges();
+          }
+        });
     } else if (this.screening) {
       this.isDetailPage = false;
       this.isLoading = false;
@@ -47,38 +99,6 @@ export class ScreeningCardComponent implements OnInit, OnDestroy {
   }
 
   selectedSeats: any[] = [];
-
-  loadScreening(id: string) {
-    this.isLoading = true;
-    this.error = null;
-
-    this.getScreeningById.execute(id)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res: any) => {
-          // Normalize snake_case to camelCase if needed
-          this.screening = {
-            ...res,
-            startTime: res.startTime || res.start_time,
-            roomNumber: res.roomNumber || res.room_number,
-            // Normalize seats if they exist
-            seats: res.seats ? res.seats.map((seat: any) => ({
-              ...seat,
-              isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true),
-              status: this.getSeatStatus(seat),
-              isSelected: false,
-              row: seat.row || String(seat.rowNumber) || '0',
-              number: seat.number || seat.seatNumber || 0
-            })) : []
-          };
-          this.isLoading = false;
-        },
-        error: (err: any) => {
-          this.error = 'Failed to load screening details';
-          this.isLoading = false;
-        }
-      });
-  }
 
   getSeatStatus(seat: any): string {
     if (seat.status) {

@@ -1,7 +1,8 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, NavigationEnd } from '@angular/router';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 import { ScreeningCardComponent } from '../screening-card/screening-card';
 import { ScreeningFormComponent } from '../screening-form/screening-form';
 import { ScreeningApiService } from '../../../infrastructure/adapters/screening-api-service';
@@ -23,26 +24,68 @@ export class ScreeningListComponent implements OnInit, OnDestroy {
   editingScreening: any = null;
   private destroy$ = new Subject<void>();
   authService = inject(AuthService);
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   constructor(private api: ScreeningApiService) {}
 
   ngOnInit(): void {
+    // Clear cache first to ensure fresh data
+    this.api.clearCache();
+    
+    // Load data on initial component creation
+    this.loadScreenings();
+    
+    // Reload data whenever navigating to this route (but skip the first one since ngOnInit already loaded)
+    let isFirstNavigation = true;
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        filter((event: any) => event.url === '/screenings' || (event.url.includes('/screenings') && !event.url.includes('/screenings/'))),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
+        if (isFirstNavigation) {
+          isFirstNavigation = false;
+          return;
+        }
+        // Clear cache and reload when navigating to this route
+        this.api.clearCache();
+        this.loadScreenings();
+      });
+  }
+
+  private loadScreenings(): void {
     this.loading = true;
+    this.error = null;
+    
     this.api.getAllScreenings()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data: any) => {
-          // map snake_case -> camelCase dacă e nevoie
-          this.screenings = data.map((s: any) => ({
-            ...s,
-            startTime: s.startTime || s.start_time,
-            roomNumber: s.roomNumber || s.room_number
-          }));
+          if (data && Array.isArray(data)) {
+            // map snake_case -> camelCase dacă e nevoie
+            const mappedScreenings = data.map((s: any) => ({
+              ...s,
+              startTime: s.startTime || s.start_time,
+              roomNumber: s.roomNumber || s.room_number
+            }));
+            this.screenings = mappedScreenings;
+            
+            // Force change detection
+            this.cdr.detectChanges();
+          } else {
+            this.screenings = [];
+          }
           this.loading = false;
+          
+          // Force change detection again after loading is set to false
+          this.cdr.detectChanges();
         },
         error: (err: any) => {
-          console.error('Eroare la încărcarea proiecțiilor', err);
-          this.error = 'Nu am putut încărca proiecțiile';
+          console.error('Error loading screenings:', err);
+          this.error = 'Nu am putut încărca proiecțiile. Te rugăm să reîncerci.';
+          this.screenings = [];
           this.loading = false;
         }
       });
@@ -130,6 +173,10 @@ export class ScreeningListComponent implements OnInit, OnDestroy {
   onScreeningFormCancel() {
     this.showScreeningForm = false;
     this.editingScreening = null;
+  }
+
+  trackByScreeningId(index: number, screening: any): string {
+    return screening?.id || index;
   }
 }
 

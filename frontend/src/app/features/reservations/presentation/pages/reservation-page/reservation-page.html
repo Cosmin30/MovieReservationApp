@@ -19,16 +19,109 @@
       <button type="button" class="btn-close" (click)="success = null"></button>
     </div>
 
-    <!-- Loading State -->
-    <div *ngIf="isLoadingSeats || isLoadingScreening" class="loading-container">
+    <!-- Loading State for New Reservation -->
+    <div *ngIf="!isExistingReservation && (isLoadingSeats || isLoadingScreening)" class="loading-container">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
       <p class="mt-3">Se încarcă detaliile proiecției...</p>
     </div>
 
-    <!-- Main Content -->
-    <div *ngIf="!isLoadingSeats && !isLoadingScreening && screening" class="row g-4">
+    <!-- Loading State for Existing Reservation -->
+    <div *ngIf="isExistingReservation && isLoadingReservation" class="loading-container">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3">Se încarcă detaliile rezervării...</p>
+    </div>
+
+    <!-- Existing Reservation Details with QR Code -->
+    <div *ngIf="isExistingReservation && !isLoadingReservation && reservation" class="row g-4">
+      <div class="col-lg-8">
+        <div class="card shadow-lg border-0 mb-4">
+          <div class="card-body">
+            <h3 class="section-title mb-4"><i class="fas fa-ticket-alt"></i> Detalii Rezervare</h3>
+            
+            <div class="info-grid mb-4">
+              <div class="info-item">
+                <label class="info-label"><i class="fas fa-hashtag"></i> ID Rezervare</label>
+                <p class="info-value">{{ reservation.id }}</p>
+              </div>
+              <div class="info-item">
+                <label class="info-label"><i class="fas fa-info-circle"></i> Status</label>
+                <p class="info-value">
+                  <span class="badge bg-primary">{{ reservation.status }}</span>
+                </p>
+              </div>
+            </div>
+
+            <div class="info-grid mb-4" *ngIf="reservation.screening">
+              <div class="info-item">
+                <label class="info-label"><i class="fas fa-film"></i> Film</label>
+                <p class="info-value">{{ reservation.screening.movie?.title }}</p>
+              </div>
+              <div class="info-item">
+                <label class="info-label"><i class="fas fa-building"></i> Sala</label>
+                <p class="info-value">{{ reservation.screening.hall?.name }}</p>
+              </div>
+            </div>
+
+            <div class="info-grid mb-4" *ngIf="reservation.screening">
+              <div class="info-item">
+                <label class="info-label"><i class="fas fa-calendar-alt"></i> Data & Ora</label>
+                <p class="info-value">
+                  {{ (reservation.screening.startTime || reservation.screening.start_time) | date:'dd MMM yyyy, HH:mm' }}
+                </p>
+              </div>
+              <div class="info-item">
+                <label class="info-label"><i class="fas fa-money-bill-wave"></i> Preț Total</label>
+                <p class="info-value">
+                  {{ reservation.totalPrice || reservation.total_price || (reservation.tickets?.length * 50) || 0 }} RON
+                </p>
+              </div>
+            </div>
+
+            <div *ngIf="reservation.tickets && reservation.tickets.length > 0" class="mb-4">
+              <label class="form-label fw-bold"><i class="fas fa-chair"></i> Bilete:</label>
+              <div class="selected-seats-list">
+                <div *ngFor="let ticket of reservation.tickets" class="selected-seat-badge">
+                  <i class="fas fa-ticket-alt seat-icon"></i>
+                  <span>
+                    Rând {{ ticket.seat?.row || ticket.seat?.rowNumber || ticket.seat?.row_number || 'N/A' }}, 
+                    Loc {{ ticket.seat?.number || ticket.seat?.seatNumber || ticket.seat?.seat_number || 'N/A' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card shadow-lg border-0">
+          <div class="card-body text-center">
+            <h4 class="mb-4"><i class="fas fa-qrcode"></i> Cod QR Rezervare</h4>
+            <div *ngIf="qrCodeDataUrl" class="mb-3">
+              <img [src]="qrCodeDataUrl" alt="QR Code" class="img-fluid" style="max-width: 300px; border: 2px solid #dee2e6; border-radius: 8px; padding: 10px;">
+            </div>
+            <div *ngIf="!qrCodeDataUrl" class="mb-3">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Generating QR Code...</span>
+              </div>
+            </div>
+            <p class="text-muted small">
+              Scanează codul QR pentru a accesa rapid detaliile rezervării
+            </p>
+            <button class="btn btn-outline-primary mt-3" routerLink="/reservations">
+              <i class="fas fa-arrow-left"></i> Înapoi la Rezervări
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content for New Reservation -->
+    <div *ngIf="!isExistingReservation && !isLoadingSeats && !isLoadingScreening && screening" class="row g-4">
       
       <!-- Left: Screening Details and Seats Selection -->
       <div class="col-lg-8">

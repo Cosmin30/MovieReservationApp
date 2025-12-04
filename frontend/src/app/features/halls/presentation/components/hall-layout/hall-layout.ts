@@ -1,9 +1,10 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, distinctUntilChanged } from 'rxjs/operators';
 import { GetHallByIdService } from '../../../application/use-cases/get-hall-by-id-service';
+import { HallApiService } from '../../../infrastructure/adapters/hall-api-service';
 
 @Component({
   selector: 'app-hall-layout',
@@ -19,20 +20,32 @@ export class HallLayoutComponent implements OnInit, OnDestroy {
   error: string | null = null;
   hallId: string | null = null;
   private destroy$ = new Subject<void>();
+  private cdr = inject(ChangeDetectorRef);
+  private lastHallId: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
-    private getHallByIdService: GetHallByIdService
+    private getHallByIdService: GetHallByIdService,
+    private hallApi: HallApiService
   ) {}
 
   ngOnInit(): void {
     // Get hall ID from route parameters
-    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
-      if (params['id']) {
-        this.hallId = params['id'];
-        this.loadHall();
-      }
-    });
+    this.route.params
+      .pipe(
+        distinctUntilChanged((prev, curr) => prev['id'] === curr['id']),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(params => {
+        const id = params['id'];
+        if (id && id !== this.lastHallId) {
+          this.lastHallId = id;
+          this.hallId = id;
+          // Clear cache for this specific hall
+          this.hallApi.clearHallCache(id);
+          this.loadHall();
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -53,11 +66,14 @@ export class HallLayoutComponent implements OnInit, OnDestroy {
         next: (hall: any) => {
           this.hall = hall;
           this.isLoading = false;
+          // Force change detection
+          this.cdr.detectChanges();
         },
         error: (err: any) => {
           console.error('Error loading hall:', err);
           this.error = 'Nu am putut încărca detaliile salii. Vă rugăm încercați din nou.';
           this.isLoading = false;
+          this.cdr.detectChanges();
         }
       });
   }

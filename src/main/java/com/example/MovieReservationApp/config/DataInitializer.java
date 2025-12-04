@@ -24,18 +24,17 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         String adminEmail = "admin@example.com";
 
-        // Verificăm dacă există deja un admin
         if (userRepository.findByEmail(adminEmail).isEmpty()) {
             User admin = User.builder()
                     .fullName("Administrator")
                     .email(adminEmail)
-                    .passwordHash(passwordEncoder.encode("Admin123!")) // parola default
+                    .passwordHash(passwordEncoder.encode("Admin123!"))
                     .role(Role.ADMIN)
                     .createdAt(OffsetDateTime.now())
                     .build();
 
             userRepository.save(admin);
-            System.out.println("✅ Admin creat: " + adminEmail);
+            System.out.println("Admin creat: " + adminEmail);
         }
     }
 }

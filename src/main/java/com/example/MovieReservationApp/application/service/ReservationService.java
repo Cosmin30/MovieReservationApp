@@ -66,6 +66,13 @@ public class ReservationService {
             ticketDTO.setPrice(ticket.getPrice());
             ticketDTO.setSeatId(seat.getId());
             ticketDTO.setReservationId(reservation.getId());
+            // Include seat information
+            SeatDTO seatDTO = new SeatDTO();
+            seatDTO.setId(seat.getId());
+            seatDTO.setNumber(seat.getNumber());
+            seatDTO.setRow(seat.getRow());
+            seatDTO.setIsAvailable(seat.getIsAvailable());
+            ticketDTO.setSeat(seatDTO);
             return ticketDTO;
         }).collect(Collectors.toList());
 
@@ -148,6 +155,13 @@ public class ReservationService {
                     tDto.setSeatId(ticket.getSeat().getId());
                     tDto.setReservationId(reservation.getId());
                     tDto.setPrice(ticket.getPrice());
+                    // Include seat information
+                    SeatDTO seatDTO = new SeatDTO();
+                    seatDTO.setId(ticket.getSeat().getId());
+                    seatDTO.setNumber(ticket.getSeat().getNumber());
+                    seatDTO.setRow(ticket.getSeat().getRow());
+                    seatDTO.setIsAvailable(ticket.getSeat().getIsAvailable());
+                    tDto.setSeat(seatDTO);
                     return tDto;
                 }).collect(Collectors.toList());
         return mapReservationToDTO(reservation, tickets);

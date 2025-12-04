@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
 import { MovieApiService } from '../../infrastructure/adapters/movie-api-service';
 import { MoviesState } from '../state/movies-state.state';
 
@@ -18,6 +18,10 @@ export class GetAllMoviesService {
     return this.api.getAllMovies().pipe(
       tap(movies => {
         this.state.setMovies(movies);
+      }),
+      catchError(error => {
+        console.error('Error loading movies:', error);
+        throw error;
       })
     );
   }

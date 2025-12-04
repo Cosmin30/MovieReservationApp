@@ -15,9 +15,28 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        var user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+        try {
+            System.out.println("🔍 [CUSTOM USER DETAILS SERVICE] Loading user by email: " + email);
+            var user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
-        return new CustomUserDetails(user);
+            System.out.println("🔍 [CUSTOM USER DETAILS SERVICE] User found - ID: " + user.getId());
+            System.out.println("🔍 [CUSTOM USER DETAILS SERVICE] User found - Role: " + (user.getRole() != null ? user.getRole().name() : "NULL"));
+            
+            if (user.getRole() == null) {
+                System.out.println("❌ [CUSTOM USER DETAILS SERVICE] ERROR: User role is NULL!");
+            }
+            
+            CustomUserDetails userDetails = new CustomUserDetails(user);
+            System.out.println("🔍 [CUSTOM USER DETAILS SERVICE] UserDetails created");
+            System.out.println("🔍 [CUSTOM USER DETAILS SERVICE] Calling getAuthorities()...");
+            var authorities = userDetails.getAuthorities();
+            System.out.println("🔍 [CUSTOM USER DETAILS SERVICE] Authorities retrieved: " + authorities);
+            return userDetails;
+        } catch (Exception e) {
+            System.out.println("❌ [CUSTOM USER DETAILS SERVICE] ERROR: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 }

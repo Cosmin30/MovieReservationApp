@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 
 import { MoviesState } from '../../../application/state/movies-state.state';
 import { GetAllMoviesService } from '../../../application/use-cases/get-all-movies-service';
@@ -38,6 +38,7 @@ export class MoviesListPage implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   constructor(
     private state: MoviesState,
@@ -47,16 +48,60 @@ export class MoviesListPage implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    // Clear cache first to ensure fresh data
+    this.movieApi.clearCache();
+    this.state.clearCache();
+    
     this.state.movies$
       .pipe(takeUntil(this.destroy$))
       .subscribe(m => {
         this.movies = m;
         this.filterService.setOriginalMovies(m);
+        // Force change detection
+        this.cdr.detectChanges();
       });
     
+    // Load data on initial component creation
     this.getAllMovies.execute()
       .pipe(takeUntil(this.destroy$))
-      .subscribe();
+      .subscribe({
+        next: () => {
+          // Data loaded successfully
+        },
+        error: (err) => {
+          console.error('Error loading movies:', err);
+          this.error = 'Nu am putut încărca filmele. Te rugăm să reîncerci.';
+        }
+      });
+
+    // Reload data whenever navigating to this route (but skip the first one since ngOnInit already loaded)
+    let isFirstNavigation = true;
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        filter((event: any) => event.url === '/movies' || (event.url.includes('/movies') && !event.url.includes('/movies/'))),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
+        if (isFirstNavigation) {
+          isFirstNavigation = false;
+          return;
+        }
+        // Clear cache and reload when navigating to this route
+        this.movieApi.clearCache();
+        this.state.clearCache();
+        this.getAllMovies.execute()
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              // Data reloaded successfully
+            },
+            error: (err) => {
+              console.error('Error reloading movies:', err);
+              this.error = 'Nu am putut reîncărca filmele. Te rugăm să reîncerci.';
+            }
+          });
+      });
   }
 
   ngOnDestroy(): void {
