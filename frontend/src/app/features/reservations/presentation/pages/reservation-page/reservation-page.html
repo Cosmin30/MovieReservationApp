@@ -20,18 +20,76 @@
     </div>
 
     <!-- Loading State -->
-    <div *ngIf="isLoadingSeats" class="loading-container">
+    <div *ngIf="isLoadingSeats || isLoadingScreening" class="loading-container">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
-      <p class="mt-3">Se încarcă locurile disponibile...</p>
+      <p class="mt-3">Se încarcă detaliile proiecției...</p>
     </div>
 
     <!-- Main Content -->
-    <div *ngIf="!isLoadingSeats" class="row g-4">
+    <div *ngIf="!isLoadingSeats && !isLoadingScreening && screening" class="row g-4">
       
-      <!-- Left: Seats Selection -->
+      <!-- Left: Screening Details and Seats Selection -->
       <div class="col-lg-8">
+        <!-- Screening Details Card -->
+        <div class="card shadow-lg border-0 mb-4">
+          <div class="card-body">
+            <h3 class="section-title mb-4"><i class="fas fa-info-circle"></i> Detalii Proiecție</h3>
+            
+            <!-- Info Grid -->
+            <div class="info-grid mb-4">
+              <div class="info-item">
+                <label class="info-label"><i class="fas fa-film"></i> Film</label>
+                <p class="info-value">{{ screening.movie?.title }}</p>
+              </div>
+              <div class="info-item">
+                <label class="info-label"><i class="fas fa-building"></i> Sala</label>
+                <p class="info-value">{{ screening.hall?.name }}</p>
+              </div>
+            </div>
+
+            <div class="info-grid mb-4">
+              <div class="info-item">
+                <label class="info-label"><i class="fas fa-calendar-alt"></i> Data & Ora</label>
+                <p class="info-value">{{ (screening.startTime || screening.start_time) | date:'dd MMM yyyy, HH:mm' }}</p>
+              </div>
+              <div class="info-item">
+                <label class="info-label"><i class="fas fa-door-open"></i> Sală Nr.</label>
+                <p class="info-value">{{ screening.roomNumber || screening.room_number || '-' }}</p>
+              </div>
+            </div>
+
+            <!-- Seats Stats -->
+            <div class="stats-grid mt-4">
+              <div class="stat-item">
+                <div class="stat-icon capacity-icon"><i class="fas fa-chair"></i></div>
+                <div class="stat-content">
+                  <p class="stat-label">Capacitate Totală</p>
+                  <p class="stat-number">{{ screening.capacity || 0 }}</p>
+                </div>
+              </div>
+
+              <div class="stat-item">
+                <div class="stat-icon available-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-content">
+                  <p class="stat-label">Disponibile</p>
+                  <p class="stat-number">{{ getAvailableSeatsCount() }}</p>
+                </div>
+              </div>
+
+              <div class="stat-item">
+                <div class="stat-icon reserved-icon"><i class="fas fa-times-circle"></i></div>
+                <div class="stat-content">
+                  <p class="stat-label">Rezervate</p>
+                  <p class="stat-number">{{ getReservedSeatsCount() }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seats Selection Card -->
         <div class="card shadow-lg border-0">
           <div class="card-header bg-gradient-primary text-white">
             <h4 class="mb-0"><i class="fas fa-chair"></i> Selectează Locurile</h4>
@@ -45,10 +103,50 @@
         </div>
       </div>
 
-      <!-- Right: Summary and Payment -->
+      <!-- Right: Reservation Summary and Payment -->
       <div class="col-lg-4">
         <div class="sticky-top reservation-summary">
           
+          <!-- Reservation Card -->
+          <div class="card shadow-lg border-0 mb-3 reservation-card">
+            <div class="card-body">
+              <h3 class="section-title mb-4"><i class="fas fa-ticket-alt"></i> Rezervare</h3>
+              
+              <!-- Quick Info -->
+              <div class="quick-info mb-3">
+                <div class="quick-item">
+                  <span class="quick-label">Film:</span>
+                  <span class="quick-value">{{ screening.movie?.title }}</span>
+                </div>
+                <div class="quick-item">
+                  <span class="quick-label">Sala:</span>
+                  <span class="quick-value">{{ screening.hall?.name }}</span>
+                </div>
+                <div class="quick-item">
+                  <span class="quick-label">Data:</span>
+                  <span class="quick-value">{{ (screening.startTime || screening.start_time) | date:'dd MMM, HH:mm' }}</span>
+                </div>
+              </div>
+
+              <!-- Availability Status -->
+              <div class="availability-status" [ngClass]="getAvailableSeatsCount() > 0 ? 'available' : 'full'">
+                <i [ngClass]="getAvailableSeatsCount() > 0 ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
+                <div class="status-text">
+                  <strong *ngIf="getAvailableSeatsCount() > 0">
+                    {{ getAvailableSeatsCount() }} locuri disponibile
+                  </strong>
+                  <strong *ngIf="getAvailableSeatsCount() === 0">
+                    Proiecție full - Nu mai sunt locuri
+                  </strong>
+                </div>
+              </div>
+
+              <p class="helper-text mt-3 mb-0">
+                Selectează locurile și cumpără bilete în pagina următoare.
+              </p>
+            </div>
+          </div>
+
           <!-- Reservation Summary Card -->
           <div class="card shadow-lg border-0 mb-3">
             <div class="card-header bg-gradient-success text-white">

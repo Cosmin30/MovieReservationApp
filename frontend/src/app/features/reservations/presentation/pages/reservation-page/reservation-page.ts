@@ -9,6 +9,7 @@ import { SeatSelectionComponent } from '../../components/seat-selection/seat-sel
 import { GetAvailableSeatsService } from '../../../application/use-cases/get-available-seats-service';
 import { CreateReservationService } from '../../../application/use-cases/create-reservation-service';
 import { AuthService } from '../../../../../core/auth/auth-service';
+import { GetScreeningByIdService } from '../../../../screenings/application/use-cases/get-screening-by-id-service';
 
 @Component({
   selector: 'app-reservation-page',
@@ -24,6 +25,7 @@ import { AuthService } from '../../../../../core/auth/auth-service';
 export class ReservationPage implements OnInit, OnDestroy {
 
   screeningId!: string;
+  screening: any = null;
   availableSeats: any[] = [];
   selectedSeats: any[] = [];
   reservation: any;
@@ -40,6 +42,7 @@ export class ReservationPage implements OnInit, OnDestroy {
   
   // UI State
   isLoadingSeats = true;
+  isLoadingScreening = true;
   isCreatingReservation = false;
   error: string | null = null;
   success: string | null = null;
@@ -50,7 +53,8 @@ export class ReservationPage implements OnInit, OnDestroy {
     private router: Router,
     private getSeats: GetAvailableSeatsService,
     private createReservation: CreateReservationService,
-    private authService: AuthService
+    private authService: AuthService,
+    private getScreeningById: GetScreeningByIdService
   ) {}
 
   ngOnInit() {
@@ -61,7 +65,8 @@ export class ReservationPage implements OnInit, OnDestroy {
       return;
     }
 
-    this.loadAvailableSeats();
+    // Load screening details first, seats will be loaded after screening is loaded
+    this.loadScreeningDetails();
   }
 
   ngOnDestroy(): void {
@@ -69,10 +74,89 @@ export class ReservationPage implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  loadScreeningDetails() {
+    this.isLoadingScreening = true;
+    this.error = null;
+
+    this.getScreeningById.execute(this.screeningId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res: any) => {
+          console.log('Raw screening response:', res);
+          
+          // Normalize snake_case to camelCase if needed
+          this.screening = {
+            ...res,
+            startTime: res.startTime || res.start_time,
+            roomNumber: res.roomNumber || res.room_number,
+            capacity: res.capacity || 0,
+            // Normalize seats if they exist
+            seats: res.seats ? res.seats.map((seat: any) => ({
+              ...seat,
+              isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true),
+              status: this.getSeatStatus(seat),
+              row: seat.row || String(seat.rowNumber) || '0',
+              number: seat.number || seat.seatNumber || 0,
+              isSelected: false
+            })) : (res.seats || []),
+            // Ensure movie and hall are preserved
+            movie: res.movie || null,
+            hall: res.hall || null
+          };
+          
+          console.log('Normalized screening:', this.screening);
+          console.log('Screening seats count:', this.screening.seats?.length || 0);
+          console.log('Available seats:', this.getAvailableSeatsCount());
+          console.log('Reserved seats:', this.getReservedSeatsCount());
+          
+          this.isLoadingScreening = false;
+          
+          // Load seats after screening is loaded
+          this.loadAvailableSeats();
+        },
+        error: (err: any) => {
+          console.error('Error loading screening details:', err);
+          this.error = 'Nu am putut încărca detaliile proiecției. Te rugăm să reîmprospătezi pagina.';
+          this.isLoadingScreening = false;
+        }
+      });
+  }
+
+  getAvailableSeatsCount(): number {
+    if (!this.screening?.seats || this.screening.seats.length === 0) return 0;
+    return this.screening.seats.filter((s: any) => {
+      const isAvailable = s.isAvailable !== undefined ? s.isAvailable : (s.is_available !== undefined ? s.is_available : false);
+      return isAvailable === true || isAvailable === 'true';
+    }).length;
+  }
+
+  getReservedSeatsCount(): number {
+    if (!this.screening?.seats || this.screening.seats.length === 0) return 0;
+    return this.screening.seats.filter((s: any) => {
+      const isAvailable = s.isAvailable !== undefined ? s.isAvailable : (s.is_available !== undefined ? s.is_available : true);
+      return isAvailable === false || isAvailable === 'false';
+    }).length;
+  }
+
   loadAvailableSeats() {
     this.isLoadingSeats = true;
     this.error = null;
 
+    // First try to use seats from screening if already loaded
+    if (this.screening?.seats && this.screening.seats.length > 0) {
+      this.availableSeats = this.screening.seats.map((seat: any) => ({
+        id: seat.id,
+        row: seat.row || String(seat.rowNumber) || '0',
+        number: seat.number || seat.seatNumber || 0,
+        status: this.getSeatStatus(seat),
+        isSelected: false,
+        isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true)
+      }));
+      this.isLoadingSeats = false;
+      return;
+    }
+
+    // Otherwise fetch from API
     this.getSeats.execute(this.screeningId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -87,15 +171,28 @@ export class ReservationPage implements OnInit, OnDestroy {
             number: seat.number || seat.seatNumber || 0,
             status: this.getSeatStatus(seat),
             isSelected: false,
-            isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : true
+            isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true)
           }));
           
           this.isLoadingSeats = false;
         },
         error: (err: any) => {
           console.error('Error loading seats:', err);
-          this.error = 'Nu am putut încărca locurile disponibile. Te rugăm să reîmprospătezi pagina.';
-          this.isLoadingSeats = false;
+          // If we have screening seats, use those
+          if (this.screening?.seats && this.screening.seats.length > 0) {
+            this.availableSeats = this.screening.seats.map((seat: any) => ({
+              id: seat.id,
+              row: seat.row || String(seat.rowNumber) || '0',
+              number: seat.number || seat.seatNumber || 0,
+              status: this.getSeatStatus(seat),
+              isSelected: false,
+              isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true)
+            }));
+            this.isLoadingSeats = false;
+          } else {
+            this.error = 'Nu am putut încărca locurile disponibile. Te rugăm să reîmprospătezi pagina.';
+            this.isLoadingSeats = false;
+          }
         }
       });
   }
@@ -177,10 +274,7 @@ export class ReservationPage implements OnInit, OnDestroy {
             cvv: ''
           };
           
-          // Reload available seats to reflect changes
-          this.loadAvailableSeats();
-          
-          // Redirect to reservations page after 3 seconds
+          // Redirect to reservations page after 3 seconds (don't reload seats)
           setTimeout(() => {
             this.router.navigate(['/reservations']);
           }, 3000);

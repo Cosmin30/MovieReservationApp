@@ -1,5 +1,5 @@
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
-import { BehaviorSubject, tap } from 'rxjs';
+import { BehaviorSubject, tap, timeout, catchError, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
@@ -32,13 +32,18 @@ export class AuthService {
 
   login(email: string, password: string) {
     return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, { email, password }).pipe(
+      timeout(10000), // ✅ Adaugă timeout
       tap(response => {
         if (this.isBrowser()) {
           localStorage.setItem('token', response.token);
           localStorage.setItem('role', response.role);
         }
         this.loadUserProfile();
-        this.router.navigate(['/movies']);
+        this.router.navigate(['/home']);
+      }),
+      catchError(error => {
+        console.error('❌ Login failed:', error);
+        throw error;
       })
     );
   }
@@ -48,20 +53,42 @@ export class AuthService {
 
     const token = localStorage.getItem('token');
     if (token) {
+      console.log('🔑 Token found, loading user profile...');
       this.loadUserProfile();
+    } else {
+      console.log('⚠️ No token found');
     }
   }
 
   loadUserProfile() {
     const token = this.getToken();
-    if (!token) return;
+    if (!token) {
+      console.log('⚠️ No token available');
+      return;
+    }
 
+    console.log('📡 Fetching user profile...');
+    
     this.http
       .get<any>(`${this.apiUrl}/users/me`, {
         headers: { Authorization: `Bearer ${token}` }
       })
+      .pipe(
+        timeout(8000), // ✅ 8 secunde timeout
+        catchError(error => {
+          console.error('❌ Failed to load user profile:', error);
+          // Nu face logout automat - poate fi problema de network temporară
+          // this.logout();
+          return of(null); // ✅ Returnează null în loc să arunce eroare
+        })
+      )
       .subscribe({
         next: response => {
+          if (!response) {
+            console.log('⚠️ No user data received');
+            return;
+          }
+
           const user: UserModel = {
             id: response.id,
             email: response.email,
@@ -77,8 +104,7 @@ export class AuthService {
           }
         },
         error: (err) => {
-          console.error('❌ Failed to load user profile:', err);
-          this.logout();
+          console.error('❌ Subscription error:', err);
         }
       });
   }
@@ -106,7 +132,9 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    const hasToken = !!this.getToken();
+    console.log('🔐 isAuthenticated:', hasToken);
+    return hasToken;
   }
 
   isAdmin(): boolean {

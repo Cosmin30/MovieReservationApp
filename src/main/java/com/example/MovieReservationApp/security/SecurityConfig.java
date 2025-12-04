@@ -34,7 +34,38 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        // GET requests - toate pentru utilizatori autentificați
+                        .requestMatchers(HttpMethod.GET, "/api/movies/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/screenings/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/seats/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/reservations/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/halls/**").authenticated()
+                        // POST, PUT, DELETE, PATCH - doar pentru admin
+                        .requestMatchers(HttpMethod.POST, "/api/movies/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/movies/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/movies/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/movies/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/screenings/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/screenings/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/screenings/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/screenings/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/seats/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/seats/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/seats/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/seats/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/halls/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/halls/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/halls/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/halls/**").hasRole("ADMIN")
+                        // Users endpoint
                         .requestMatchers("/api/users/me").authenticated()
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        // Reservations - POST pentru utilizatori autentificați, rest pentru admin
+                        .requestMatchers(HttpMethod.POST, "/api/reservations/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/reservations/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/reservations/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/reservations/**").hasRole("ADMIN")
+                        // Alte request-uri necesită autentificare
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -47,7 +78,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:4200"));
         config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Admin-Secret"));
         config.setExposedHeaders(List.of("Authorization"));
         config.setAllowCredentials(true);
 

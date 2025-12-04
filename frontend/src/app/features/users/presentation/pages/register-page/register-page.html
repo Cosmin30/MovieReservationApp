@@ -1,3 +1,12 @@
-<div class="container mt-5" style="max-width: 450px;">
-  <app-register-form (onRegister)="register($event)"></app-register-form>
+<div class="register-page">
+  <div class="register-container">
+    <div class="register-header">
+      <div class="logo-section">
+        <h1>Movie Reservation</h1>
+      </div>
+      <p class="welcome-text">Creează-ți un cont și începe să rezervi bilete!</p>
+    </div>
+    
+    <app-register-form (onRegister)="register($event)"></app-register-form>
+  </div>
 </div>

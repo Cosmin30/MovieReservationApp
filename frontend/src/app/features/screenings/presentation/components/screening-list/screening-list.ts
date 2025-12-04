@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ScreeningCardComponent } from '../screening-card/screening-card';
 import { ScreeningApiService } from '../../../infrastructure/adapters/screening-api-service';
+import { AuthService } from '../../../../../core/auth/auth-service';
 
 @Component({
   selector: 'app-screening-list',
@@ -14,14 +15,16 @@ import { ScreeningApiService } from '../../../infrastructure/adapters/screening-
 })
 export class ScreeningListComponent implements OnInit, OnDestroy {
   screenings: any[] = [];
-  loading = true;
+  loading = false;
   error: string | null = null;
   success: string | null = null;
   private destroy$ = new Subject<void>();
+  authService = inject(AuthService);
 
   constructor(private api: ScreeningApiService) {}
 
   ngOnInit(): void {
+    this.loading = true;
     this.api.getAllScreenings()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -64,6 +67,16 @@ export class ScreeningListComponent implements OnInit, OnDestroy {
           }
         });
     }
+  }
+
+  onAddScreening() {
+    // TODO: Navigate to add screening page or open modal
+    alert('Funcționalitatea de adăugare proiecție va fi implementată!');
+  }
+
+  onEditScreening(screeningId: string) {
+    // TODO: Navigate to edit screening page or open modal
+    alert(`Funcționalitatea de editare proiecție (ID: ${screeningId}) va fi implementată!`);
   }
 }
 

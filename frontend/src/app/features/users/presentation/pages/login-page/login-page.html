@@ -1,3 +1,12 @@
-<div class="container mt-5" style="max-width: 450px;">
-  <app-login-form (onLogin)="login($event)"></app-login-form>
+<div class="login-page">
+  <div class="login-container">
+    <div class="login-header">
+      <div class="logo-section">
+        <h1>Movie Reservation</h1>
+      </div>
+      <p class="welcome-text">Bine ai revenit! Intră în cont pentru a rezerva bilete.</p>
+    </div>
+    
+    <app-login-form (onLogin)="login($event)"></app-login-form>
+  </div>
 </div>

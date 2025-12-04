@@ -1,9 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { AuthService } from '../../../core/auth/auth-service';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './footer.html',
   styleUrls: ['./footer.css']
 })
-export class FooterComponent {}
+export class FooterComponent {
+  authService = inject(AuthService);
+  
+  get isLoggedIn(): boolean {
+    return this.authService.isAuthenticated();
+  }
+}

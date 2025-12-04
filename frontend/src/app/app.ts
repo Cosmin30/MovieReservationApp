@@ -12,7 +12,7 @@ import { ConfirmationDialogComponent } from './shared/components/confirmation-di
   selector: 'app-root',
   standalone: true,
   templateUrl: './app.html',
-
+  styleUrls: ['./app.css'],
   imports: [
     RouterOutlet,
     HeaderComponent,

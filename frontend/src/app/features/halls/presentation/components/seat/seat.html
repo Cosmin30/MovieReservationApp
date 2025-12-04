@@ -1,13 +1,13 @@
 <button
   class="btn seat-box"
   [ngClass]="{
-    'available': seat?.status === 'AVAILABLE',
-    'reserved': seat?.status === 'RESERVED',
+    'available': (seat?.status === 'AVAILABLE' || seat?.isAvailable === true || seat?.is_available === true),
+    'reserved': (seat?.status === 'RESERVED' || seat?.isAvailable === false || seat?.is_available === false),
     'unavailable': seat?.status === 'UNAVAILABLE',
     'selected': seat?.isSelected
   }"
   (click)="selectSeat()"
-  [disabled]="seat?.status !== 'AVAILABLE'"
+  [disabled]="!(seat?.status === 'AVAILABLE' || seat?.isAvailable === true || seat?.is_available === true)"
 >
   {{ seat?.row }}-{{ seat?.number }}
 </button>

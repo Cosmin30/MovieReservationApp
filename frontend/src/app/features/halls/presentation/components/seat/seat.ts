@@ -13,7 +13,12 @@ export class SeatComponent {
   @Output() seatToggled = new EventEmitter<any>();
 
   selectSeat() {
-    if (this.seat?.status !== 'AVAILABLE') {
+    // Check if seat is available (handle both status and isAvailable)
+    const isAvailable = this.seat?.status === 'AVAILABLE' || 
+                       (this.seat?.isAvailable === true || this.seat?.isAvailable === 'true') ||
+                       (this.seat?.is_available === true || this.seat?.is_available === 'true');
+    
+    if (!isAvailable) {
       return;
     }
     this.seat.isSelected = !this.seat.isSelected;

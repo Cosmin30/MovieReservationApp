@@ -19,6 +19,10 @@ export class SeatSelectionComponent {
   }
 
   selectSeat(seat: any) {
+    // Update seat selection state
+    if (seat) {
+      seat.isSelected = !seat.isSelected;
+    }
     // Emit the updated list of selected seats
     this.selectedSeatsChanged.emit(this.selectedSeats);
   }

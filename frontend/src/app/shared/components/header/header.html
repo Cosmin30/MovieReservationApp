@@ -1,45 +1,53 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-  <div class="container-fluid">
-    <a class="navbar-brand" routerLink="/"><i class="fas fa-film"></i> Movie Reservation</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
+<nav *ngIf="isLoggedIn" class="app-navbar">
+  <div class="nav-container">
+    <a class="nav-brand" routerLink="/home">
+      <span class="brand-text">Movie Reservation</span>
+    </a>
+    
+    <button class="nav-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="toggler-line"></span>
+      <span class="toggler-line"></span>
+      <span class="toggler-line"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
+      <ul class="nav-menu">
         <li class="nav-item">
           <a routerLink="/movies" routerLinkActive="active" class="nav-link">
-            <i class="fas fa-video"></i> Filme
+            Filme
           </a>
         </li>
         <li class="nav-item">
           <a routerLink="/screenings" routerLinkActive="active" class="nav-link">
-            <i class="fas fa-calendar-alt"></i> Proiecții
+            Proiecții
           </a>
         </li>
         <li class="nav-item">
           <a routerLink="/halls" routerLinkActive="active" class="nav-link">
-            <i class="fas fa-building"></i> Săli
+            Săli
           </a>
         </li>
         <li class="nav-item">
           <a routerLink="/reservations" routerLinkActive="active" class="nav-link">
-            <i class="fas fa-ticket-alt"></i> Rezervări
+            Rezervări
           </a>
         </li>
 
         @if (authService.currentUser$ | async; as user) {
-          <li class="nav-item">
-            <span class="nav-link">
-              <i class="fas fa-user"></i> {{ user.fullName }}
+          <li class="nav-item user-item">
+            <div class="user-info">
+              <div class="user-avatar">
+                {{ user.fullName.charAt(0).toUpperCase() }}
+              </div>
+              <span class="user-name">{{ user.fullName }}</span>
               @if (authService.isAdmin()) {
-                <span class="badge bg-danger ms-2">ADMIN</span>
+                <span class="admin-badge">ADMIN</span>
               }
-            </span>
+            </div>
           </li>
-          <li class="nav-item d-flex align-items-center">
-            <button class="btn btn-outline-light btn-sm" (click)="logout()">
-              <i class="fas fa-sign-out-alt"></i> Logout
+          <li class="nav-item">
+            <button class="logout-btn" (click)="logout()">
+              Logout
             </button>
           </li>
         }

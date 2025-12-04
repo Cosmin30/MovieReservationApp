@@ -1,0 +1,17 @@
+/* Global App Styles */
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Main content should grow to push footer down */
+main {
+  flex: 1 0 auto;
+}
+
+footer {
+  position: relative;
+  flex-shrink: 0;
+  z-index: 10;
+}

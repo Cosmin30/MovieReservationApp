@@ -12,4 +12,5 @@ import { MovieCardComponent } from '../movie-card/movie-card';
 export class MovieGridComponent {
   @Input() movies: MovieModel[] = [];
   @Output() deleteMovie = new EventEmitter<string>();
+  @Output() editMovie = new EventEmitter<string>();
 }

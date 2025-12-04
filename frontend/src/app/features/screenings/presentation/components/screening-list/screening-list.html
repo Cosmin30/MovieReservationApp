@@ -1,6 +1,14 @@
-<div class="container mt-5 mb-5">
+<div class="container-fluid mt-5 mb-5">
 
-  <h1 class="page-title mb-4"><i class="fas fa-calendar-alt"></i> Proiecții Disponibile</h1>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title mb-0"><i class="fas fa-calendar-alt"></i> Proiecții Disponibile</h1>
+    <button *ngIf="authService.isAdmin()" 
+            class="btn btn-success"
+            (click)="onAddScreening()"
+            title="Adaugă proiecție nouă">
+      <i class="fas fa-plus"></i> Adaugă Proiecție Nouă
+    </button>
+  </div>
 
   <!-- Success Alert -->
   <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
@@ -21,10 +29,13 @@
   </div>
 
   <!-- Screening Cards Grid -->
-  <div *ngIf="!loading && screenings?.length" class="row">
-    <div class="col-md-6 col-lg-4 mb-4" *ngFor="let screening of screenings">
-      <app-screening-card [screening]="screening" (deleteScreening)="onDeleteScreening($event)"></app-screening-card>
-    </div>
+  <div *ngIf="!loading && screenings?.length" class="screenings-grid">
+    <app-screening-card 
+      *ngFor="let screening of screenings"
+      [screening]="screening" 
+      (deleteScreening)="onDeleteScreening($event)"
+      (editScreening)="onEditScreening($event)">
+    </app-screening-card>
   </div>
 
   <!-- Empty State -->

@@ -27,12 +27,14 @@ public class ScreeningService {
     private final SeatRepository seatRepository;
     private final HallRepository hallRepository;
 
+    @Transactional(readOnly = true)
     public List<ScreeningDTO> getAllScreenings() {
         return screeningRepository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public ScreeningDTO getScreeningById(UUID id) {
-        Screening screening = screeningRepository.findById(id)
+        Screening screening = screeningRepository.findByIdWithSeats(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Screening not found"));
         return toDTO(screening);
     }

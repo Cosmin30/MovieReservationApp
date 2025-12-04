@@ -14,7 +14,13 @@ export class SeatGridComponent {
   @Output() seatSelected = new EventEmitter<any>();
 
   toggleSeat(seat: any) {
-    if (seat?.status !== 'AVAILABLE') return;
+    // Check if seat is available (handle both status and isAvailable)
+    const isAvailable = seat?.status === 'AVAILABLE' || 
+                       (seat?.isAvailable === true || seat?.isAvailable === 'true') ||
+                       (seat?.is_available === true || seat?.is_available === 'true');
+    
+    if (!isAvailable) return;
+    
     seat.isSelected = !seat.isSelected;
     this.seatSelected.emit(seat);
   }

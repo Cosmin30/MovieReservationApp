@@ -15,6 +15,10 @@ export class HeaderComponent {
 
   authService = inject(AuthService);
 
+  get isLoggedIn(): boolean {
+    return this.authService.isAuthenticated();
+  }
+
   logout() {
     this.authService.logout();
   }

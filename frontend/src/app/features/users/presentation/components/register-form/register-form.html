@@ -1,20 +1,49 @@
-<form (ngSubmit)="submit()" class="card p-4 shadow-sm">
-  <h4>Înregistrare</h4>
+<div class="auth-card">
+  <form (ngSubmit)="submit()" #f="ngForm" class="auth-form">
+    <h2 class="form-title">Creare Cont</h2>
 
-  <div class="mb-3">
-    <label class="form-label">Nume complet</label>
-    <input class="form-control" [(ngModel)]="form.fullName" name="name" required>
+    <div class="form-group">
+      <label class="form-label">Nume complet</label>
+      <input 
+        type="text"
+        class="form-control" 
+        [(ngModel)]="form.fullName" 
+        name="name" 
+        placeholder="Ion Popescu"
+        required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input 
+        type="email"
+        class="form-control" 
+        [(ngModel)]="form.email" 
+        name="email" 
+        placeholder="email@exemplu.ro"
+        required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Parola</label>
+      <input 
+        type="password" 
+        class="form-control" 
+        [(ngModel)]="form.password" 
+        name="password" 
+        placeholder="Minimum 6 caractere"
+        required>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-register" [disabled]="!f.valid">
+      Creează cont
+    </button>
+  </form>
+
+  <div class="auth-footer">
+    <p class="footer-text">Ai deja cont?</p>
+    <a routerLink="/login" class="btn btn-login">
+      Intră în cont
+    </a>
   </div>
-
-  <div class="mb-3">
-    <label class="form-label">Email</label>
-    <input class="form-control" [(ngModel)]="form.email" name="email" required>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Parola</label>
-    <input type="password" class="form-control" [(ngModel)]="form.password" name="password" required>
-  </div>
-
-  <button class="btn btn-success w-100">Creează cont</button>
-</form>
+</div>

@@ -16,12 +16,18 @@
   <div class="card-body">
     <div class="d-flex justify-content-between align-items-start mb-2">
       <h5 class="card-title mb-0">{{ movie.title }}</h5>
-      <button *ngIf="authService.isAdmin()" 
-              class="btn btn-sm btn-danger"
-              (click)="deleteMovie.emit(movie.id)"
-              title="Șterge film">
-        <i class="fas fa-trash"></i>
-      </button>
+      <div *ngIf="authService.isAdmin()" class="d-flex gap-2">
+        <button class="btn btn-sm btn-warning"
+                (click)="editMovie.emit(movie.id)"
+                title="Editează film">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn btn-sm btn-danger"
+                (click)="deleteMovie.emit(movie.id)"
+                title="Șterge film">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
     </div>
     <p class="text-muted">{{ genre }}</p>
 

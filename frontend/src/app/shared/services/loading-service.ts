@@ -5,20 +5,25 @@ import { BehaviorSubject } from 'rxjs';
 export class LoadingService {
   private loadingSubject = new BehaviorSubject<boolean>(false);
   loading$ = this.loadingSubject.asObservable();
-  private requestCount = 0;
 
   show() {
-    this.requestCount++;
-    if (this.requestCount > 0) {
-      this.loadingSubject.next(true);
-    }
+    this.loadingSubject.next(true);
   }
 
   hide() {
-    this.requestCount--;
-    if (this.requestCount <= 0) {
-      this.requestCount = 0; // Ensure it doesn't go negative
-      this.loadingSubject.next(false);
-    }
+    this.loadingSubject.next(false);
+  }
+
+  /**
+   * Force hide loading after timeout (safety measure)
+   * Use this in specific long-running operations
+   */
+  forceHideAfter(milliseconds: number = 30000) {
+    setTimeout(() => {
+      if (this.loadingSubject.value) {
+        console.warn(`⚠️ Force hiding loading spinner after ${milliseconds}ms`);
+        this.hide();
+      }
+    }, milliseconds);
   }
 }

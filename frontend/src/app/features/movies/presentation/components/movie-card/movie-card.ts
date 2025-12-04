@@ -15,6 +15,7 @@ import { AuthService } from '../../../../../core/auth/auth-service';
 export class MovieCardComponent implements OnInit {
   @Input() movie!: MovieModel;
   @Output() deleteMovie = new EventEmitter<string>();
+  @Output() editMovie = new EventEmitter<string>();
   imageUrl: string = 'assets/default-movie.jpg';
   isLoadingImage = true;
   authService = inject(AuthService);

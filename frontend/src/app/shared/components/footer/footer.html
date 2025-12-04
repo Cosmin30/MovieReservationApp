@@ -1,5 +1,41 @@
-<footer class="app-footer">
-  <div class="container text-center">
-    © 2025 Movie Reservation App
+<footer *ngIf="isLoggedIn" class="app-footer">
+  <div class="container-fluid">
+    <div class="footer-content">
+      <div class="row">
+        <!-- Despre noi -->
+        <div class="col-md-4 footer-section">
+          <h5 class="footer-title">Movie Reservation</h5>
+          <p class="footer-text">
+            Platforma ta de rezervare bilete la filme. Descoperă cele mai noi filme și rezervă-ți locul preferat!
+          </p>
+        </div>
+
+        <!-- Linkuri rapide -->
+        <div class="col-md-4 footer-section">
+          <h5 class="footer-title">Linkuri Rapide</h5>
+          <ul class="footer-links">
+            <li><a routerLink="/home"><i class="fas fa-home"></i> Acasă</a></li>
+            <li><a routerLink="/movies"><i class="fas fa-film"></i> Filme</a></li>
+            <li><a routerLink="/screenings"><i class="fas fa-calendar-alt"></i> Proiecții</a></li>
+            <li><a routerLink="/reservations"><i class="fas fa-ticket-alt"></i> Rezervările Mele</a></li>
+          </ul>
+        </div>
+
+        <!-- Informații -->
+        <div class="col-md-4 footer-section">
+          <h5 class="footer-title">Informații</h5>
+          <ul class="footer-links">
+            <li><a routerLink="/contact"><i class="fas fa-envelope"></i> Contact</a></li>
+            <li><a routerLink="/terms"><i class="fas fa-file-contract"></i> Termeni și Condiții</a></li>
+            <li><a routerLink="/privacy"><i class="fas fa-shield-alt"></i> Politică de Confidențialitate</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Copyright -->
+      <div class="footer-bottom">
+        <p>© 2025 Movie Reservation App. Toate drepturile rezervate.</p>
+      </div>
+    </div>
   </div>
 </footer>

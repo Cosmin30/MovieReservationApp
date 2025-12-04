@@ -13,6 +13,9 @@ import { RegisterPage } from './features/users/presentation/pages/register-page/
 import { ProfilePage } from './features/users/presentation/pages/profile-page/profile-page';
 import { MyReservationsPage } from './features/reservations/presentation/pages/my-reservations-page/my-reservations-page';
 import { ReservationPage } from './features/reservations/presentation/pages/reservation-page/reservation-page';
+import { ContactPage } from './features/static-pages/contact-page';
+import { TermsPage } from './features/static-pages/terms-page';
+import { PrivacyPage } from './features/static-pages/privacy-page';
 import { authGuard } from './core/guards/auth-guard';
 import { guestGuard } from './core/guards/guest-guard';
 
@@ -44,6 +47,11 @@ export const routes: Routes = [
   { path: 'reservations', component: MyReservationsPage, canActivate: [authGuard] },
   { path: 'reservations/new', component: ReservationPage, canActivate: [authGuard] },
   { path: 'reservations/:id', component: ReservationPage, canActivate: [authGuard] },
+  
+  // Pagini statice (protejate - doar pentru utilizatori autentificați)
+  { path: 'contact', component: ContactPage, canActivate: [authGuard] },
+  { path: 'terms', component: TermsPage, canActivate: [authGuard] },
+  { path: 'privacy', component: PrivacyPage, canActivate: [authGuard] },
   
   { path: '**', redirectTo: '/login' }
 ];
