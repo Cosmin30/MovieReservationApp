@@ -4,61 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="login register implemented">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/config/DataInitializer.java" afterDir="false" />
+    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment=".">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/app.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/app.config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/app.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/app.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/app.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/app.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/app.routes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/app.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/core/auth/auth-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/core/auth/auth-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/core/guards/admin-guard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/core/guards/admin-guard.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/core/guards/auth-guard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/core/guards/auth-guard.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/core/interceptors/auth-interceptor.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/core/interceptors/auth-interceptor.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/core/services/cache-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/core/services/cache-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/halls/presentation/components/seat/seat.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/halls/presentation/components/seat/seat.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/halls/presentation/components/seat/seat.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/halls/presentation/components/seat/seat.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/components/movie-card/movie-card.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/components/movie-card/movie-card.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/components/movie-card/movie-card.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/components/movie-card/movie-card.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/components/movie-grid/movie-grid.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/components/movie-grid/movie-grid.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/components/movie-grid/movie-grid.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/components/movie-grid/movie-grid.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/pages/movies-list-page/movies-list-page.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/pages/movies-list-page/movies-list-page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/pages/movies-list-page/movies-list-page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/pages/movies-list-page/movies-list-page.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/components/seat-grid/seat-grid.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/components/seat-grid/seat-grid.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/components/seat-grid/seat-grid.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/components/seat-grid/seat-grid.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/components/seat-selection/seat-selection.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/components/seat-selection/seat-selection.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/pages/reservation-page/reservation-page.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/pages/reservation-page/reservation-page.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/pages/reservation-page/reservation-page.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/pages/reservation-page/reservation-page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/pages/reservation-page/reservation-page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/pages/reservation-page/reservation-page.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-card/screening-card.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-card/screening-card.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-card/screening-card.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-card/screening-card.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-card/screening-card.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-card/screening-card.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-list/screening-list.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-list/screening-list.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-list/screening-list.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-list/screening-list.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-list/screening-list.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-list/screening-list.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/components/login-form/login-form.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/components/login-form/login-form.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/components/login-form/login-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/components/login-form/login-form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/components/register-form/register-form.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/components/register-form/register-form.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/components/register-form/register-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/components/register-form/register-form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/components/register-form/register-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/components/register-form/register-form.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/pages/login-page/login-page.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/pages/login-page/login-page.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/pages/login-page/login-page.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/pages/login-page/login-page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/pages/register-page/register-page.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/pages/register-page/register-page.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/pages/register-page/register-page.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/pages/register-page/register-page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/shared/components/footer/footer.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/shared/components/footer/footer.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/shared/components/footer/footer.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/shared/components/footer/footer.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/shared/components/footer/footer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/shared/components/footer/footer.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/shared/components/header/header.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/shared/components/header/header.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/shared/components/header/header.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/shared/components/header/header.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/shared/components/header/header.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/shared/components/header/header.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/shared/services/loading-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/shared/services/loading-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/SeatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/api/SeatController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/ScreeningService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/ScreeningService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/SeatService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/SeatService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/infrastructure/persistence/repository/ScreeningRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/infrastructure/persistence/repository/ScreeningRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/security/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/security/SecurityConfig.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -422,7 +372,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764779721198</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary=".">
+      <option name="closed" value="true" />
+      <created>1764855104852</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1764855104852</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -440,7 +398,6 @@
     <MESSAGE value="first commit" />
     <MESSAGE value="screening" />
     <MESSAGE value="push de test" />
-    <MESSAGE value="." />
     <MESSAGE value="part teodor" />
     <MESSAGE value="services" />
     <MESSAGE value="database connection + postgres dependency" />
@@ -462,6 +419,7 @@
     <MESSAGE value="persistare teste in bd" />
     <MESSAGE value="frontend core and shared" />
     <MESSAGE value="login register implemented" />
-    <option name="LAST_COMMIT_MESSAGE" value="login register implemented" />
+    <MESSAGE value="." />
+    <option name="LAST_COMMIT_MESSAGE" value="." />
   </component>
 </project>

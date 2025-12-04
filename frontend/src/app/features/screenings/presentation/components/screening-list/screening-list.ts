@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ScreeningCardComponent } from '../screening-card/screening-card';
+import { ScreeningFormComponent } from '../screening-form/screening-form';
 import { ScreeningApiService } from '../../../infrastructure/adapters/screening-api-service';
 import { AuthService } from '../../../../../core/auth/auth-service';
 
 @Component({
   selector: 'app-screening-list',
   standalone: true,
-  imports: [CommonModule, ScreeningCardComponent],
+  imports: [CommonModule, ScreeningCardComponent, ScreeningFormComponent],
   templateUrl: './screening-list.html',
   styleUrls: ['./screening-list.css']
 })
@@ -18,6 +19,8 @@ export class ScreeningListComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   success: string | null = null;
+  showScreeningForm = false;
+  editingScreening: any = null;
   private destroy$ = new Subject<void>();
   authService = inject(AuthService);
 
@@ -70,13 +73,63 @@ export class ScreeningListComponent implements OnInit, OnDestroy {
   }
 
   onAddScreening() {
-    // TODO: Navigate to add screening page or open modal
-    alert('Funcționalitatea de adăugare proiecție va fi implementată!');
+    this.editingScreening = null;
+    this.showScreeningForm = true;
   }
 
   onEditScreening(screeningId: string) {
-    // TODO: Navigate to edit screening page or open modal
-    alert(`Funcționalitatea de editare proiecție (ID: ${screeningId}) va fi implementată!`);
+    const screening = this.screenings.find(s => s.id === screeningId);
+    if (screening) {
+      this.editingScreening = screening;
+      this.showScreeningForm = true;
+    }
+  }
+
+  onScreeningFormSubmit(screeningData: any) {
+    const operation = this.editingScreening ? 
+      this.api.updateScreening(this.editingScreening.id, screeningData) :
+      this.api.createScreening(screeningData);
+
+    operation
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.success = this.editingScreening ? 
+            'Proiecția a fost actualizată cu succes!' : 
+            'Proiecția a fost adăugată cu succes!';
+          this.showScreeningForm = false;
+          this.editingScreening = null;
+          // Reload screenings
+          this.loading = true;
+          this.api.getAllScreenings()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (data: any) => {
+                this.screenings = data.map((s: any) => ({
+                  ...s,
+                  startTime: s.startTime || s.start_time,
+                  roomNumber: s.roomNumber || s.room_number
+                }));
+                this.loading = false;
+              },
+              error: () => {
+                this.loading = false;
+              }
+            });
+          setTimeout(() => this.success = null, 3000);
+        },
+        error: (err) => {
+          this.error = this.editingScreening ? 
+            'Nu am putut actualiza proiecția. Te rugăm să încerci din nou.' :
+            'Nu am putut adăuga proiecția. Te rugăm să încerci din nou.';
+          setTimeout(() => this.error = null, 3000);
+        }
+      });
+  }
+
+  onScreeningFormCancel() {
+    this.showScreeningForm = false;
+    this.editingScreening = null;
   }
 }
 
