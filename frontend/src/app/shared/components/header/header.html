@@ -35,15 +35,17 @@
 
         @if (authService.currentUser$ | async; as user) {
           <li class="nav-item user-item">
-            <div class="user-info">
-              <div class="user-avatar">
-                {{ user.fullName.charAt(0).toUpperCase() }}
+            <a routerLink="/profile" class="user-info-link">
+              <div class="user-info">
+                <div class="user-avatar">
+                  {{ user.fullName.charAt(0).toUpperCase() }}
+                </div>
+                <span class="user-name">{{ user.fullName }}</span>
+                @if (authService.isAdmin()) {
+                  <span class="admin-badge">ADMIN</span>
+                }
               </div>
-              <span class="user-name">{{ user.fullName }}</span>
-              @if (authService.isAdmin()) {
-                <span class="admin-badge">ADMIN</span>
-              }
-            </div>
+            </a>
           </li>
           <li class="nav-item">
             <button class="logout-btn" (click)="logout()">

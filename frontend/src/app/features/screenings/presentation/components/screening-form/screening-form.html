@@ -74,11 +74,15 @@
           formControlName="roomNumber"
           placeholder="1"
           min="1"
+          [readonly]="hallId?.value"
           [class.is-invalid]="roomNumber?.invalid && roomNumber?.touched">
         <div *ngIf="roomNumber?.invalid && roomNumber?.touched" class="invalid-feedback">
           <span *ngIf="roomNumber?.errors?.['required']">Numărul sălii este obligatoriu</span>
           <span *ngIf="roomNumber?.errors?.['min']">Numărul sălii trebuie să fie minim 1</span>
         </div>
+        <small *ngIf="hallId?.value" class="form-text text-muted">
+          <i class="fas fa-info-circle"></i> Se completează automat când selectezi o sală
+        </small>
       </div>
 
       <div class="form-group">
@@ -92,11 +96,15 @@
           formControlName="capacity"
           placeholder="100"
           min="1"
+          [readonly]="hallId?.value"
           [class.is-invalid]="capacity?.invalid && capacity?.touched">
         <div *ngIf="capacity?.invalid && capacity?.touched" class="invalid-feedback">
           <span *ngIf="capacity?.errors?.['required']">Capacitatea este obligatorie</span>
           <span *ngIf="capacity?.errors?.['min']">Capacitatea trebuie să fie minim 1</span>
         </div>
+        <small *ngIf="hallId?.value" class="form-text text-muted">
+          <i class="fas fa-info-circle"></i> Se completează automat când selectezi o sală
+        </small>
       </div>
     </div>
 

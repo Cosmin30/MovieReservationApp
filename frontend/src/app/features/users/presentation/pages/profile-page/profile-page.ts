@@ -1,31 +1,28 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { GetCurrentUserService } from '../../../application/use-cases/get-current-user-service';
-import { UpdateUserProfileService } from '../../../application/use-cases/update-user-profile-service';
-import { ProfileFormComponent } from '../../components/profile-form/profile-form'; // import componenta
+import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../../../core/auth/auth-service';
 
 @Component({
   selector: 'app-profile-page',
   templateUrl: './profile-page.html',
+  styleUrls: ['./profile-page.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ProfileFormComponent]  // <-- import componenta
+  imports: [CommonModule, RouterLink]
 })
 export class ProfilePage implements OnInit {
-  profile: any = {};
-
-  constructor(
-    private getUser: GetCurrentUserService,
-    private updateUser: UpdateUserProfileService
-  ) {}
+  authService = inject(AuthService);
+  profile: any = null;
 
   ngOnInit() {
-    this.getUser.execute().subscribe(u => {
-      this.profile = { ...u };
+    this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        // Normalize createdAt - handle both snake_case and camelCase, and null values
+        this.profile = {
+          ...user,
+          createdAt: user.createdAt || (user as any).created_at || null
+        };
+      }
     });
-  }
-
-  update(form: any) {
-    this.updateUser.execute(form).subscribe();
   }
 }

@@ -62,6 +62,30 @@
 <div *ngIf="screening && !isLoading && isDetailPage" class="screening-detail-page">
   <div class="container-fluid px-4 py-4">
     
+    <!-- Screening Form Modal -->
+    <div *ngIf="showScreeningForm" class="modal-overlay" (click)="onScreeningFormCancel()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <app-screening-form 
+          [screening]="editingScreening"
+          [isEditMode]="!!editingScreening"
+          (submitForm)="onScreeningFormSubmit($event)"
+          (cancel)="onScreeningFormCancel()">
+        </app-screening-form>
+      </div>
+    </div>
+
+    <!-- Success Alert -->
+    <div *ngIf="success" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+      <strong><i class="fas fa-check-circle"></i> Succes:</strong> {{ success }}
+      <button type="button" class="btn-close" (click)="success = null"></button>
+    </div>
+
+    <!-- Error Alert -->
+    <div *ngIf="error" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+      <strong><i class="fas fa-exclamation-triangle"></i> Eroare:</strong> {{ error }}
+      <button type="button" class="btn-close" (click)="error = null"></button>
+    </div>
+    
     <!-- Back Button -->
     <button class="btn btn-outline-secondary mb-3" routerLink="/screenings">
       <i class="fas fa-arrow-left"></i> Înapoi
@@ -147,10 +171,10 @@
 
         <!-- Admin Actions -->
         <div *ngIf="authService.isAdmin()" class="mt-4 d-flex gap-2">
-          <button class="btn btn-warning" (click)="editScreening.emit(screening.id)">
+          <button class="btn btn-warning" (click)="onEditScreening()">
             <i class="fas fa-edit"></i> Editează Proiecție
           </button>
-          <button class="btn btn-danger" (click)="deleteScreening.emit(screening.id)">
+          <button class="btn btn-danger" (click)="onDeleteScreening()">
             <i class="fas fa-trash"></i> Șterge Proiecție
           </button>
         </div>

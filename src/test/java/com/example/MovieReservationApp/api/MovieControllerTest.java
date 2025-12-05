@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@org.springframework.context.annotation.Import(com.example.MovieReservationApp.config.TestSecurityConfig.class)
 class MovieControllerTest {
 
     @Autowired
@@ -70,7 +71,7 @@ class MovieControllerTest {
             mockMvc.perform(post("/api/movies")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dto)))
-                    .andExpect(status().isOk())
+                    .andExpect(status().isOk()) // Controller returns 200, not 201
                     .andExpect(jsonPath("$.title").value(titles[i]))
                     .andExpect(jsonPath("$.genre").value(genres[i]))
                     .andExpect(jsonPath("$.duration").value(durations[i]));

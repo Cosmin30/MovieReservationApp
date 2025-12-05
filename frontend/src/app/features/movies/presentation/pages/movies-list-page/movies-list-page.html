@@ -36,6 +36,8 @@
   <div class="row">
     <div class="col-md-3">
       <app-movie-filters 
+        [movies]="movies"
+        [allMovies]="allMovies"
         (onFilter)="filter($event)"
         (onGenreFilter)="filterGenre($event)">
       </app-movie-filters>

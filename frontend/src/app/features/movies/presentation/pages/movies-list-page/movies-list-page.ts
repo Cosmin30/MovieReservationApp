@@ -14,6 +14,7 @@ import { MovieGridComponent } from '../../components/movie-grid/movie-grid';
 import { MovieSearchComponent } from '../../components/movie-search/movie-search';
 import { MovieFiltersComponent } from '../../components/movie-filters/movie-filters';
 import { MovieFormComponent } from '../../components/movie-form/movie-form';
+import { CacheService } from '../../../../../core/services/cache-service';
 
 @Component({
   selector: 'app-movies-list-page',
@@ -30,7 +31,8 @@ import { MovieFormComponent } from '../../components/movie-form/movie-form';
 })
 export class MoviesListPage implements OnInit, OnDestroy {
 
-  movies: any[] = [];
+  movies: any[] = []; // Filtered movies (for display)
+  allMovies: any[] = []; // All movies from database (for genre extraction)
   error: string | null = null;
   success: string | null = null;
   showMovieForm = false;
@@ -39,6 +41,7 @@ export class MoviesListPage implements OnInit, OnDestroy {
   authService = inject(AuthService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private cacheService = inject(CacheService);
 
   constructor(
     private state: MoviesState,
@@ -55,8 +58,33 @@ export class MoviesListPage implements OnInit, OnDestroy {
     this.state.movies$
       .pipe(takeUntil(this.destroy$))
       .subscribe(m => {
-        this.movies = m;
-        this.filterService.setOriginalMovies(m);
+        // Normalize snake_case to camelCase for all movies
+        // Backend may send release_date (snake_case), so we normalize it
+        const normalizedMovies = m.map((movie: any) => {
+          const normalized: any = { ...movie };
+          // Handle both release_date (from backend) and releaseDate (normalized)
+          // Prioritize release_date from backend, but keep both for compatibility
+          const releaseDate = normalized.release_date || normalized.releaseDate;
+          if (releaseDate) {
+            normalized.releaseDate = releaseDate;
+            normalized.release_date = releaseDate; // Keep both
+          }
+          return normalized;
+        });
+        
+        // Update filtered movies (what's displayed)
+        this.movies = normalizedMovies;
+        
+        // Set allMovies from filterService originalMovies (all movies from database)
+        // This ensures genres are always extracted from all movies, not filtered ones
+        const originalMovies = this.filterService.getOriginalMovies();
+        if (originalMovies.length > 0) {
+          this.allMovies = originalMovies;
+        } else {
+          // First load - set allMovies to current movies and store in filterService
+          this.allMovies = [...normalizedMovies];
+          this.filterService.setOriginalMovies(normalizedMovies);
+        }
         // Force change detection
         this.cdr.detectChanges();
       });
@@ -117,8 +145,8 @@ export class MoviesListPage implements OnInit, OnDestroy {
     this.filterService.execute(query);
   }
 
-  filterGenre(genre: string) {
-    this.filterService.execute(genre);
+  filterGenre(genres: string[]) {
+    this.filterService.filterByGenres(genres);
   }
 
   onDeleteMovie(movieId: string) {
@@ -128,11 +156,30 @@ export class MoviesListPage implements OnInit, OnDestroy {
         .subscribe({
           next: () => {
             this.success = 'Filmul a fost șters cu succes!';
-            // Clear cache and reload movies
+            
+            // Clear all related caches (movies and screenings)
+            this.movieApi.clearCache();
+            this.cacheService.clear('all_screenings'); // Clear screenings cache too
             this.state.clearCache();
+            
+            // Remove movie from local array immediately for better UX
+            this.movies = this.movies.filter(m => m.id !== movieId);
+            this.filterService.setOriginalMovies(this.movies);
+            this.cdr.detectChanges();
+            
+            // Then reload movies to ensure consistency
             this.getAllMovies.execute()
               .pipe(takeUntil(this.destroy$))
-              .subscribe();
+              .subscribe({
+                next: () => {
+                  // Force change detection after reload
+                  this.cdr.detectChanges();
+                },
+                error: (err) => {
+                  console.error('Error reloading movies after delete:', err);
+                }
+              });
+            
             setTimeout(() => this.success = null, 3000);
           },
           error: (err) => {
@@ -151,7 +198,26 @@ export class MoviesListPage implements OnInit, OnDestroy {
   onEditMovie(movieId: string) {
     const movie = this.movies.find(m => m.id === movieId);
     if (movie) {
-      this.editingMovie = movie;
+      // Normalize snake_case to camelCase for releaseDate
+      const movieData = movie as any;
+      console.log('🔍 [MOVIES LIST] Original movie data:', movieData);
+      console.log('🔍 [MOVIES LIST] release_date:', movieData.release_date);
+      console.log('🔍 [MOVIES LIST] releaseDate:', movieData.releaseDate);
+      
+      // Get releaseDate from either snake_case or camelCase, prioritize snake_case (from backend)
+      const releaseDate = movieData.release_date || movieData.releaseDate;
+      
+      const normalizedMovie: any = {
+        ...movieData,
+        releaseDate: releaseDate,
+        release_date: releaseDate // Keep both for compatibility
+      };
+      
+      console.log('🔍 [MOVIES LIST] Normalized movie:', normalizedMovie);
+      console.log('🔍 [MOVIES LIST] Final releaseDate:', normalizedMovie.releaseDate);
+      console.log('🔍 [MOVIES LIST] Final release_date:', normalizedMovie.release_date);
+      
+      this.editingMovie = normalizedMovie;
       this.showMovieForm = true;
     }
   }

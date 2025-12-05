@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 import { ScreeningCardComponent } from '../screening-card/screening-card';
@@ -25,6 +25,7 @@ export class ScreeningListComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
 
   constructor(private api: ScreeningApiService) {}
@@ -32,6 +33,21 @@ export class ScreeningListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Clear cache first to ensure fresh data
     this.api.clearCache();
+    
+    // Check for edit/delete query params
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        if (params['edit']) {
+          this.onEditScreening(params['edit']);
+          // Clear query param
+          this.router.navigate(['/screenings'], { replaceUrl: true });
+        } else if (params['delete']) {
+          this.onDeleteScreening(params['delete']);
+          // Clear query param
+          this.router.navigate(['/screenings'], { replaceUrl: true });
+        }
+      });
     
     // Load data on initial component creation
     this.loadScreenings();
@@ -103,8 +119,17 @@ export class ScreeningListComponent implements OnInit, OnDestroy {
         .subscribe({
           next: () => {
             this.success = 'Proiecția a fost ștearsă cu succes!';
-            // Remove from list
+            
+            // Clear cache first
+            this.api.clearCache();
+            
+            // Remove from local array immediately for better UX
             this.screenings = this.screenings.filter(s => s.id !== screeningId);
+            this.cdr.detectChanges();
+            
+            // Then reload screenings to ensure consistency
+            this.loadScreenings();
+            
             setTimeout(() => this.success = null, 3000);
           },
           error: (err) => {

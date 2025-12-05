@@ -29,6 +29,7 @@ public class Seat {
     private Screening screening;
 
     @NotBlank(message = "Row cannot be blank")
+    @Column(name = "\"row\"")
     private String row;
 
     @NotNull(message = "Seat number cannot be null")

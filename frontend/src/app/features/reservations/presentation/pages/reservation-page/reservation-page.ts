@@ -34,6 +34,7 @@ export class ReservationPage implements OnInit, OnDestroy {
   selectedSeats: any[] = [];
   reservation: any;
   pricePerSeat = 50; // Lei
+  preselectedSeatIds: string[] = []; // Store seat IDs from query params
   
   // Payment
   showPaymentForm = false;
@@ -116,9 +117,15 @@ export class ReservationPage implements OnInit, OnDestroy {
           }
         });
     } else {
-      // New reservation - check query params for screeningId
+      // New reservation - check query params for screeningId and seatIds
       this.isExistingReservation = false;
       const screeningId = this.route.snapshot.queryParamMap.get('screeningId');
+      const seatIdsParam = this.route.snapshot.queryParamMap.get('seatIds');
+      
+      // Parse preselected seat IDs from query params
+      if (seatIdsParam) {
+        this.preselectedSeatIds = seatIdsParam.split(',').filter(id => id.trim() !== '');
+      }
       
       if (screeningId) {
         this.screeningId = screeningId;
@@ -204,14 +211,27 @@ export class ReservationPage implements OnInit, OnDestroy {
 
     // First try to use seats from screening if already loaded
     if (this.screening?.seats && this.screening.seats.length > 0) {
-      this.availableSeats = this.screening.seats.map((seat: any) => ({
-        id: seat.id,
-        row: seat.row || String(seat.rowNumber) || '0',
-        number: seat.number || seat.seatNumber || 0,
-        status: this.getSeatStatus(seat),
-        isSelected: false,
-        isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true)
-      }));
+      this.availableSeats = this.screening.seats.map((seat: any) => {
+        // Check if this seat should be preselected
+        const isPreselected = this.preselectedSeatIds.includes(seat.id);
+        return {
+          id: seat.id,
+          row: seat.row || String(seat.rowNumber) || '0',
+          number: seat.number || seat.seatNumber || 0,
+          status: this.getSeatStatus(seat),
+          isSelected: isPreselected, // Preselect if in preselectedSeatIds
+          isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true)
+        };
+      });
+      
+          // Update selectedSeats with preselected seats
+          this.selectedSeats = this.availableSeats.filter(seat => seat.isSelected);
+          
+          // Emit event to update seat selection component
+          if (this.selectedSeats.length > 0) {
+            this.onSeatsSelected(this.selectedSeats);
+          }
+      
       this.isLoadingSeats = false;
       // Force change detection
       this.cdr.detectChanges();
@@ -227,14 +247,26 @@ export class ReservationPage implements OnInit, OnDestroy {
           const seats = Array.isArray(res) ? res : (res.seats || []);
           
           // Transform backend data to frontend format
-          this.availableSeats = seats.map((seat: any) => ({
-            id: seat.id,
-            row: seat.row || String(seat.rowNumber) || '0',
-            number: seat.number || seat.seatNumber || 0,
-            status: this.getSeatStatus(seat),
-            isSelected: false,
-            isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true)
-          }));
+          this.availableSeats = seats.map((seat: any) => {
+            // Check if this seat should be preselected
+            const isPreselected = this.preselectedSeatIds.includes(seat.id);
+            return {
+              id: seat.id,
+              row: seat.row || String(seat.rowNumber) || '0',
+              number: seat.number || seat.seatNumber || 0,
+              status: this.getSeatStatus(seat),
+              isSelected: isPreselected, // Preselect if in preselectedSeatIds
+              isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true)
+            };
+          });
+          
+          // Update selectedSeats with preselected seats
+          this.selectedSeats = this.availableSeats.filter(seat => seat.isSelected);
+          
+          // Emit event to update seat selection component
+          if (this.selectedSeats.length > 0) {
+            this.onSeatsSelected(this.selectedSeats);
+          }
           
           this.isLoadingSeats = false;
           // Force change detection
@@ -244,14 +276,27 @@ export class ReservationPage implements OnInit, OnDestroy {
           console.error('Error loading seats:', err);
           // If we have screening seats, use those
           if (this.screening?.seats && this.screening.seats.length > 0) {
-            this.availableSeats = this.screening.seats.map((seat: any) => ({
-              id: seat.id,
-              row: seat.row || String(seat.rowNumber) || '0',
-              number: seat.number || seat.seatNumber || 0,
-              status: this.getSeatStatus(seat),
-              isSelected: false,
-              isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true)
-            }));
+            this.availableSeats = this.screening.seats.map((seat: any) => {
+              // Check if this seat should be preselected
+              const isPreselected = this.preselectedSeatIds.includes(seat.id);
+              return {
+                id: seat.id,
+                row: seat.row || String(seat.rowNumber) || '0',
+                number: seat.number || seat.seatNumber || 0,
+                status: this.getSeatStatus(seat),
+                isSelected: isPreselected, // Preselect if in preselectedSeatIds
+                isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true)
+              };
+            });
+            
+            // Update selectedSeats with preselected seats
+            this.selectedSeats = this.availableSeats.filter(seat => seat.isSelected);
+            
+            // Emit event to update seat selection component
+            if (this.selectedSeats.length > 0) {
+              this.onSeatsSelected(this.selectedSeats);
+            }
+            
             this.isLoadingSeats = false;
           } else {
             this.error = 'Nu am putut încărca locurile disponibile. Te rugăm să reîmprospătezi pagina.';

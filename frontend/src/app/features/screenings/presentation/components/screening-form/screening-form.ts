@@ -51,6 +51,36 @@ export class ScreeningFormComponent implements OnInit {
       roomNumber: [this.screening?.roomNumber || '', [Validators.required, Validators.min(1)]],
       capacity: [this.screening?.capacity || '', [Validators.required, Validators.min(1)]]
     });
+
+    // Listen to hall selection changes to auto-fill roomNumber and capacity
+    this.screeningForm.get('hallId')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(hallId => {
+        const selectedHall = this.halls.find(h => h.id === hallId);
+        if (selectedHall) {
+          // Auto-fill roomNumber and capacity
+          this.screeningForm.patchValue({
+            roomNumber: selectedHall.number || '',
+            capacity: selectedHall.capacity || ''
+          }, { emitEvent: false });
+          
+          // Make roomNumber and capacity readonly when hall is selected
+          if (hallId) {
+            this.screeningForm.get('roomNumber')?.disable();
+            this.screeningForm.get('capacity')?.disable();
+          }
+        } else {
+          // Enable editing when no hall is selected
+          this.screeningForm.get('roomNumber')?.enable();
+          this.screeningForm.get('capacity')?.enable();
+        }
+      });
+    
+    // Initially disable if hall is already selected
+    if (this.screening?.hall?.id) {
+      this.screeningForm.get('roomNumber')?.disable();
+      this.screeningForm.get('capacity')?.disable();
+    }
   }
 
   ngOnDestroy() {
@@ -84,7 +114,8 @@ export class ScreeningFormComponent implements OnInit {
 
   onSubmit() {
     if (this.screeningForm.valid) {
-      const formValue = this.screeningForm.value;
+      // Get form value including disabled fields
+      const formValue = this.screeningForm.getRawValue();
       
       // Convert datetime-local to ISO string
       const startTimeDate = new Date(formValue.startTime);

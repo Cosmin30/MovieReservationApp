@@ -90,13 +90,22 @@ public class ScreeningService {
         seatRepository.saveAll(seats);
     }
 
+    @Transactional
     public ScreeningDTO updateScreening(UUID id, ScreeningDTO dto) {
-        Screening screening = screeningRepository.findById(id)
+        // Use findByIdWithSeats to ensure seats are loaded
+        Screening screening = screeningRepository.findByIdWithSeats(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Screening not found"));
 
-        screening.setStartTime(dto.getStartTime());
-        screening.setRoomNumber(dto.getRoomNumber());
-        screening.setCapacity(dto.getCapacity());
+        // Only update fields that are not null in DTO
+        if (dto.getStartTime() != null) {
+            screening.setStartTime(dto.getStartTime());
+        }
+        if (dto.getRoomNumber() != null) {
+            screening.setRoomNumber(dto.getRoomNumber());
+        }
+        if (dto.getCapacity() != null) {
+            screening.setCapacity(dto.getCapacity());
+        }
 
         if (dto.getMovie() != null && dto.getMovie().getId() != null) {
             Movie movie = new Movie();
@@ -114,8 +123,10 @@ public class ScreeningService {
         return toDTO(screening);
     }
 
+    @Transactional
     public ScreeningDTO patchScreening(UUID id, ScreeningDTO dto) {
-        Screening screening = screeningRepository.findById(id)
+        // Use findByIdWithSeats to ensure seats are loaded
+        Screening screening = screeningRepository.findByIdWithSeats(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Screening not found"));
 
         if (dto.getStartTime() != null) screening.setStartTime(dto.getStartTime());
@@ -205,16 +216,22 @@ public class ScreeningService {
             dto.setHall(hallDTO);
         }
 
-        List<SeatDTO> seats = screening.getSeats().stream().map(seat -> {
-            SeatDTO seatDTO = new SeatDTO();
-            seatDTO.setId(seat.getId());
-            seatDTO.setNumber(seat.getNumber());
-            seatDTO.setRow(seat.getRow());
-            seatDTO.setIsAvailable(seat.getIsAvailable());
-            seatDTO.setScreeningId(screening.getId());
-            return seatDTO;
-        }).collect(Collectors.toList());
-        dto.setSeats(seats);
+        // Handle seats - check for null to avoid NullPointerException
+        if (screening.getSeats() != null && !screening.getSeats().isEmpty()) {
+            List<SeatDTO> seats = screening.getSeats().stream().map(seat -> {
+                SeatDTO seatDTO = new SeatDTO();
+                seatDTO.setId(seat.getId());
+                seatDTO.setNumber(seat.getNumber());
+                seatDTO.setRow(seat.getRow());
+                seatDTO.setIsAvailable(seat.getIsAvailable());
+                seatDTO.setScreeningId(screening.getId());
+                return seatDTO;
+            }).collect(Collectors.toList());
+            dto.setSeats(seats);
+        } else {
+            // If seats are not loaded or null, set empty list
+            dto.setSeats(new ArrayList<>());
+        }
 
         return dto;
     }

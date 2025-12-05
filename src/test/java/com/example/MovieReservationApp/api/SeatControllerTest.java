@@ -29,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@org.springframework.context.annotation.Import(com.example.MovieReservationApp.config.TestSecurityConfig.class)
 class SeatControllerTest {
 
     @Autowired
@@ -49,10 +50,6 @@ class SeatControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    // @BeforeEach - comentat pentru a păstra datele în BD
-    // void setUp() {
-    //     seatRepository.deleteAll();
-    // }
 
     private Movie createMovie() {
         return movieRepository.save(Movie.builder()

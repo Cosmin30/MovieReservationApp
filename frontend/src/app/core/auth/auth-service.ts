@@ -92,8 +92,8 @@ export class AuthService {
           const user: UserModel = {
             id: response.id,
             email: response.email,
-            fullName: response.full_name,
-            createdAt: response.created_at,
+            fullName: response.full_name || response.fullName,
+            createdAt: response.created_at || response.createdAt || null,
             reservations: response.reservations
           };
           

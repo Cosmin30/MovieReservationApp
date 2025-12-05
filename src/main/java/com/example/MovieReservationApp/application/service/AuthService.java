@@ -10,6 +10,8 @@ import com.example.MovieReservationApp.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.OffsetDateTime;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -34,6 +36,7 @@ public class AuthService {
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setFullName(request.getFullName());
         user.setRole(Role.USER);
+        user.setCreatedAt(OffsetDateTime.now());
 
         userRepository.save(user);
 
