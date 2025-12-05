@@ -53,11 +53,12 @@ class ReservationRepositoryTest {
 
     @BeforeEach
     void setup() {
+        // Clear in correct order to avoid foreign key constraints
         reservationRepository.deleteAll();
         screeningRepository.deleteAll();
         movieRepository.deleteAll();
         userRepository.deleteAll();
-        hallRepository.deleteAll(); // dacă ai repository pentru Hall
+        hallRepository.deleteAll();
 
         // Creează și salvează filmul
         Movie movie = new Movie();
@@ -86,7 +87,7 @@ class ReservationRepositoryTest {
         Hall hall = new Hall();
         hall.setName("Main Hall");
         hall.setCapacity(100);
-        hall.setNumber(2);
+        hall.setNumber(1000 + (int)(Math.random() * 1000)); // Unique number
         hall = hallRepository.save(hall);
 
         // Creează și salvează screening-urile

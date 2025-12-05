@@ -6,6 +6,7 @@ import com.example.MovieReservationApp.infrastructure.persistence.repository.Mov
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,11 +36,17 @@ class MovieControllerTest {
     private ObjectMapper objectMapper;
 
     @BeforeEach
-    void setUp() {
-        movieRepository.deleteAll();
+    void setUp(org.junit.jupiter.api.TestInfo testInfo) {
+        // Nu ștergem datele pentru testul cu @Commit
+        if (testInfo.getTestMethod().isEmpty() || 
+            !testInfo.getTestMethod().get().getName().equals("testCreateMultipleMovies")) {
+            movieRepository.deleteAll();
+        }
     }
 
     @Test
+    @org.springframework.test.annotation.Commit
+    @org.springframework.test.annotation.DirtiesContext(methodMode = org.springframework.test.annotation.DirtiesContext.MethodMode.AFTER_METHOD)
     void testCreateMultipleMovies() throws Exception {
         // Creăm 5 filme diferite
         String[] titles = {"Inception", "The Matrix", "Interstellar", "The Dark Knight", "Pulp Fiction"};

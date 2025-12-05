@@ -3,8 +3,10 @@ package com.example.MovieReservationApp.infrastructure.persistence;
 
 import com.example.MovieReservationApp.domain.model.hall.Hall;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.HallRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.Optional;
@@ -12,10 +14,16 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class HallRepositoryTest {
 
     @Autowired
     private HallRepository hallRepository;
+
+    @BeforeEach
+    void setUp() {
+        hallRepository.deleteAll();
+    }
 
     @Test
     void testSaveAndFindById() {

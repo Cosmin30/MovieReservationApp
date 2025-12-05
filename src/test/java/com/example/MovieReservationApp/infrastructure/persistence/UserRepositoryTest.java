@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.OffsetDateTime;
@@ -14,6 +15,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UserRepositoryTest {
 
     @Autowired
@@ -29,16 +31,19 @@ class UserRepositoryTest {
         user1 = new User();
         user1.setFullName("John Doe");
         user1.setEmail("john.doe@example.com");
+        user1.setPasswordHash("hashedPassword123");
         user1.setCreatedAt(OffsetDateTime.now());
 
         user2 = new User();
         user2.setFullName("Jane Doe");
         user2.setEmail("jane.doe@example.com");
+        user2.setPasswordHash("hashedPassword456");
         user2.setCreatedAt(OffsetDateTime.now());
 
         user3 = new User();
         user3.setFullName("Johnny Bravo");
         user3.setEmail("johnny.bravo@example.com");
+        user3.setPasswordHash("hashedPassword789");
         user3.setCreatedAt(OffsetDateTime.now());
 
         userRepository.saveAll(List.of(user1, user2, user3));

@@ -78,7 +78,7 @@ class TicketRepositoryTest {
         Hall hall1= new Hall();
         hall1.setName("Sala Talentului");
         hall1.setCapacity(140);
-        hall1.setNumber(11);
+        hall1.setNumber(6000 + (int)(Math.random() * 1000)); // Unique number
         hallRepository.save(hall1);
 
         User user = new User();
