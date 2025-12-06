@@ -1,17 +1,52 @@
 <div class="container mt-4">
 
-  <app-movie-search (searchEvent)="search($event)"></app-movie-search>
+  <!-- Movie Form Modal -->
+  <div *ngIf="showMovieForm" class="modal-overlay" (click)="onMovieFormCancel()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <app-movie-form 
+        [movie]="editingMovie"
+        [isEditMode]="!!editingMovie"
+        (submitForm)="onMovieFormSubmit($event)"
+        (cancel)="onMovieFormCancel()">
+      </app-movie-form>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="fas fa-exclamation-circle"></i> {{ error }}
+    <button type="button" class="btn-close" (click)="error = null"></button>
+  </div>
+
+  <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="fas fa-check-circle"></i> {{ success }}
+    <button type="button" class="btn-close" (click)="success = null"></button>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <app-movie-search (searchEvent)="search($event)"></app-movie-search>
+    <button *ngIf="authService.isAdmin()" 
+            class="btn btn-success"
+            (click)="onAddMovie()"
+            title="Adaugă film nou">
+      <i class="fas fa-plus"></i> Adaugă Film Nou
+    </button>
+  </div>
 
   <div class="row">
     <div class="col-md-3">
       <app-movie-filters 
+        [movies]="movies"
+        [allMovies]="allMovies"
         (onFilter)="filter($event)"
         (onGenreFilter)="filterGenre($event)">
       </app-movie-filters>
     </div>
 
     <div class="col-md-9">
-      <app-movie-grid [movies]="movies"></app-movie-grid>
+      <app-movie-grid [movies]="movies" 
+                      (deleteMovie)="onDeleteMovie($event)"
+                      (editMovie)="onEditMovie($event)"></app-movie-grid>
     </div>
   </div>
 

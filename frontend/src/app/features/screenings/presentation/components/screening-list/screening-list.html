@@ -1,3 +1,74 @@
-<div class="d-flex flex-column gap-3">
-  <app-screening-card *ngFor="let s of screenings" [screening]="s"></app-screening-card>
+<div class="screenings-list-page">
+  <div class="container-fluid px-4 py-5">
+    
+    <!-- Screening Form Modal -->
+    <div *ngIf="showScreeningForm" class="modal-overlay" (click)="onScreeningFormCancel()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <app-screening-form 
+          [screening]="editingScreening"
+          [isEditMode]="!!editingScreening"
+          (submitForm)="onScreeningFormSubmit($event)"
+          (cancel)="onScreeningFormCancel()">
+        </app-screening-form>
+      </div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header mb-5">
+      <div class="header-content">
+        <div class="header-text">
+          <h1 class="page-title">
+            <i class="fas fa-calendar-alt"></i> Proiecții Disponibile
+          </h1>
+          <p class="page-subtitle">Alege proiecția dorită și rezervă-ți locurile</p>
+        </div>
+        <button *ngIf="authService.isAdmin()" 
+                class="btn btn-add-screening"
+                (click)="onAddScreening()"
+                title="Adaugă proiecție nouă">
+          <i class="fas fa-plus"></i> Adaugă Proiecție Nouă
+        </button>
+      </div>
+    </div>
+
+    <!-- Success Alert -->
+    <div *ngIf="success" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+      <strong><i class="fas fa-check-circle"></i> Succes:</strong> {{ success }}
+      <button type="button" class="btn-close" (click)="success = null"></button>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+      <strong><i class="fas fa-exclamation-triangle"></i> Eroare:</strong> {{ error }}
+      <button type="button" class="btn-close" (click)="error = null"></button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner-wrapper">
+        <div class="spinner"></div>
+      </div>
+      <p class="loading-text">Se încarcă proiecțiile...</p>
+    </div>
+
+    <!-- Screening Cards Grid -->
+    <div *ngIf="!loading && screenings && screenings.length > 0" class="screenings-grid">
+      <app-screening-card 
+        *ngFor="let screening of screenings; trackBy: trackByScreeningId"
+        [screening]="screening" 
+        (deleteScreening)="onDeleteScreening($event)"
+        (editScreening)="onEditScreening($event)">
+      </app-screening-card>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && !screenings?.length" class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-film"></i>
+      </div>
+      <h3 class="empty-title">Nu există proiecții disponibile</h3>
+      <p class="empty-text">Momentan nu sunt proiecții programate. Revino mai târziu pentru mai multe opțiuni.</p>
+    </div>
+
+  </div>
 </div>

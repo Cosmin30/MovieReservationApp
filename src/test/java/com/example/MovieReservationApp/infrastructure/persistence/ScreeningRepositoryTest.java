@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.OffsetDateTime;
@@ -18,6 +19,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ScreeningRepositoryTest {
 
     @Autowired
@@ -38,11 +40,15 @@ class ScreeningRepositoryTest {
 
     @BeforeEach
     void setup() {
+        // Clear all data first
+        screeningRepository.deleteAll();
+        movieRepository.deleteAll();
+        hallRepository.deleteAll();
 
         hall1 = new Hall(); // fără "Hall" în față
         hall1.setName("Hall 1");
         hall1.setCapacity(100);
-        hall1.setNumber(1);
+        hall1.setNumber(2000 + (int)(Math.random() * 1000)); // Unique number
         hallRepository.save(hall1);
 
         movie1 = new Movie();
@@ -50,12 +56,14 @@ class ScreeningRepositoryTest {
         movie1.setDescription("Mind-bending");
         movie1.setGenre("Thriller");
         movie1.setDuration(150);
+        movie1.setReleaseDate(java.time.LocalDate.of(2010, 7, 16));
 
         movie2 = new Movie();
         movie2.setTitle("Godfather");
         movie2.setDescription("Mafia story");
         movie2.setGenre("Action");
         movie2.setDuration(180);
+        movie2.setReleaseDate(java.time.LocalDate.of(1972, 3, 24));
 
         movieRepository.saveAll(List.of(movie1, movie2));
 

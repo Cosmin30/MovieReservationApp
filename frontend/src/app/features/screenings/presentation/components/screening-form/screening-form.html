@@ -1,0 +1,123 @@
+<div class="screening-form-container">
+  <div class="form-header">
+    <h3>{{ isEditMode ? 'Editează Proiecție' : 'Adaugă Proiecție Nouă' }}</h3>
+  </div>
+
+  <form [formGroup]="screeningForm" (ngSubmit)="onSubmit()" class="screening-form">
+    
+    <!-- Movie Selection -->
+    <div class="form-group">
+      <label for="movieId" class="form-label">
+        <i class="fas fa-film"></i> Film <span class="required">*</span>
+      </label>
+      <select 
+        id="movieId"
+        class="form-control"
+        formControlName="movieId"
+        [class.is-invalid]="movieId?.invalid && movieId?.touched">
+        <option value="">Selectează filmul</option>
+        <option *ngFor="let movie of movies" [value]="movie.id">
+          {{ movie.title }}
+        </option>
+      </select>
+      <div *ngIf="movieId?.invalid && movieId?.touched" class="invalid-feedback">
+        Filmul este obligatoriu
+      </div>
+    </div>
+
+    <!-- Hall Selection -->
+    <div class="form-group">
+      <label for="hallId" class="form-label">
+        <i class="fas fa-building"></i> Sală <span class="required">*</span>
+      </label>
+      <select 
+        id="hallId"
+        class="form-control"
+        formControlName="hallId"
+        [class.is-invalid]="hallId?.invalid && hallId?.touched">
+        <option value="">Selectează sala</option>
+        <option *ngFor="let hall of halls" [value]="hall.id">
+          {{ hall.name }} (Capacitate: {{ hall.capacity }})
+        </option>
+      </select>
+      <div *ngIf="hallId?.invalid && hallId?.touched" class="invalid-feedback">
+        Sala este obligatorie
+      </div>
+    </div>
+
+    <!-- Start Time -->
+    <div class="form-group">
+      <label for="startTime" class="form-label">
+        <i class="fas fa-calendar-alt"></i> Data & Ora <span class="required">*</span>
+      </label>
+      <input 
+        type="datetime-local" 
+        id="startTime"
+        class="form-control"
+        formControlName="startTime"
+        [class.is-invalid]="startTime?.invalid && startTime?.touched">
+      <div *ngIf="startTime?.invalid && startTime?.touched" class="invalid-feedback">
+        Data și ora sunt obligatorii
+      </div>
+    </div>
+
+    <!-- Room Number & Capacity Row -->
+    <div class="form-row">
+      <div class="form-group">
+        <label for="roomNumber" class="form-label">
+          <i class="fas fa-door-open"></i> Număr Sală <span class="required">*</span>
+        </label>
+        <input 
+          type="number" 
+          id="roomNumber"
+          class="form-control"
+          formControlName="roomNumber"
+          placeholder="1"
+          min="1"
+          [readonly]="hallId?.value"
+          [class.is-invalid]="roomNumber?.invalid && roomNumber?.touched">
+        <div *ngIf="roomNumber?.invalid && roomNumber?.touched" class="invalid-feedback">
+          <span *ngIf="roomNumber?.errors?.['required']">Numărul sălii este obligatoriu</span>
+          <span *ngIf="roomNumber?.errors?.['min']">Numărul sălii trebuie să fie minim 1</span>
+        </div>
+        <small *ngIf="hallId?.value" class="form-text text-muted">
+          <i class="fas fa-info-circle"></i> Se completează automat când selectezi o sală
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="capacity" class="form-label">
+          <i class="fas fa-users"></i> Capacitate <span class="required">*</span>
+        </label>
+        <input 
+          type="number" 
+          id="capacity"
+          class="form-control"
+          formControlName="capacity"
+          placeholder="100"
+          min="1"
+          [readonly]="hallId?.value"
+          [class.is-invalid]="capacity?.invalid && capacity?.touched">
+        <div *ngIf="capacity?.invalid && capacity?.touched" class="invalid-feedback">
+          <span *ngIf="capacity?.errors?.['required']">Capacitatea este obligatorie</span>
+          <span *ngIf="capacity?.errors?.['min']">Capacitatea trebuie să fie minim 1</span>
+        </div>
+        <small *ngIf="hallId?.value" class="form-text text-muted">
+          <i class="fas fa-info-circle"></i> Se completează automat când selectezi o sală
+        </small>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">
+        <i class="fas fa-times"></i> Anulează
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="screeningForm.invalid || loading">
+        <i class="fas fa-save"></i> {{ isEditMode ? 'Salvează Modificările' : 'Adaugă Proiecție' }}
+      </button>
+    </div>
+
+  </form>
+</div>
+

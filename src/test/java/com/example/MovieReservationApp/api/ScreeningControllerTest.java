@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@org.springframework.context.annotation.Import(com.example.MovieReservationApp.config.TestSecurityConfig.class)
 class ScreeningControllerTest {
 
     @Autowired
@@ -83,6 +84,15 @@ class ScreeningControllerTest {
             dto.setStartTime(OffsetDateTime.now().plusDays(i + 1));
             dto.setCapacity(capacities[i]);
             dto.setRoomNumber(roomNumbers[i]);
+            
+            // Set movie and hall in DTO
+            com.example.MovieReservationApp.application.dto.MovieDTO movieDTO = new com.example.MovieReservationApp.application.dto.MovieDTO();
+            movieDTO.setId(savedMovie.getId());
+            dto.setMovie(movieDTO);
+            
+            com.example.MovieReservationApp.application.dto.HallDTO hallDTO = new com.example.MovieReservationApp.application.dto.HallDTO();
+            hallDTO.setId(savedHall.getId());
+            dto.setHall(hallDTO);
 
             mockMvc.perform(post("/api/screenings")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -160,10 +170,22 @@ class ScreeningControllerTest {
     @Test
     void testCreateScreening() throws Exception {
         // Arrange
+        Movie savedMovie = createMovie();
+        Hall savedHall = createHall(1);
+        
         ScreeningDTO dto = new ScreeningDTO();
         dto.setStartTime(OffsetDateTime.now().plusDays(1));
         dto.setCapacity(120);
         dto.setRoomNumber(3);
+        
+        // Set movie and hall in DTO
+        com.example.MovieReservationApp.application.dto.MovieDTO movieDTO = new com.example.MovieReservationApp.application.dto.MovieDTO();
+        movieDTO.setId(savedMovie.getId());
+        dto.setMovie(movieDTO);
+        
+        com.example.MovieReservationApp.application.dto.HallDTO hallDTO = new com.example.MovieReservationApp.application.dto.HallDTO();
+        hallDTO.setId(savedHall.getId());
+        dto.setHall(hallDTO);
 
         // Act
         mockMvc.perform(post("/api/screenings")

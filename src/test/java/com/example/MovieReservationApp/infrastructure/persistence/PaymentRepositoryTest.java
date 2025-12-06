@@ -81,14 +81,14 @@ class PaymentRepositoryTest {
         Hall hall1 = new Hall();
         hall1.setName("Hall 1");
         hall1.setCapacity(100);
-        hall1.setNumber(1);
+        hall1.setNumber(3000 + (int)(Math.random() * 1000)); // Unique number
 
         hall1 = hallRepository.save(hall1);
 
         Hall hall2 = new Hall();
         hall2.setName("Hall 2");
         hall2.setCapacity(80);
-        hall2.setNumber(2); //
+        hall2.setNumber(4000 + (int)(Math.random() * 1000)); // Unique number
 
         hall2 = hallRepository.save(hall2);
 

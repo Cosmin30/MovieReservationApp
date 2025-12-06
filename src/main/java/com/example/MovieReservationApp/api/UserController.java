@@ -16,6 +16,12 @@ public class UserController {
 
     private final UserService userService;
 
+    // 🔥 get current user
+    @GetMapping("/me")
+    public UserDTO getCurrentUser() {
+        return userService.getCurrentUser();
+    }
+
     @GetMapping
     public List<UserDTO> getAllUsers() {
         return userService.getAllUsers();

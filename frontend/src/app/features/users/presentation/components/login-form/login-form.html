@@ -1,17 +1,52 @@
-<form (ngSubmit)="submit()" class="card p-4 shadow-sm">
+<div class="auth-card">
+  <form (ngSubmit)="submit(f)" #f="ngForm" class="auth-form">
 
-  <h4 class="mb-3">Autentificare</h4>
+    <h2 class="form-title">Autentificare</h2>
 
-  <div class="mb-3">
-    <label class="form-label">Email</label>
-    <input class="form-control" [(ngModel)]="form.email" name="email" required>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input 
+        type="email" 
+        class="form-control" 
+        [class.is-invalid]="f.controls['email']?.invalid && f.controls['email']?.touched"
+        [(ngModel)]="form.email" 
+        name="email" 
+        placeholder="email@exemplu.ro"
+        required
+        email>
+      <div *ngIf="f.controls['email']?.invalid && f.controls['email']?.touched" class="invalid-feedback">
+        <span *ngIf="f.controls['email']?.errors?.['required']">Email-ul este obligatoriu</span>
+        <span *ngIf="f.controls['email']?.errors?.['email']">Email-ul nu este valid</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Parola</label>
+      <input 
+        type="password" 
+        class="form-control" 
+        [class.is-invalid]="f.controls['password']?.invalid && f.controls['password']?.touched"
+        [(ngModel)]="form.password" 
+        name="password" 
+        placeholder="Introduceți parola"
+        required
+        minlength="6">
+      <div *ngIf="f.controls['password']?.invalid && f.controls['password']?.touched" class="invalid-feedback">
+        <span *ngIf="f.controls['password']?.errors?.['required']">Parola este obligatorie</span>
+        <span *ngIf="f.controls['password']?.errors?.['minlength']">Parola trebuie să aibă minim 6 caractere</span>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-login" [disabled]="!f.valid">
+      Intră în cont
+    </button>
+    
+  </form>
+
+  <div class="auth-footer">
+    <p class="footer-text">Nu ai cont?</p>
+    <a routerLink="/register" class="btn btn-register">
+      Creează cont nou
+    </a>
   </div>
-
-  <div class="mb-3">
-    <label class="form-label">Parola</label>
-    <input type="password" class="form-control" [(ngModel)]="form.password" name="password" required>
-  </div>
-
-  <button class="btn btn-primary w-100">Login</button>
-
-</form>
+</div>

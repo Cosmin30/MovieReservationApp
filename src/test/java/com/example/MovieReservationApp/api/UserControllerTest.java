@@ -22,7 +22,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class UserControllerIntegrationTest {
+@org.springframework.context.annotation.Import(com.example.MovieReservationApp.config.TestSecurityConfig.class)
+class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

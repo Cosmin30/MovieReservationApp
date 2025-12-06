@@ -5,12 +5,18 @@ import com.example.MovieReservationApp.domain.model.hall.Hall;
 import com.example.MovieReservationApp.domain.model.movie.Movie;
 import com.example.MovieReservationApp.domain.model.screening.Screening;
 import com.example.MovieReservationApp.domain.model.seat.Seat;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.HallRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.ReservationRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.SeatRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -20,31 +26,86 @@ import java.util.stream.Collectors;
 public class ScreeningService {
 
     private final ScreeningRepository screeningRepository;
+    private final SeatRepository seatRepository;
+    private final HallRepository hallRepository;
+    private final TicketRepository ticketRepository;
+    private final ReservationRepository reservationRepository;
 
+    @Transactional(readOnly = true)
     public List<ScreeningDTO> getAllScreenings() {
         return screeningRepository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<ScreeningDTO> getScreeningsByMovieId(UUID movieId) {
+        return screeningRepository.findByMovieId(movieId).stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public ScreeningDTO getScreeningById(UUID id) {
-        Screening screening = screeningRepository.findById(id)
+        Screening screening = screeningRepository.findByIdWithSeats(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Screening not found"));
         return toDTO(screening);
     }
 
+    @Transactional
     public ScreeningDTO createScreening(ScreeningDTO dto) {
         Screening screening = toEntity(dto);
         screening.setId(null);
         screening = screeningRepository.save(screening);
+        
+        // Create seats automatically based on hall capacity
+        if (screening.getHall() != null) {
+            Hall hall = hallRepository.findById(screening.getHall().getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Hall not found"));
+            
+            int capacity = hall.getCapacity() != null ? hall.getCapacity() : screening.getCapacity();
+            createSeatsForScreening(screening, capacity);
+        }
+        
         return toDTO(screening);
     }
+    
+    private void createSeatsForScreening(Screening screening, int capacity) {
+        List<Seat> seats = new ArrayList<>();
+        int seatsPerRow = 10; // Default seats per row
+        int numRows = (int) Math.ceil((double) capacity / seatsPerRow);
+        
+        int seatNumber = 1;
+        for (int row = 1; row <= numRows; row++) {
+            int seatsInThisRow = Math.min(seatsPerRow, capacity - (row - 1) * seatsPerRow);
+            for (int seat = 1; seat <= seatsInThisRow; seat++) {
+                Seat newSeat = Seat.builder()
+                        .screening(screening)
+                        .row(String.valueOf(row))
+                        .number(seatNumber++)
+                        .isAvailable(true)
+                        .build();
+                seats.add(newSeat);
+            }
+        }
+        
+        seatRepository.saveAll(seats);
+    }
 
+    @Transactional
     public ScreeningDTO updateScreening(UUID id, ScreeningDTO dto) {
-        Screening screening = screeningRepository.findById(id)
+        // Use findByIdWithSeats to ensure seats are loaded
+        Screening screening = screeningRepository.findByIdWithSeats(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Screening not found"));
 
-        screening.setStartTime(dto.getStartTime());
-        screening.setRoomNumber(dto.getRoomNumber());
-        screening.setCapacity(dto.getCapacity());
+        // Only update fields that are not null in DTO
+        if (dto.getStartTime() != null) {
+            screening.setStartTime(dto.getStartTime());
+        }
+        if (dto.getRoomNumber() != null) {
+            screening.setRoomNumber(dto.getRoomNumber());
+        }
+        if (dto.getCapacity() != null) {
+            screening.setCapacity(dto.getCapacity());
+        }
 
         if (dto.getMovie() != null && dto.getMovie().getId() != null) {
             Movie movie = new Movie();
@@ -62,8 +123,10 @@ public class ScreeningService {
         return toDTO(screening);
     }
 
+    @Transactional
     public ScreeningDTO patchScreening(UUID id, ScreeningDTO dto) {
-        Screening screening = screeningRepository.findById(id)
+        // Use findByIdWithSeats to ensure seats are loaded
+        Screening screening = screeningRepository.findByIdWithSeats(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Screening not found"));
 
         if (dto.getStartTime() != null) screening.setStartTime(dto.getStartTime());
@@ -86,11 +149,44 @@ public class ScreeningService {
         return toDTO(screening);
     }
 
+    @Transactional
     public void deleteScreening(UUID id) {
-        if (!screeningRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Screening not found");
+        System.out.println("🔍 [SCREENING SERVICE] Starting deletion of screening: " + id);
+        
+        Screening screening = screeningRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Screening not found"));
+
+        System.out.println("🔍 [SCREENING SERVICE] Screening found");
+        
+        // Step 1: Delete all reservations for this screening (this will cascade delete tickets)
+        var reservations = reservationRepository.findByScreening_Id(id);
+        System.out.println("🔍 [SCREENING SERVICE] Found " + reservations.size() + " reservations for screening");
+        
+        for (var reservation : reservations) {
+            System.out.println("🔍 [SCREENING SERVICE] Deleting reservation: " + reservation.getId());
+            reservationRepository.delete(reservation); // This will cascade delete tickets
         }
-        screeningRepository.deleteById(id);
+        
+        // Step 2: Get all seats for this screening
+        var seats = seatRepository.findByScreeningId(id);
+        System.out.println("🔍 [SCREENING SERVICE] Found " + seats.size() + " seats for screening");
+        
+        // Step 3: Delete any remaining tickets for these seats (shouldn't exist, but just in case)
+        for (var seat : seats) {
+            var tickets = ticketRepository.findBySeatId(seat.getId());
+            if (!tickets.isEmpty()) {
+                System.out.println("🔍 [SCREENING SERVICE] Found " + tickets.size() + " remaining tickets for seat " + seat.getId());
+                for (var ticket : tickets) {
+                    System.out.println("🔍 [SCREENING SERVICE] Deleting remaining ticket: " + ticket.getId());
+                    ticketRepository.delete(ticket);
+                }
+            }
+        }
+        
+        System.out.println("🔍 [SCREENING SERVICE] All reservations and tickets deleted. Now deleting screening...");
+        // Step 4: Now delete the screening (this will cascade delete seats)
+        screeningRepository.delete(screening);
+        System.out.println("✅ [SCREENING SERVICE] Screening deleted successfully");
     }
 
     private ScreeningDTO toDTO(Screening screening) {
@@ -120,16 +216,22 @@ public class ScreeningService {
             dto.setHall(hallDTO);
         }
 
-        List<SeatDTO> seats = screening.getSeats().stream().map(seat -> {
-            SeatDTO seatDTO = new SeatDTO();
-            seatDTO.setId(seat.getId());
-            seatDTO.setNumber(seat.getNumber());
-            seatDTO.setRow(seat.getRow());
-            seatDTO.setIsAvailable(seat.getIsAvailable());
-            seatDTO.setScreeningId(screening.getId());
-            return seatDTO;
-        }).collect(Collectors.toList());
-        dto.setSeats(seats);
+        // Handle seats - check for null to avoid NullPointerException
+        if (screening.getSeats() != null && !screening.getSeats().isEmpty()) {
+            List<SeatDTO> seats = screening.getSeats().stream().map(seat -> {
+                SeatDTO seatDTO = new SeatDTO();
+                seatDTO.setId(seat.getId());
+                seatDTO.setNumber(seat.getNumber());
+                seatDTO.setRow(seat.getRow());
+                seatDTO.setIsAvailable(seat.getIsAvailable());
+                seatDTO.setScreeningId(screening.getId());
+                return seatDTO;
+            }).collect(Collectors.toList());
+            dto.setSeats(seats);
+        } else {
+            // If seats are not loaded or null, set empty list
+            dto.setSeats(new ArrayList<>());
+        }
 
         return dto;
     }

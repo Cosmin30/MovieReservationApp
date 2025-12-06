@@ -1,7 +1,171 @@
 .card {
   border-radius: 12px;
+  border: 1px solid #e0e0e0;
 }
 
 h2, h5 {
   font-weight: 600;
 }
+
+/* Hall Header Card */
+.hall-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+}
+
+.hall-header .card-body {
+  padding: 24px;
+}
+
+.hall-header p {
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0;
+}
+
+.hall-header .btn-outline-secondary {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: white;
+}
+
+.hall-header .btn-outline-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: white;
+}
+
+.hall-header hr {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.hall-header .badge {
+  font-size: 0.9rem;
+  padding: 8px 14px;
+}
+
+/* Capacity Card */
+.capacity-card {
+  margin-top: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  border: none;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+}
+
+.capacity-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.capacity-icon {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  color: white;
+  font-size: 2rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.capacity-content {
+  flex: 1;
+}
+
+.capacity-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.75rem;
+}
+
+.capacity-text {
+  font-size: 1rem;
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+}
+
+.capacity-number {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #667eea;
+}
+
+.btn-view-screenings {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.875rem 1.75rem;
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-view-screenings:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  color: white;
+}
+
+.btn-view-screenings i {
+  margin-right: 0.5rem;
+}
+
+.seats-container {
+  padding: 24px;
+  background-color: #fafafa;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Alert Styles */
+.alert {
+  border-radius: 12px;
+  border: none;
+  padding: 16px 20px;
+}
+
+.alert-info {
+  background-color: #e3f2fd;
+  color: #0d47a1;
+}
+
+.alert-warning {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.spinner-border-sm {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hall-header .card-body {
+    padding: 16px;
+  }
+
+  .seats-container {
+    padding: 16px;
+  }
+
+  h2 {
+    font-size: 1.5rem !important;
+  }
+}
+

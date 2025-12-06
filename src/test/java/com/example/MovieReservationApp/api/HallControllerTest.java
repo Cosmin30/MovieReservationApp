@@ -3,6 +3,11 @@ package com.example.MovieReservationApp.api;
 import com.example.MovieReservationApp.application.dto.HallDTO;
 import com.example.MovieReservationApp.domain.model.hall.Hall;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.HallRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.PaymentRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.ReservationRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.SeatRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.TicketRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@org.springframework.context.annotation.Import(com.example.MovieReservationApp.config.TestSecurityConfig.class)
 class HallControllerTest {
 
     @Autowired
@@ -31,8 +37,29 @@ class HallControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private ScreeningRepository screeningRepository;
+
+    @Autowired
+    private SeatRepository seatRepository;
+
+    @Autowired
+    private TicketRepository ticketRepository;
+
+    @Autowired
+    private ReservationRepository reservationRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @BeforeEach
     void setUp() {
+        // Șterge în ordinea corectă pentru a respecta constrângerile de chei străine
+        paymentRepository.deleteAll();
+        ticketRepository.deleteAll();
+        reservationRepository.deleteAll();
+        seatRepository.deleteAll();
+        screeningRepository.deleteAll();
         hallRepository.deleteAll();
     }
 

@@ -1,28 +1,33 @@
-import { Component, OnInit } from '@angular/core';
-import { GetCurrentUserService } from '../../../application/use-cases/get-current-user-service';
-import { UpdateUserProfileService } from '../../../application/use-cases/update-user-profile-service';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { AuthService } from '../../../../../core/auth/auth-service';
+import { UserModel } from '../../../domain/models/user.model';
 
 @Component({
   selector: 'app-profile-page',
   templateUrl: './profile-page.html',
-  styleUrls: ['./profile-page.css']
+  styleUrls: ['./profile-page.css'],
+  standalone: true,
+  imports: [CommonModule, RouterLink]
 })
-export class ProfilePage implements OnInit {
+export class ProfilePage implements OnInit, OnDestroy {
+  authService = inject(AuthService);
+  profile: UserModel | null = null;
+  private destroy$ = new Subject<void>();
 
-  profile: any = {};
-
-  constructor(
-    private getUser: GetCurrentUserService,
-    private updateUser: UpdateUserProfileService
-  ) {}
-
-  ngOnInit() {
-    this.getUser.execute().subscribe(u => {
-      this.profile = { ...u };
-    });
+  ngOnInit(): void {
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        this.profile = user;
+      });
   }
 
-  update(form: any) {
-    this.updateUser.execute(form).subscribe();
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

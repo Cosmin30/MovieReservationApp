@@ -1,6 +1,120 @@
-<div class="container mt-4" style="max-width: 600px;">
-  <app-profile-form 
-      [form]="profile"
-      (onUpdate)="update($event)">
-  </app-profile-form>
+<div class="profile-page">
+  <div class="container-fluid px-4 py-5">
+    
+    <!-- Page Header -->
+    <div class="page-header mb-5">
+      <h1 class="page-title">
+        <i class="fas fa-user-circle"></i> Profil Utilizator
+      </h1>
+      <p class="page-subtitle">Gestionează informațiile tale personale</p>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="row g-4" *ngIf="profile">
+      
+      <!-- Left Column: Profile Info -->
+      <div class="col-lg-8">
+        <div class="card shadow-lg border-0 profile-card">
+          <div class="card-header-gradient">
+            <div class="profile-avatar-large">
+              {{ profile.fullName.charAt(0).toUpperCase() || 'U' }}
+            </div>
+            <h2 class="profile-name">{{ profile.fullName || 'Utilizator' }}</h2>
+            <p class="profile-email">{{ profile.email || 'N/A' }}</p>
+          </div>
+          
+          <div class="card-body p-4">
+            <h3 class="section-title mb-4">
+              <i class="fas fa-info-circle"></i> Informații Personale
+            </h3>
+            
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-icon">
+                  <i class="fas fa-id-card"></i>
+                </div>
+                <div class="info-content">
+                  <label class="info-label">Nume Complet</label>
+                  <p class="info-value">{{ profile.fullName || 'N/A' }}</p>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <div class="info-icon">
+                  <i class="fas fa-envelope"></i>
+                </div>
+                <div class="info-content">
+                  <label class="info-label">Email</label>
+                  <p class="info-value">{{ profile.email || 'N/A' }}</p>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <div class="info-icon">
+                  <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="info-content">
+                  <label class="info-label">Membru din</label>
+                  <p class="info-value" *ngIf="profile.createdAt; else noDate">
+                    {{ profile.createdAt | date:'dd MMMM yyyy' }}
+                  </p>
+                  <ng-template #noDate>
+                    <p class="info-value text-muted">Data nu este disponibilă</p>
+                  </ng-template>
+                </div>
+              </div>
+
+              <div class="info-item" *ngIf="profile.reservations">
+                <div class="info-icon">
+                  <i class="fas fa-ticket-alt"></i>
+                </div>
+                <div class="info-content">
+                  <label class="info-label">Rezervări</label>
+                  <p class="info-value">{{ (profile.reservations && profile.reservations.length) || 0 }} rezervări</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Quick Actions -->
+      <div class="col-lg-4">
+        <div class="card shadow-lg border-0 quick-actions-card">
+          <div class="card-body p-4">
+            <h3 class="section-title mb-4">
+              <i class="fas fa-bolt"></i> Acțiuni Rapide
+            </h3>
+            
+            <div class="action-buttons">
+              <a routerLink="/reservations" class="action-btn">
+                <i class="fas fa-ticket-alt"></i>
+                <span>Vezi Rezervările</span>
+              </a>
+              
+              <a routerLink="/screenings" class="action-btn">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Vezi Proiecții</span>
+              </a>
+              
+              <a routerLink="/movies" class="action-btn">
+                <i class="fas fa-film"></i>
+                <span>Vezi Filme</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="!profile" class="loading-container">
+      <div class="spinner-wrapper">
+        <div class="spinner"></div>
+      </div>
+      <p class="loading-text">Se încarcă profilul...</p>
+    </div>
+
+  </div>
 </div>

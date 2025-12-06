@@ -7,14 +7,17 @@ import { ScreeningListComponent } from './presentation/components/screening-list
 import { ScreeningTimeSelectorComponent } from './presentation/components/screening-time-selector/screening-time-selector';
 
 @NgModule({
-  declarations: [
+  imports: [  
+    CommonModule,
+    RouterModule,
     ScreeningCardComponent,
     ScreeningListComponent,
     ScreeningTimeSelectorComponent
   ],
-  imports: [
-    CommonModule,
-    RouterModule
+  exports: [
+    ScreeningCardComponent,
+    ScreeningListComponent,
+    ScreeningTimeSelectorComponent
   ]
 })
 export class ScreeningsModule {}

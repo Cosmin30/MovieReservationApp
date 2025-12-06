@@ -1,22 +1,67 @@
-<form (ngSubmit)="submit()" class="card p-4 shadow-sm">
+<div class="auth-card">
+  <form (ngSubmit)="submit(f)" #f="ngForm" class="auth-form">
+    <h2 class="form-title">Creare Cont</h2>
 
-  <h4>Înregistrare</h4>
+    <div class="form-group">
+      <label class="form-label">Nume complet</label>
+      <input 
+        type="text"
+        class="form-control" 
+        [class.is-invalid]="f.controls['fullName']?.invalid && f.controls['fullName']?.touched"
+        [(ngModel)]="form.fullName" 
+        name="fullName" 
+        placeholder="Ion Popescu"
+        required
+        minlength="2">
+      <div *ngIf="f.controls['fullName']?.invalid && f.controls['fullName']?.touched" class="invalid-feedback">
+        <span *ngIf="f.controls['fullName']?.errors?.['required']">Numele este obligatoriu</span>
+        <span *ngIf="f.controls['fullName']?.errors?.['minlength']">Numele trebuie să aibă minim 2 caractere</span>
+      </div>
+    </div>
 
-  <div class="mb-3">
-    <label class="form-label">Nume complet</label>
-    <input class="form-control" [(ngModel)]="form.fullName" name="fullName" required>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input 
+        type="email"
+        class="form-control" 
+        [class.is-invalid]="f.controls['email']?.invalid && f.controls['email']?.touched"
+        [(ngModel)]="form.email" 
+        name="email" 
+        placeholder="email@exemplu.ro"
+        required
+        email>
+      <div *ngIf="f.controls['email']?.invalid && f.controls['email']?.touched" class="invalid-feedback">
+        <span *ngIf="f.controls['email']?.errors?.['required']">Email-ul este obligatoriu</span>
+        <span *ngIf="f.controls['email']?.errors?.['email']">Email-ul nu este valid</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Parola</label>
+      <input 
+        type="password" 
+        class="form-control" 
+        [class.is-invalid]="f.controls['password']?.invalid && f.controls['password']?.touched"
+        [(ngModel)]="form.password" 
+        name="password" 
+        placeholder="Minimum 6 caractere"
+        required
+        minlength="6">
+      <div *ngIf="f.controls['password']?.invalid && f.controls['password']?.touched" class="invalid-feedback">
+        <span *ngIf="f.controls['password']?.errors?.['required']">Parola este obligatorie</span>
+        <span *ngIf="f.controls['password']?.errors?.['minlength']">Parola trebuie să aibă minim 6 caractere</span>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-register" [disabled]="!f.valid">
+      Creează cont
+    </button>
+  </form>
+
+  <div class="auth-footer">
+    <p class="footer-text">Ai deja cont?</p>
+    <a routerLink="/login" class="btn btn-login">
+      Intră în cont
+    </a>
   </div>
-
-  <div class="mb-3">
-    <label class="form-label">Email</label>
-    <input class="form-control" [(ngModel)]="form.email" name="email" required>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Parola</label>
-    <input type="password" class="form-control" [(ngModel)]="form.password" name="password" required>
-  </div>
-
-  <button class="btn btn-success w-100">Creează cont</button>
-
-</form>
+</div>

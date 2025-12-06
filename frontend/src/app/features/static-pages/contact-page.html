@@ -1,0 +1,168 @@
+<div class="static-page contact-page">
+  <div class="container py-5">
+    
+    <!-- Back Button -->
+    <button class="btn btn-outline-secondary mb-4" routerLink="/home">
+      <i class="fas fa-arrow-left"></i> Înapoi
+    </button>
+
+    <!-- Page Header -->
+    <div class="page-header text-center mb-5">
+      <h1 class="page-title">
+        <i class="fas fa-envelope"></i> Contactează-ne
+      </h1>
+      <p class="page-subtitle">
+        Suntem aici să te ajutăm! Trimite-ne un mesaj și îți vom răspunde în cel mai scurt timp.
+      </p>
+    </div>
+
+    <div class="row">
+      <!-- Contact Info -->
+      <div class="col-lg-5 mb-4">
+        <div class="contact-info-card">
+          <h3 class="section-title"><i class="fas fa-info-circle"></i> Informații de Contact</h3>
+          
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="contact-details">
+              <h5>Adresă</h5>
+              <p>Strada Cinema 123, București, România</p>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fas fa-phone"></i>
+            </div>
+            <div class="contact-details">
+              <h5>Telefon</h5>
+              <p>+40 123 456 789</p>
+              <p class="text-muted small">Luni - Vineri: 09:00 - 18:00</p>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="contact-details">
+              <h5>Email</h5>
+              <p>contact@moviereservation.ro</p>
+              <p>support@moviereservation.ro</p>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="contact-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="contact-details">
+              <h5>Program</h5>
+              <p>Luni - Duminică: 10:00 - 23:00</p>
+            </div>
+          </div>
+
+          <!-- Social Media -->
+          <div class="social-media mt-4">
+            <h5 class="mb-3">Urmărește-ne</h5>
+            <div class="social-icons">
+              <a href="#" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
+              <a href="#" class="social-icon twitter"><i class="fab fa-twitter"></i></a>
+              <a href="#" class="social-icon instagram"><i class="fab fa-instagram"></i></a>
+              <a href="#" class="social-icon youtube"><i class="fab fa-youtube"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <div class="col-lg-7">
+        <div class="contact-form-card">
+          <h3 class="section-title"><i class="fas fa-paper-plane"></i> Trimite-ne un mesaj</h3>
+          
+          <form class="contact-form">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Nume *</label>
+                <input type="text" class="form-control" placeholder="Numele tău" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Prenume *</label>
+                <input type="text" class="form-control" placeholder="Prenumele tău" required>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Email *</label>
+              <input type="email" class="form-control" placeholder="email@exemplu.ro" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Telefon</label>
+              <input type="tel" class="form-control" placeholder="+40 123 456 789">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Subiect *</label>
+              <select class="form-control" required>
+                <option value="">Selectează un subiect</option>
+                <option value="reservation">Probleme cu rezervarea</option>
+                <option value="payment">Probleme cu plata</option>
+                <option value="technical">Probleme tehnice</option>
+                <option value="suggestion">Sugestii</option>
+                <option value="other">Altceva</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Mesaj *</label>
+              <textarea class="form-control" rows="6" placeholder="Descrie problema sau întrebarea ta..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg w-100">
+              <i class="fas fa-paper-plane"></i> Trimite Mesajul
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="faq-section mt-5">
+      <h3 class="section-title text-center mb-4">
+        <i class="fas fa-question-circle"></i> Întrebări Frecvente
+      </h3>
+      
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <div class="faq-item">
+            <h5><i class="fas fa-chevron-right"></i> Cum pot rezerva bilete?</h5>
+            <p>Intră în secțiunea "Proiecții", alege filmul dorit, selectează locurile și finalizează plata.</p>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="faq-item">
+            <h5><i class="fas fa-chevron-right"></i> Pot anula o rezervare?</h5>
+            <p>Da, poți anula rezervarea din secțiunea "Rezervările Mele" cu cel puțin 2 ore înainte de proiecție.</p>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="faq-item">
+            <h5><i class="fas fa-chevron-right"></i> Ce metode de plată acceptați?</h5>
+            <p>Acceptăm carduri de credit/debit (Visa, Mastercard) și plata prin PayPal.</p>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="faq-item">
+            <h5><i class="fas fa-chevron-right"></i> Primiți biletele prin email?</h5>
+            <p>Da, după confirmarea plății vei primi biletele pe email și le vei găsi în secțiunea "Rezervările Mele".</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+

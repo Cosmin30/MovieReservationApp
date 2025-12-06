@@ -1,12 +1,19 @@
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '../auth/auth-service';
+import { LoggerService } from '../services/logger.service';
 
-export const GuestGuard = () => {
-  const auth = inject(AuthService);
+export const guestGuard: CanActivateFn = () => {
+  const authService = inject(AuthService);
   const router = inject(Router);
+  const logger = inject(LoggerService);
 
-  if (!auth.isAuthenticated()) return true;
+  logger.debug('GuestGuard - isAuthenticated:', authService.isAuthenticated());
+  
+  if (!authService.isAuthenticated()) {
+    return true;
+  }
 
-  return router.parseUrl('/');
+  logger.debug('GuestGuard - Redirecting to /movies');
+  return router.parseUrl('/movies');
 };

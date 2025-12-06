@@ -1,16 +1,42 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { RegisterFormComponent, RegisterFormData } from '../../components/register-form/register-form';
 import { RegisterService } from '../../../application/use-cases/register-service';
+import { NotificationService } from '../../../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-register-page',
   templateUrl: './register-page.html',
-  styleUrls: ['./register-page.css']
+  standalone: true,
+  imports: [CommonModule, RegisterFormComponent]
 })
-export class RegisterPage {
+export class RegisterPage implements OnDestroy {
+  private registerService = inject(RegisterService);
+  private notificationService = inject(NotificationService);
+  private router = inject(Router);
+  private destroy$ = new Subject<void>();
 
-  constructor(private registerService: RegisterService) {}
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
-  register(form: any) {
-    this.registerService.execute(form).subscribe();
+  register(form: RegisterFormData): void {
+    this.registerService.execute(form)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.notificationService.success('Cont creat cu succes!');
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 1500);
+        },
+        error: () => {
+          this.notificationService.error('A apărut o eroare la înregistrare. Te rugăm să încerci din nou.');
+        }
+      });
   }
 }

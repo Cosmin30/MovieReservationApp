@@ -52,7 +52,7 @@ class SeatRepositoryTest {
 
         Hall hall= new Hall();
         hall.setName("Sala Fericirii");
-        hall.setNumber(7);
+        hall.setNumber(5000 + (int)(Math.random() * 1000)); // Unique number
         hall.setCapacity(120);
         hallRepository.save(hall);
 

@@ -1,9 +1,13 @@
 import { Component, EventEmitter, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-payment-form',
   templateUrl: './payment-form.html',
-  styleUrls: ['./payment-form.css']
+  styleUrls: ['./payment-form.css'],
+  standalone: true,
+  imports: [CommonModule, FormsModule] 
 })
 export class PaymentFormComponent {
 

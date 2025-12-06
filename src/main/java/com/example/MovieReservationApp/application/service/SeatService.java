@@ -38,6 +38,12 @@ public class SeatService {
                 .collect(Collectors.toList());
     }
 
+    public List<SeatDTO> getAvailableSeatsByScreening(UUID screeningId) {
+        return seatRepository.findByScreeningIdAndIsAvailable(screeningId, true).stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
     public SeatDTO createSeat(SeatDTO dto) {
         Seat seat = toEntity(dto);
         seat.setId(null); // ID generat automat

@@ -7,21 +7,20 @@ import { MovieGridComponent } from './presentation/components/movie-grid/movie-g
 import { MovieFiltersComponent } from './presentation/components/movie-filters/movie-filters';
 import { MovieSearchComponent } from './presentation/components/movie-search/movie-search';
 
-import { MoviesListPage } from './presentation/pages/movies-list-page/movies-list-page';
-import { MovieDetailsPage } from './presentation/pages/movie-details-page/movie-details-page';
-
 @NgModule({
-  declarations: [
+  imports: [
+    CommonModule,
+    RouterModule,
+    MovieCardComponent,    
+    MovieGridComponent,    
+    MovieFiltersComponent, 
+    MovieSearchComponent   
+  ],
+  exports: [
     MovieCardComponent,
     MovieGridComponent,
     MovieFiltersComponent,
-    MovieSearchComponent,
-    MoviesListPage,
-    MovieDetailsPage
-  ],
-  imports: [
-    CommonModule,
-    RouterModule
+    MovieSearchComponent
   ]
 })
 export class MoviesModule {}

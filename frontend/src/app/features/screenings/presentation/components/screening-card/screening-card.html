@@ -1,25 +1,268 @@
-<div class="card shadow-sm screening-card">
-  <div class="card-body">
+<!-- Card View (in list) -->
+<div *ngIf="screening && !isLoading && !isDetailPage" class="card screening-card h-100">
+  <div class="card-body d-flex flex-column">
     
-    <h5 class="card-title">{{ screening.movie.title }}</h5>
+    <!-- Movie Title -->
+    <h5 class="card-title movie-title mb-3">{{ screening.movie?.title }}</h5>
+
+    <!-- Hall Info -->
+    <div class="card-text">
+      <strong><i class="fas fa-building"></i> Sala:</strong>
+      <span>{{ screening.hall?.name || 'N/A' }}</span>
+    </div>
+
+    <!-- Time Info -->
+    <div class="card-text">
+      <strong><i class="fas fa-clock"></i> Ora:</strong>
+      <span>{{ screening.startTime | date:'short' }}</span>
+    </div>
+
+    <!-- Seats Info -->
+    <div class="card-text">
+      <strong><i class="fas fa-chair"></i> Locuri:</strong>
+      <span class="badge bg-success">{{ getAvailableSeatsCount() }} disponibile</span>
+    </div>
+
+    <!-- Buttons -->
+    <div class="d-grid gap-2 mt-auto">
+      <button class="btn btn-primary w-100"
+              [routerLink]="['/screenings', screening.id]">
+        <i class="fas fa-info-circle"></i> Detalii & Rezervare
+      </button>
+      <div *ngIf="authService.isAdmin()" class="d-flex gap-2">
+        <button class="btn btn-warning btn-sm flex-fill"
+                (click)="editScreening.emit(screening.id)"
+                title="Editează proiecție">
+          <i class="fas fa-edit"></i> Editează
+        </button>
+        <button class="btn btn-danger btn-sm flex-fill"
+                (click)="deleteScreening.emit(screening.id)"
+                title="Șterge proiecție">
+          <i class="fas fa-trash"></i> Șterge
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div *ngIf="isLoading" class="container mt-4">
+  <div class="alert alert-info">
+    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+    Se încarcă detaliile proiecției...
+  </div>
+</div>
+
+<!-- Error State -->
+<div *ngIf="error && !isLoading" class="container mt-4">
+  <div class="alert alert-danger">{{ error }}</div>
+</div>
+
+<!-- DETAIL PAGE - Completely Redesigned -->
+<div *ngIf="screening && !isLoading && isDetailPage" class="screening-detail-page">
+  <div class="container-fluid px-4 py-4">
     
-    <p class="text-muted mb-1">
-      Sala: {{ screening.hall.name }} ({{ screening.roomNumber }})
-    </p>
+    <!-- Screening Form Modal -->
+    <div *ngIf="showScreeningForm" class="modal-overlay" (click)="onScreeningFormCancel()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <app-screening-form 
+          [screening]="editingScreening"
+          [isEditMode]="!!editingScreening"
+          (submitForm)="onScreeningFormSubmit($event)"
+          (cancel)="onScreeningFormCancel()">
+        </app-screening-form>
+      </div>
+    </div>
 
-    <p class="mb-1">
-      <strong>Ora:</strong>
-      {{ screening.startTime | date:'short' }}
-    </p>
+    <!-- Success Alert -->
+    <div *ngIf="success" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+      <strong><i class="fas fa-check-circle"></i> Succes:</strong> {{ success }}
+      <button type="button" class="btn-close" (click)="success = null"></button>
+    </div>
 
-    <p>
-      <strong>Locuri:</strong> {{ screening.capacity }}
-    </p>
-
-    <button class="btn btn-primary w-100"
-            [routerLink]="['/screenings', screening.id]">
-      Detalii
+    <!-- Error Alert -->
+    <div *ngIf="error" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+      <strong><i class="fas fa-exclamation-triangle"></i> Eroare:</strong> {{ error }}
+      <button type="button" class="btn-close" (click)="error = null"></button>
+    </div>
+    
+    <!-- Back Button -->
+    <button class="btn btn-outline-secondary mb-3" routerLink="/screenings">
+      <i class="fas fa-arrow-left"></i> Înapoi
     </button>
 
+    <!-- Page Title -->
+    <h1 class="page-title mb-4">{{ screening.movie?.title }}</h1>
+
+    <!-- Two Column Layout -->
+    <div class="row g-4">
+      
+      <!-- LEFT COLUMN: Details & Seats -->
+      <div class="col-lg-8">
+        
+        <!-- Details Card -->
+        <div class="card shadow-lg border-0 mb-4">
+          <div class="card-body">
+            <h3 class="section-title mb-4">
+              <i class="fas fa-info-circle"></i> Detalii Proiecție
+            </h3>
+            
+            <div class="info-grid mb-4">
+              <div class="info-item">
+                <label class="info-label"><i class="fas fa-film"></i> Film</label>
+                <p class="info-value">{{ screening.movie?.title }}</p>
+              </div>
+              <div class="info-item">
+                <label class="info-label"><i class="fas fa-building"></i> Sala</label>
+                <p class="info-value">{{ screening.hall?.name }}</p>
+              </div>
+            </div>
+
+            <div class="info-grid mb-4">
+              <div class="info-item">
+                <label class="info-label"><i class="fas fa-calendar-alt"></i> Data & Ora</label>
+                <p class="info-value">{{ screening.startTime | date:'dd MMM yyyy, HH:mm' }}</p>
+              </div>
+              <div class="info-item">
+                <label class="info-label"><i class="fas fa-door-open"></i> Sală Nr.</label>
+                <p class="info-value">{{ screening.roomNumber }}</p>
+              </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-icon capacity-icon"><i class="fas fa-chair"></i></div>
+                <div class="stat-content">
+                  <p class="stat-label">Capacitate</p>
+                  <p class="stat-number">{{ screening.capacity }}</p>
+                </div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-icon available-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-content">
+                  <p class="stat-label">Disponibile</p>
+                  <p class="stat-number">{{ getAvailableSeatsCount() }}</p>
+                </div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-icon reserved-icon"><i class="fas fa-times-circle"></i></div>
+                <div class="stat-content">
+                  <p class="stat-label">Rezervate</p>
+                  <p class="stat-number">{{ getReservedSeatsCount() }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seats Selection Card -->
+        <div class="card shadow-lg border-0">
+          <div class="card-header bg-gradient-primary text-white">
+            <h4 class="mb-0"><i class="fas fa-chair"></i> Selectează Locurile</h4>
+          </div>
+          <div class="card-body seats-card-body">
+            <app-seat-grid 
+              [seats]="screening.seats || []"
+              (seatSelected)="toggleSeat($event)">
+            </app-seat-grid>
+          </div>
+        </div>
+
+        <!-- Admin Actions -->
+        <div *ngIf="authService.isAdmin()" class="mt-4 d-flex gap-2">
+          <button class="btn btn-warning" (click)="onEditScreening()">
+            <i class="fas fa-edit"></i> Editează Proiecție
+          </button>
+          <button class="btn btn-danger" (click)="onDeleteScreening()">
+            <i class="fas fa-trash"></i> Șterge Proiecție
+          </button>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: Reservation Summary (Sticky) -->
+      <div class="col-lg-4">
+        <div class="sticky-top reservation-summary">
+          
+          <!-- Reservation Info Card -->
+          <div class="card shadow-lg border-0 mb-3 reservation-card">
+            <div class="card-body">
+              <h3 class="section-title mb-4">
+                <i class="fas fa-ticket-alt"></i> Rezervare
+              </h3>
+              
+              <div class="quick-info mb-3">
+                <div class="quick-item">
+                  <span class="quick-label">Film:</span>
+                  <span class="quick-value">{{ screening.movie?.title }}</span>
+                </div>
+                <div class="quick-item">
+                  <span class="quick-label">Sala:</span>
+                  <span class="quick-value">{{ screening.hall?.name }}</span>
+                </div>
+                <div class="quick-item">
+                  <span class="quick-label">Data:</span>
+                  <span class="quick-value">{{ screening.startTime | date:'dd MMM, HH:mm' }}</span>
+                </div>
+              </div>
+
+              <div class="availability-status" [ngClass]="getAvailableSeatsCount() > 0 ? 'available' : 'full'">
+                <i [ngClass]="getAvailableSeatsCount() > 0 ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
+                <div class="status-text">
+                  <strong *ngIf="getAvailableSeatsCount() > 0">
+                    {{ getAvailableSeatsCount() }} locuri disponibile
+                  </strong>
+                  <strong *ngIf="getAvailableSeatsCount() === 0">
+                    Proiecție full
+                  </strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Summary Card (only when seats selected) -->
+          <div class="card shadow-lg border-0" *ngIf="selectedSeats.length > 0">
+            <div class="card-header bg-gradient-success text-white">
+              <h5 class="mb-0"><i class="fas fa-clipboard-list"></i> Rezumat</h5>
+            </div>
+            <div class="card-body">
+              
+              <div class="mb-3">
+                <label class="form-label fw-bold">Locuri selectate:</label>
+                <div class="selected-seats-list">
+                  <div *ngFor="let seat of selectedSeats" class="selected-seat-badge">
+                    <i class="fas fa-chair seat-icon"></i>
+                    <span>Rând {{ seat.row }}, Loc {{ seat.number }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="price-breakdown">
+                <div class="price-row">
+                  <span>Preț per loc:</span>
+                  <strong>50 lei</strong>
+                </div>
+                <div class="price-row">
+                  <span>Număr locuri:</span>
+                  <strong>{{ selectedSeats.length }}</strong>
+                </div>
+                <hr class="my-2">
+                <div class="price-row total">
+                  <span>Total:</span>
+                  <strong class="total-price">{{ selectedSeats.length * 50 }} lei</strong>
+                </div>
+              </div>
+
+              <button class="btn btn-primary btn-lg w-100 mt-3" (click)="goToReservation()">
+                <i class="fas fa-credit-card"></i> Continuă la Rezervare
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>

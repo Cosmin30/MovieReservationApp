@@ -1,0 +1,71 @@
+<div class="container mt-4">
+  <!-- Page Title -->
+  <div class="mb-4">
+    <h1 class="display-6 fw-bold"><i class="fas fa-building"></i> Salile Cinematografului</h1>
+    <p class="text-muted">Selectează o sală pentru a vedea detaliile și locurile disponibile</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="alert alert-info">
+    <div class="spinner-border spinner-border-sm me-2" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    Se încarcă salile...
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="alert alert-danger">
+    {{ error }}
+    <button class="btn btn-sm btn-outline-danger ms-2" (click)="loadHalls()">
+      Încearcă din nou
+    </button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !error && halls.length === 0" class="alert alert-warning">
+    <h4 class="alert-heading">Nu au fost găsite salii</h4>
+    <p>Se pare că nu sunt salii disponibile în sistem.</p>
+  </div>
+
+  <!-- Halls Grid -->
+  <div *ngIf="!isLoading && halls && halls.length > 0" class="row g-4">
+    <div *ngFor="let hall of halls; trackBy: trackByHallId" class="col-lg-4 col-md-6">
+      <div class="card hall-card h-100 shadow-sm">
+        <div class="card-body d-flex flex-column">
+          <!-- Hall Icon & Name -->
+          <h5 class="card-title hall-name mb-3">
+            <i class="fas fa-theater-masks"></i> {{ hall.name }}
+          </h5>
+
+          <!-- Hall Details -->
+          <div class="hall-details flex-grow-1">
+            <div class="detail-row mb-2">
+              <span class="detail-label">Numar sală:</span>
+              <span class="detail-value">{{ hall.number || 'N/A' }}</span>
+            </div>
+
+            <div class="detail-row mb-2">
+              <span class="detail-label">Capacitate:</span>
+              <span class="detail-value">
+                <span class="badge bg-primary">{{ hall.capacity }} locuri</span>
+              </span>
+            </div>
+
+            <div class="detail-row">
+              <span class="detail-label">Tip:</span>
+              <span class="detail-value">
+                <span class="badge bg-info">{{ hall.type || 'Standard' }}</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Button -->
+          <button class="btn btn-primary w-100 mt-3"
+                  [routerLink]="['/halls', hall.id]">
+            <i class="fas fa-info-circle"></i> Vezi detalii
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

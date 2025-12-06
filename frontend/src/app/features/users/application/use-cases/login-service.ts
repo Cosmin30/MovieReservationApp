@@ -1,14 +1,14 @@
-import { Injectable } from '@angular/core';
-import { AuthApiService } from '../../infrastructure/adapters/auth-api-service';
+import { Injectable, inject } from '@angular/core';
+import { AuthService } from '../../../../core/auth/auth-service';
+import { LoginFormData } from '../../presentation/components/login-form/login-form';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoginService {
+  private authService = inject(AuthService);
 
-  constructor(private api: AuthApiService) {}
-
-  execute(credentials: any) {
-    return this.api.login(credentials);
+  execute(form: LoginFormData) {
+    return this.authService.login(form.email, form.password);
   }
 }

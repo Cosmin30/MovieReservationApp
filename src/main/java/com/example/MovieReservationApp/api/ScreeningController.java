@@ -17,7 +17,10 @@ public class ScreeningController {
     private final ScreeningService screeningService;
 
     @GetMapping
-    public List<ScreeningDTO> getAllScreenings() {
+    public List<ScreeningDTO> getAllScreenings(@RequestParam(required = false) UUID movieId) {
+        if (movieId != null) {
+            return screeningService.getScreeningsByMovieId(movieId);
+        }
         return screeningService.getAllScreenings();
     }
 

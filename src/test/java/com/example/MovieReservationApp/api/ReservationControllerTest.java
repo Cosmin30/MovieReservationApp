@@ -11,6 +11,8 @@ import com.example.MovieReservationApp.infrastructure.persistence.repository.Use
 import com.example.MovieReservationApp.infrastructure.persistence.repository.ScreeningRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.MovieRepository;
 import com.example.MovieReservationApp.infrastructure.persistence.repository.HallRepository;
+import com.example.MovieReservationApp.infrastructure.persistence.repository.SeatRepository;
+import com.example.MovieReservationApp.domain.model.seat.Seat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@org.springframework.context.annotation.Import(com.example.MovieReservationApp.config.TestSecurityConfig.class)
 class ReservationControllerTest {
 
     @Autowired
@@ -51,6 +54,9 @@ class ReservationControllerTest {
 
     @Autowired
     private HallRepository hallRepository;
+
+    @Autowired
+    private SeatRepository seatRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -89,13 +95,26 @@ class ReservationControllerTest {
     private Screening createScreening() {
         Movie movie = createMovie();
         Hall hall = createHall(1);
-        return screeningRepository.save(Screening.builder()
+        Screening screening = screeningRepository.save(Screening.builder()
                 .movie(movie)
                 .hall(hall)
                 .startTime(OffsetDateTime.now().plusDays(1))
                 .roomNumber(1)
                 .capacity(100)
                 .build());
+        
+        // Create some seats for the screening
+        for (int i = 1; i <= 10; i++) {
+            Seat seat = Seat.builder()
+                    .screening(screening)
+                    .row("A")
+                    .number(i)
+                    .isAvailable(true)
+                    .build();
+            seatRepository.save(seat);
+        }
+        
+        return screening;
     }
 
     @Test
@@ -103,6 +122,13 @@ class ReservationControllerTest {
         // Creăm dependencies
         User savedUser = createUser("multi");
         Screening savedScreening = createScreening();
+        
+        // Get available seats for the screening
+        java.util.List<Seat> availableSeats = seatRepository.findByScreeningId(savedScreening.getId())
+                .stream()
+                .filter(Seat::getIsAvailable)
+                .limit(5)
+                .collect(java.util.stream.Collectors.toList());
 
         // Creăm 5 rezervări
         BigDecimal[] prices = {
@@ -113,18 +139,20 @@ class ReservationControllerTest {
                 BigDecimal.valueOf(150)
         };
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 5 && i < availableSeats.size(); i++) {
+            java.util.List<java.util.UUID> seatIds = java.util.Collections.singletonList(availableSeats.get(i).getId());
+            
             mockMvc.perform(post("/api/reservations")
                             .param("userId", savedUser.getId().toString())
                             .param("screeningId", savedScreening.getId().toString())
-                            .param("seatIds", java.util.UUID.randomUUID().toString())
+                            .param("seatIds", seatIds.get(0).toString())
                             .param("pricePerSeat", prices[i].toString())
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isCreated());
         }
 
         // Verificăm persistența
-        assertThat(reservationRepository.count()).isGreaterThanOrEqualTo(5);
+        assertThat(reservationRepository.count()).isGreaterThanOrEqualTo(Math.min(5, availableSeats.size()));
     }
 
     @Test

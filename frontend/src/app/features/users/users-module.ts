@@ -12,18 +12,17 @@ import { ProfilePage } from './presentation/pages/profile-page/profile-page';
 import { RegisterPage } from './presentation/pages/register-page/register-page';
 
 @NgModule({
-  declarations: [
+  declarations: [],  
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
     LoginFormComponent,
     ProfileFormComponent,
     RegisterFormComponent,
     LoginPage,
     ProfilePage,
     RegisterPage
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    RouterModule
   ]
 })
 export class UsersModule {}

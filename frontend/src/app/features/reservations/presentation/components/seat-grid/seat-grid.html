@@ -1,8 +1,39 @@
-<div class="d-flex flex-wrap gap-2 justify-content-center">
-  <button *ngFor="let s of seats"
-          class="btn seat-box"
-          [ngClass]="{ 'available': s.available, 'unavailable': !s.available }"
-          (click)="toggleSeat(s)">
-    {{ s.row }}-{{ s.number }}
-  </button>
+<div class="seat-grid-container">
+  <!-- Cinema Screen -->
+  <div class="cinema-screen">
+    <i class="fas fa-film"></i> ECRAN <i class="fas fa-film"></i>
+  </div>
+
+  <!-- Legend -->
+  <div class="seats-legend">
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #10b981; border-color: #059669;"></div>
+      <span><i class="fas fa-check-circle"></i> Disponibil</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #ef4444; border-color: #dc2626;"></div>
+      <span><i class="fas fa-times-circle"></i> Ocupat</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #3b82f6; border-color: #2563eb;"></div>
+      <span><i class="fas fa-star"></i> Selectat</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #6b7280; border-color: #4b5563;"></div>
+      <span><i class="fas fa-ban"></i> Indisponibil</span>
+    </div>
+  </div>
+
+  <!-- Seats organized by rows -->
+  <div class="seats-grid">
+    <div *ngFor="let row of getSeatsByRows()" class="seat-row">
+      <div class="row-label">{{ row.row }}</div>
+      <div class="seats-in-row">
+        <app-seat *ngFor="let seat of row.seats"
+                  [seat]="seat"
+                  (seatToggled)="toggleSeat($event)">
+        </app-seat>
+      </div>
+    </div>
+  </div>
 </div>

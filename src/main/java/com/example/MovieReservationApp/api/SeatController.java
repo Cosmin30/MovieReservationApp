@@ -31,6 +31,11 @@ public class SeatController {
         return seatService.getSeatsByScreening(screeningId);
     }
 
+    @GetMapping("/screening/{screeningId}/available")
+    public List<SeatDTO> getAvailableSeatsByScreening(@PathVariable UUID screeningId) {
+        return seatService.getAvailableSeatsByScreening(screeningId);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public SeatDTO createSeat(@RequestBody SeatDTO dto) {

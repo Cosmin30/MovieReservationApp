@@ -1,11 +1,32 @@
 <div class="card p-3 mb-3 shadow-sm">
   <h5 class="mb-3">Filtre</h5>
 
-  <input class="form-control mb-2" placeholder="Caută după titlu..." 
-         (input)="filter($event.target.value)" />
+  <input class="form-control mb-3" placeholder="Caută după titlu..." 
+         (input)="filter($event)" />
 
-  <select class="form-select" (change)="filterGenre($event.target.value)">
-    <option value="">Toate genurile</option>
-    <option *ngFor="let g of genres" [value]="g">{{ g }}</option>
-  </select>
+  <div class="genre-filters">
+    <label class="form-label fw-bold mb-2">
+      <i class="fas fa-filter"></i> Filtrează după gen:
+    </label>
+    <div class="genre-checkboxes">
+      <div *ngFor="let genre of genres" class="form-check mb-2">
+        <input 
+          class="form-check-input" 
+          type="checkbox" 
+          [id]="'genre-' + genre"
+          [checked]="selectedGenres.has(genre)"
+          (change)="toggleGenre(genre, $event)">
+        <label class="form-check-label" [for]="'genre-' + genre">
+          {{ genre }}
+        </label>
+      </div>
+    </div>
+    <button 
+      *ngIf="selectedGenres.size > 0" 
+      class="btn btn-sm btn-outline-secondary mt-2 w-100"
+      (click)="clearGenreFilters()">
+      <i class="fas fa-times"></i> Șterge filtrele
+    </button>
+  </div>
+
 </div>
