@@ -13,8 +13,8 @@ export class GetUserReservationsService {
   private api = inject(ReservationApiService);
   private state = inject(ReservationState);
 
-  execute(userId: string): Observable<ReservationModel[]> {
-    return this.api.getReservationsByUser(userId).pipe(
+  execute(userId: string, forceRefresh: boolean = false): Observable<ReservationModel[]> {
+    return this.api.getReservationsByUser(userId, forceRefresh).pipe(
       map(dtos => dtos.map(dto => ReservationMapper.fromDto(dto))),
       tap(reservations => {
         this.state.setReservations(reservations);

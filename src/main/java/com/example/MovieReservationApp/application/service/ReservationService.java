@@ -43,7 +43,8 @@ public class ReservationService {
         reservation.setUser(user);
         reservation.setScreening(screening);
         reservation.setCreatedAt(OffsetDateTime.now());
-        reservation.setStatus("CREATED");
+        // Since payment is simulated, set status directly to CONFIRMED (paid)
+        reservation.setStatus("CONFIRMED");
         reservation.setTotalPrice(pricePerSeat.multiply(BigDecimal.valueOf(seatIds.size())));
         reservationRepository.save(reservation);
 

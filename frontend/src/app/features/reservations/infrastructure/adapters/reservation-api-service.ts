@@ -48,7 +48,14 @@ export class ReservationApiService {
     this.cache.clear(`reservation_${id}`);
   }
 
-  getReservationsByUser(userId: string): Observable<ReservationDTO[]> {
+  clearUserReservationsCache(userId: string): void {
+    this.cache.clear(`reservations_user_${userId}`);
+  }
+
+  getReservationsByUser(userId: string, forceRefresh: boolean = false): Observable<ReservationDTO[]> {
+    if (forceRefresh) {
+      this.clearUserReservationsCache(userId);
+    }
     return this.cache.getOrFetch(
       `reservations_user_${userId}`,
       () => this.http.get<ReservationDTO[]>(`${this.baseUrl}/user/${encodeURIComponent(userId)}`)

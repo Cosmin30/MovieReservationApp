@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, AfterViewInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ScreeningDTO } from '../../../infrastructure/dtos/screening.dto';
@@ -14,13 +14,13 @@ import { takeUntil } from 'rxjs/operators';
   templateUrl: './screening-form.html',
   styleUrls: ['./screening-form.css']
 })
-export class ScreeningFormComponent implements OnInit {
+export class ScreeningFormComponent implements OnInit, AfterViewInit {
   @Input() screening: ScreeningDTO | null = null;
   @Input() isEditMode: boolean = false;
   @Output() submitForm = new EventEmitter<ScreeningDTO>();
   @Output() cancel = new EventEmitter<void>();
 
-  screeningForm!: FormGroup;
+  screeningForm: FormGroup;
   movies: any[] = [];
   halls: any[] = [];
   loading = false;
@@ -28,8 +28,21 @@ export class ScreeningFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private movieApi = inject(MovieApiService);
   private hallApi = inject(HallApiService);
+  private cdr = inject(ChangeDetectorRef);
+
+  constructor() {
+    // Initialize form immediately to avoid template errors
+    this.screeningForm = this.fb.group({
+      movieId: ['', [Validators.required]],
+      hallId: ['', [Validators.required]],
+      startTime: ['', [Validators.required]],
+      roomNumber: ['', [Validators.required, Validators.min(1)]],
+      capacity: ['', [Validators.required, Validators.min(1)]]
+    });
+  }
 
   ngOnInit() {
+    // Load data immediately when component is initialized
     this.loadMoviesAndHalls();
     
     // Format startTime for datetime-local input
@@ -44,12 +57,13 @@ export class ScreeningFormComponent implements OnInit {
       startTimeValue = `${year}-${month}-${day}T${hours}:${minutes}`;
     }
 
-    this.screeningForm = this.fb.group({
-      movieId: [this.screening?.movie?.id || '', [Validators.required]],
-      hallId: [this.screening?.hall?.id || '', [Validators.required]],
-      startTime: [startTimeValue, [Validators.required]],
-      roomNumber: [this.screening?.roomNumber || '', [Validators.required, Validators.min(1)]],
-      capacity: [this.screening?.capacity || '', [Validators.required, Validators.min(1)]]
+    // Update form with initial values
+    this.screeningForm.patchValue({
+      movieId: this.screening?.movie?.id || '',
+      hallId: this.screening?.hall?.id || '',
+      startTime: startTimeValue,
+      roomNumber: this.screening?.roomNumber || '',
+      capacity: this.screening?.capacity || ''
     });
 
     // Listen to hall selection changes to auto-fill roomNumber and capacity
@@ -83,6 +97,17 @@ export class ScreeningFormComponent implements OnInit {
     }
   }
 
+  ngAfterViewInit() {
+    // Force change detection after view is initialized to ensure data is displayed
+    // This is especially important when component is created via *ngIf
+    if (this.movies.length === 0 || this.halls.length === 0) {
+      // If data hasn't loaded yet, wait a bit and check again
+      setTimeout(() => {
+        this.cdr.detectChanges();
+      }, 100);
+    }
+  }
+
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
@@ -97,9 +122,12 @@ export class ScreeningFormComponent implements OnInit {
         next: (movies) => {
           this.movies = movies;
           this.loading = false;
+          // Force change detection after data is loaded
+          this.cdr.detectChanges();
         },
         error: () => {
           this.loading = false;
+          this.cdr.detectChanges();
         }
       });
 
@@ -108,6 +136,11 @@ export class ScreeningFormComponent implements OnInit {
       .subscribe({
         next: (halls) => {
           this.halls = halls;
+          // Force change detection after data is loaded
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.cdr.detectChanges();
         }
       });
   }

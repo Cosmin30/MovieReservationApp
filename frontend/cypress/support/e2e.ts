@@ -14,4 +14,15 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import './commands';
+
+// Prevent Cypress from failing on uncaught exceptions
+Cypress.on('uncaught:exception', (err, runnable) => {
+  // returning false here prevents Cypress from failing the test
+  // You might want to be more specific about which errors to ignore
+  if (err.message.includes('ResizeObserver') || err.message.includes('Non-Error promise rejection')) {
+    return false;
+  }
+  // return true to fail the test on other errors
+  return true;
+});

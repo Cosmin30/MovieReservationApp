@@ -1,7 +1,7 @@
 <div class="card shadow-sm p-4">
   <h4 class="mb-3">Rezumat rezervare</h4>
 
-  <p><strong>Status:</strong> {{ reservation?.status }}</p>
+  <p><strong>Status:</strong> {{ getStatusText() }}</p>
   <p><strong>Total:</strong> {{ reservation?.totalPrice }} RON</p>
   <p><strong>Creată la:</strong> {{ reservation?.createdAt }}</p>
 

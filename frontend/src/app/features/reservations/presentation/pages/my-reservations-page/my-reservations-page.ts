@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ReservationState } from '../../../application/state/reservation-state.state';
@@ -34,7 +34,9 @@ export class MyReservationsPage implements OnInit, OnDestroy {
   constructor(
     private state: ReservationState,
     private getUserReservations: GetUserReservationsService,
-    private authService: AuthService
+    private authService: AuthService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -51,7 +53,18 @@ export class MyReservationsPage implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
         if (user && user.id) {
-          this.loadReservations(user.id);
+          // Check if refresh query parameter is present
+          const refresh = this.route.snapshot.queryParams['refresh'] === 'true';
+          this.loadReservations(user.id, refresh);
+          
+          // Clear query params after reading
+          if (refresh) {
+            this.router.navigate([], {
+              relativeTo: this.route,
+              queryParams: {},
+              replaceUrl: true
+            });
+          }
         }
       });
   }
@@ -61,11 +74,11 @@ export class MyReservationsPage implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  loadReservations(userId: string) {
+  loadReservations(userId: string, forceRefresh: boolean = false) {
     this.isLoading = true;
     this.error = null;
     
-    this.getUserReservations.execute(userId)
+    this.getUserReservations.execute(userId, forceRefresh)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {

@@ -48,7 +48,7 @@ class ScreeningRepositoryTest {
         hall1 = new Hall(); // fără "Hall" în față
         hall1.setName("Hall 1");
         hall1.setCapacity(100);
-        hall1.setNumber(2000 + (int)(Math.random() * 1000)); // Unique number
+        hall1.setNumber(1);
         hallRepository.save(hall1);
 
         movie1 = new Movie();

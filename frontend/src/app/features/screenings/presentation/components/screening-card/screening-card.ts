@@ -175,13 +175,17 @@ export class ScreeningCardComponent implements OnInit, OnDestroy {
           .subscribe({
             next: () => {
               this.success = 'Proiecția a fost ștearsă cu succes!';
-              // Navigate back to screenings list after deletion
+              // Clear cache before navigation
+              this.screeningApi.clearCache();
+              // Navigate back to screenings list with refresh flag
               setTimeout(() => {
-                this.router.navigate(['/screenings']);
-              }, 1500);
+                this.router.navigate(['/screenings'], { queryParams: { refresh: 'true' } });
+              }, 1000);
             },
             error: (err) => {
+              this.logger.error('Error deleting screening:', err);
               this.error = 'Nu am putut șterge proiecția. Te rugăm să încerci din nou.';
+              this.notificationService.error('Nu am putut șterge proiecția. Te rugăm să încerci din nou.');
               setTimeout(() => this.error = null, 3000);
             }
           });

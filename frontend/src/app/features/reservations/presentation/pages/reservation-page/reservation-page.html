@@ -50,7 +50,7 @@
               <div class="info-item">
                 <label class="info-label"><i class="fas fa-info-circle"></i> Status</label>
                 <p class="info-value">
-                  <span class="badge bg-primary">{{ reservation.status }}</span>
+                  <span class="badge" [ngClass]="getReservationStatusClass()">{{ getReservationStatusText() }}</span>
                 </p>
               </div>
             </div>
@@ -250,13 +250,27 @@
               <!-- Selected Seats -->
               <div class="mb-4">
                 <label class="form-label fw-bold">Locuri selectate:</label>
-                <div *ngIf="selectedSeats.length > 0" class="selected-seats-list">
-                  <div *ngFor="let seat of selectedSeats" class="selected-seat-badge">
-                    <i class="fas fa-chair seat-icon"></i>
-                    <span>Rând {{ seat.row }}, Loc {{ seat.number }}</span>
+                <!-- Show seats from reservation.tickets if reservation exists, otherwise from selectedSeats -->
+                <div *ngIf="((reservation?.tickets?.length || 0) > 0) || selectedSeats.length > 0" class="selected-seats-list">
+                  <!-- Show from reservation.tickets if available -->
+                  <div *ngIf="(reservation?.tickets?.length || 0) > 0">
+                    <div *ngFor="let ticket of reservation?.tickets" class="selected-seat-badge">
+                      <i class="fas fa-chair seat-icon"></i>
+                      <span>
+                        Rând {{ ticket.seat?.row || ticket.seat?.rowNumber || ticket.seat?.row_number || 'N/A' }}, 
+                        Loc {{ ticket.seat?.number || ticket.seat?.seatNumber || ticket.seat?.seat_number || 'N/A' }}
+                      </span>
+                    </div>
+                  </div>
+                  <!-- Fallback to selectedSeats if no tickets yet -->
+                  <div *ngIf="(reservation?.tickets?.length || 0) === 0 && selectedSeats.length > 0">
+                    <div *ngFor="let seat of selectedSeats" class="selected-seat-badge">
+                      <i class="fas fa-chair seat-icon"></i>
+                      <span>Rând {{ seat.row }}, Loc {{ seat.number }}</span>
+                    </div>
                   </div>
                 </div>
-                <div *ngIf="selectedSeats.length === 0" class="text-muted text-center py-3">
+                <div *ngIf="(reservation?.tickets?.length || 0) === 0 && selectedSeats.length === 0" class="text-muted text-center py-3">
                   <em>Niciun loc selectat</em>
                 </div>
               </div>
@@ -269,12 +283,12 @@
                 </div>
                 <div class="price-row">
                   <span>Număr locuri:</span>
-                  <strong>{{ selectedSeats.length }}</strong>
+                  <strong>{{ (reservation?.tickets?.length || 0) > 0 ? (reservation?.tickets?.length || 0) : selectedSeats.length }}</strong>
                 </div>
                 <hr class="my-3">
                 <div class="price-row total">
                   <span>Total de plată:</span>
-                  <strong class="total-price">{{ getTotalPrice() }} lei</strong>
+                  <strong class="total-price">{{ reservation?.totalPrice || getTotalPrice() }} lei</strong>
                 </div>
               </div>
             </div>
@@ -391,12 +405,6 @@
                   </button>
                 </div>
 
-                <!-- Payment Info -->
-                <div class="mt-3 p-2 bg-light rounded">
-                  <small class="text-muted">
-                    <strong>ℹ️ Notă:</strong> Aceasta este o plată fictivă pentru demonstrație. Nu se vor procesa plăți reale.
-                  </small>
-                </div>
               </form>
             </div>
           </div>

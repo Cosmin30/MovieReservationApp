@@ -1,98 +1,120 @@
 /// <reference types="cypress" />
-describe("Profile page", () => {
+
+describe('User Profile', () => {
   beforeEach(() => {
-    cy.intercept("GET", "/auth/me", {
+    // Login before each test
+    cy.intercept('POST', '**/api/auth/login', {
       statusCode: 200,
-      body: { id: "1", name: "Test User", email: "test@example.com", phone: "+40123456789", preferences: { newsletter: true } }
-    }).as("getMe");
-  });
+      body: {
+        token: 'fake-jwt-token',
+        role: 'USER',
+        userId: 'user-123'
+      }
+    }).as('loginRequest');
 
-  it("loads profile info", () => {
-    cy.visit("http://localhost:4200/profile");
-    cy.wait("@getMe");
-    cy.contains("Test User").should("exist");
-    cy.contains("test@example.com").should("exist");
-  });
-
-  it("allows editing profile name and phone", () => {
-    cy.intercept("PUT", "/auth/me", {
+    cy.intercept('GET', '**/api/users/me**', {
       statusCode: 200,
-      body: { id: "1", name: "Updated User", email: "test@example.com", phone: "+40987654321" }
-    }).as("updateProfile");
+      body: {
+        id: 'user-123',
+        fullName: 'Test User',
+        email: 'test@example.com',
+        role: 'USER'
+      }
+    }).as('getUserProfile');
 
-    cy.visit("http://localhost:4200/profile");
-    cy.wait("@getMe");
-
-    cy.get('input[name="name"]').clear().type("Updated User");
-    cy.get('input[name="phone"]').clear().type("+40987654321");
-    cy.get("button").contains(/Save|Salvează/i).click();
-    cy.wait("@updateProfile");
-    cy.contains(/Saved|success/i).should("exist");
+    cy.visit('/login');
+    cy.get('input[name="email"]').type('test@example.com');
+    cy.get('input[name="password"]').type('password123');
+    cy.get('button[type="submit"]').click();
+    cy.wait('@loginRequest');
+    cy.wait('@getUserProfile');
   });
 
-  it("shows validation errors on update", () => {
-    cy.visit("http://localhost:4200/profile");
-    cy.wait("@getMe");
+  describe('Profile Display', () => {
+    it('should load and display user profile information', () => {
+      cy.intercept('GET', '**/api/users/me**', {
+        statusCode: 200,
+        body: {
+          id: 'user-123',
+          fullName: 'Test User',
+          email: 'test@example.com',
+          role: 'USER',
+          createdAt: '2024-01-01T00:00:00Z'
+        }
+      }).as('getProfile');
 
-    cy.get('input[name="name"]').clear(); // empty
-    cy.get("button").contains(/Save|Salvează/i).click();
-    cy.contains(/required|obligatoriu/i).should("exist");
+      cy.visit('/profile');
+      cy.wait('@getProfile');
 
-    cy.get('input[name="phone"]').type("invalid"); // bad format
-    cy.get("button").contains(/Save|Salvează/i).click();
-    cy.contains(/phone|format|valid/i).should("exist");
+      // Check profile information is displayed
+      cy.contains('Test User').should('be.visible');
+      cy.contains('test@example.com').should('be.visible');
+    });
+
+    it('should handle profile load error', () => {
+      cy.intercept('GET', '**/api/users/me**', {
+        statusCode: 500,
+        body: { message: 'Server error' }
+      }).as('getProfileError');
+
+      cy.visit('/profile');
+      cy.wait('@getProfileError');
+
+      // Should show error message
+      cy.contains(/error|eroare|nu.*putut/i).should('exist');
+    });
+
+    it('should show loading state while fetching profile', () => {
+      cy.intercept('GET', '**/api/users/me**', {
+        delay: 1000,
+        statusCode: 200,
+        body: {
+          id: 'user-123',
+          fullName: 'Test User',
+          email: 'test@example.com'
+        }
+      }).as('getProfile');
+
+      cy.visit('/profile');
+
+      // Should show loading indicator
+      cy.contains(/loading|se.*încarcă|spinner/i).should('exist');
+
+      cy.wait('@getProfile');
+    });
   });
 
-  it("allows changing password", () => {
-    cy.intercept("POST", "/auth/change-password", {
-      statusCode: 200,
-      body: { message: "Password updated" }
-    }).as("changePass");
+  describe('Profile Information Display', () => {
+    beforeEach(() => {
+      cy.intercept('GET', '**/api/users/me**', {
+        statusCode: 200,
+        body: {
+          id: 'user-123',
+          fullName: 'Test User',
+          email: 'test@example.com',
+          role: 'USER'
+        }
+      }).as('getProfile');
+    });
 
-    cy.visit("http://localhost:4200/profile");
-    cy.wait("@getMe");
+    it('should display all profile information correctly', () => {
+      cy.visit('/profile');
+      cy.wait('@getProfile');
 
-    cy.get("button").contains(/Change Password|Schimbă parola/i).click({ force: true });
-    cy.get(".password-form").should("exist");
-    cy.get('input[name="oldPassword"]').type("oldpass");
-    cy.get('input[name="newPassword"]').type("newpass123");
-    cy.get('input[name="confirmPassword"]').type("newpass123");
-    cy.get("button").contains(/Update|Actualizează/i).click();
-    cy.wait("@changePass");
-    cy.contains(/success|updated/i).should("exist");
-  });
+      // Check all profile fields are displayed
+      cy.contains('Test User').should('be.visible');
+      cy.contains('test@example.com').should('be.visible');
+      cy.contains(/profil|profile/i).should('exist');
+    });
 
-  it("validates password change (mismatch)", () => {
-    cy.visit("http://localhost:4200/profile");
-    cy.wait("@getMe");
+    it('should display quick action links', () => {
+      cy.visit('/profile');
+      cy.wait('@getProfile');
 
-    cy.get("button").contains(/Change Password|Schimbă parola/i).click({ force: true });
-    cy.get('input[name="newPassword"]').type("newpass123");
-    cy.get('input[name="confirmPassword"]').type("newpass456"); // mismatch
-    cy.get("button").contains(/Update|Actualizează/i).click();
-    cy.contains(/not match|do not match|nu se potrivesc/i).should("exist");
-  });
-
-  it("toggles newsletter preference", () => {
-    cy.intercept("PUT", "/auth/preferences", {
-      statusCode: 200,
-      body: { preferences: { newsletter: false } }
-    }).as("updatePref");
-
-    cy.visit("http://localhost:4200/profile");
-    cy.wait("@getMe");
-
-    cy.get('input[type="checkbox"][name="newsletter"]').uncheck();
-    cy.wait("@updatePref");
-    cy.get('input[type="checkbox"][name="newsletter"]').should("not.be.checked");
-  });
-
-  it("handles profile load error and shows retry", () => {
-    cy.intercept("GET", "/auth/me", { statusCode: 500, body: { message: "Error" } }).as("getMeErr");
-    cy.visit("http://localhost:4200/profile");
-    cy.wait("@getMeErr");
-    cy.contains(/error|eroare/i).should("exist");
-    cy.get("button").contains(/Retry|Încearcă din nou/i).click({ force: true });
-    cy.wait("@getMeErr");
+      // Check quick action links exist
+      cy.contains(/rezervări|reservations/i).should('exist');
+      cy.contains(/proiecții|screenings/i).should('exist');
+      cy.contains(/filme|movies/i).should('exist');
+    });
   });
 });

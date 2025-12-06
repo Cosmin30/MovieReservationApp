@@ -1,86 +1,154 @@
 /// <reference types="cypress" />
-describe("Reservations list", () => {
+
+describe('Reservations Feature', () => {
   beforeEach(() => {
-    cy.intercept("GET", "/reservations", {
+    // Login before each test
+    cy.intercept('POST', '**/api/auth/login', {
       statusCode: 200,
-      body: [
-        { id: "r1", movie: "The Example Movie", status: "CONFIRMED", date: "2024-12-25", seats: "A1" },
-        { id: "r2", movie: "Another Movie", status: "PENDING", date: "2024-12-26", seats: "B2" },
-        { id: "r3", movie: "Old Movie", status: "COMPLETED", date: "2024-11-01", seats: "C3" }
-      ]
-    }).as("getReservations");
-  });
+      body: {
+        token: 'fake-jwt-token',
+        role: 'USER',
+        userId: 'user-123'
+      }
+    }).as('loginRequest');
 
-  it("shows reservations page with all reservations", () => {
-    cy.visit("http://localhost:4200/reservations");
-    cy.wait("@getReservations");
-    cy.get("body").then($body => {
-      expect($body.text()).to.include("The Example Movie");
-    });
-  });
-
-  it("filters reservations by status", () => {
-    cy.intercept("GET", "/reservations?status=CONFIRMED", {
+    cy.intercept('GET', '**/api/users/me**', {
       statusCode: 200,
-      body: [{ id: "r1", movie: "The Example Movie", status: "CONFIRMED", date: "2024-12-25", seats: "A1" }]
-    }).as("getConfirmed");
-
-    cy.visit("http://localhost:4200/reservations");
-    cy.wait("@getReservations");
-
-    cy.get('select[name="status"]').then($sel => {
-      if ($sel.length > 0) {
-        cy.wrap($sel).select("CONFIRMED");
-        cy.wait("@getConfirmed");
+      body: {
+        id: 'user-123',
+        fullName: 'Test User',
+        email: 'test@example.com',
+        role: 'USER'
       }
-    });
+    }).as('getUserProfile');
+
+    cy.visit('/login');
+    cy.get('input[name="email"]').type('test@example.com');
+    cy.get('input[name="password"]').type('password123');
+    cy.get('button[type="submit"]').click();
+    cy.wait('@loginRequest');
+    cy.wait('@getUserProfile');
   });
 
-  it("displays reservation details and actions", () => {
-    cy.visit("http://localhost:4200/reservations");
-    cy.wait("@getReservations");
-
-    cy.get(".reservation-item").first().then($item => {
-      if ($item.length > 0) {
-        cy.wrap($item).click();
-      }
-    });
-  });
-
-  it("allows cancellation of reservation with confirmation", () => {
-    cy.intercept("DELETE", "/reservations/r1", { statusCode: 200, body: { message: "Cancelled" } }).as("cancelRes");
-
-    cy.visit("http://localhost:4200/reservations");
-    cy.wait("@getReservations");
-
-    cy.get(".reservation-item").first().then($item => {
-      if ($item.find("button").length > 0) {
-        cy.wrap($item).find("button").contains(/Cancel|Anulează/i).click({ force: true });
-        cy.get("body").then($body => {
-          if ($body.find(".confirmation-modal").length > 0) {
-            cy.get("button").contains(/Confirm|Confirmare/i).click({ force: true });
-            cy.wait("@cancelRes");
+  describe('Reservations List', () => {
+    it('should display user reservations', () => {
+      cy.intercept('GET', '**/api/reservations/user/**', {
+        statusCode: 200,
+        body: [
+          {
+            id: 'r1',
+            user: { id: 'user-123', fullName: 'Test User' },
+            screening: {
+              id: 's1',
+              movie: { title: 'The Matrix' },
+              startTime: '2024-12-25T18:00:00Z',
+              hall: { name: 'Hall 1' }
+            },
+            status: 'CONFIRMED',
+            totalPrice: 50.00,
+            tickets: [
+              { id: 't1', seat: { row: 'A', number: 1 }, price: 25.00 },
+              { id: 't2', seat: { row: 'A', number: 2 }, price: 25.00 }
+            ],
+            createdAt: '2024-12-20T10:00:00Z'
+          },
+          {
+            id: 'r2',
+            user: { id: 'user-123', fullName: 'Test User' },
+            screening: {
+              id: 's2',
+              movie: { title: 'Inception' },
+              startTime: '2024-12-26T20:00:00Z',
+              hall: { name: 'Hall 2' }
+            },
+            status: 'PENDING',
+            totalPrice: 30.00,
+            tickets: [
+              { id: 't3', seat: { row: 'B', number: 5 }, price: 30.00 }
+            ],
+            createdAt: '2024-12-21T11:00:00Z'
           }
-        });
-      }
-    });
-  });
+        ]
+      }).as('getReservations');
 
-  it("handles empty reservations list", () => {
-    cy.intercept("GET", "/reservations", { statusCode: 200, body: [] }).as("getEmptyRes");
-    cy.visit("http://localhost:4200/reservations");
-    cy.wait("@getEmptyRes");
-    cy.get("body").then($body => {
-      expect($body.text()).to.match(/No reservations|Niciuna/i);
-    });
-  });
+      cy.visit('/reservations');
+      cy.wait('@getReservations');
 
-  it("handles server error when loading reservations", () => {
-    cy.intercept("GET", "/reservations", { statusCode: 500, body: { message: "Error" } }).as("getResErr");
-    cy.visit("http://localhost:4200/reservations");
-    cy.wait("@getResErr");
-    cy.get("body").then($body => {
-      expect($body.text()).to.match(/error|eroare/i);
+      // Check page title
+      cy.contains(/rezervările mele|my reservations/i).should('exist');
+
+      // Check reservations are displayed
+      cy.contains('The Matrix').should('be.visible');
+      cy.contains('Inception').should('be.visible');
+      // Statuses are transformed by helper functions: CONFIRMED -> "Paid", PENDING -> "Pending"
+      cy.contains(/paid/i).should('exist');
+      cy.contains(/pending/i).should('exist');
+      cy.contains('50').should('exist'); // Total price
+      cy.contains('30').should('exist'); // Total price
+    });
+
+    it('should show loading state', () => {
+      cy.intercept('GET', '**/api/reservations/user/**', {
+        delay: 1000,
+        statusCode: 200,
+        body: []
+      }).as('getReservations');
+
+      cy.visit('/reservations');
+      
+      // Check loading state
+      cy.contains(/se încarcă rezervările|loading/i).should('exist');
+      
+      cy.wait('@getReservations');
+    });
+
+    it('should show empty state when no reservations', () => {
+      cy.intercept('GET', '**/api/reservations/user/**', {
+        statusCode: 200,
+        body: []
+      }).as('getReservations');
+
+      cy.visit('/reservations');
+      cy.wait('@getReservations');
+
+      // Check empty state
+      cy.contains(/nu ai nici o rezervare|no reservations/i).should('exist');
+      cy.contains(/explorează filmele|explore movies/i).should('exist');
+    });
+
+    it('should show error state on API error', () => {
+      cy.intercept('GET', '**/api/reservations/user/**', {
+        statusCode: 500,
+        body: { message: 'Internal server error' }
+      }).as('getReservationsError');
+
+      cy.visit('/reservations');
+      cy.wait('@getReservationsError');
+
+      // Check error state
+      cy.contains(/nu am putut încărca rezervările|error/i).should('exist');
+    });
+
+    it('should refresh reservations when refresh query param is present', () => {
+      cy.intercept('GET', '**/api/reservations/user/**', {
+        statusCode: 200,
+        body: [
+          {
+            id: 'r1',
+            screening: {
+              movie: { title: 'The Matrix' }
+            },
+            status: 'CONFIRMED',
+            totalPrice: 50.00
+          }
+        ]
+      }).as('getReservations');
+
+      cy.visit('/reservations?refresh=true');
+      cy.wait('@getReservations');
+
+      // URL should be cleaned (no query params)
+      cy.url().should('not.include', 'refresh=true');
     });
   });
 });

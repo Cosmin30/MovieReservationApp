@@ -9,7 +9,7 @@
 
     <p>
       <strong>Status: </strong> 
-      <span class="badge bg-primary">{{ reservation.status }}</span>
+      <span class="badge" [ngClass]="getStatusClass()">{{ getStatusText() }}</span>
     </p>
 
     <p>

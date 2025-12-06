@@ -31,30 +31,38 @@ export class ScreeningListComponent implements OnInit, OnDestroy {
   constructor(private api: ScreeningApiService) {}
 
   ngOnInit(): void {
-    // Clear cache first to ensure fresh data
-    this.api.clearCache();
-    
-    // Check for edit query params (delete is handled directly via event emitter)
+    // Check for query params
     this.route.queryParams
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {
-        if (params['edit']) {
+        const shouldRefresh = params['refresh'] === 'true';
+        
+        if (shouldRefresh) {
+          // Clear cache and reload when refresh flag is present
+          this.api.clearCache();
+          this.loadScreenings();
+          // Clear query param
+          this.router.navigate(['/screenings'], { replaceUrl: true, queryParams: {} });
+        } else if (params['edit']) {
           this.onEditScreening(params['edit']);
           // Clear query param
           this.router.navigate(['/screenings'], { replaceUrl: true });
+        } else {
+          // Normal load - clear cache first to ensure fresh data
+          this.api.clearCache();
+          this.loadScreenings();
         }
-        // Removed delete query param handling - delete is handled directly via event emitter
       });
     
-    // Load data on initial component creation
-    this.loadScreenings();
-    
-    // Reload data whenever navigating to this route (but skip the first one since ngOnInit already loaded)
+    // Reload data whenever navigating to this route (but skip if refresh query param is handled above)
     let isFirstNavigation = true;
     this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),
-        filter((event: any) => event.url === '/screenings' || (event.url.includes('/screenings') && !event.url.includes('/screenings/'))),
+        filter((event: any) => {
+          const url = event.url || '';
+          return (url === '/screenings' || url.startsWith('/screenings?')) && !url.includes('/screenings/');
+        }),
         takeUntil(this.destroy$)
       )
       .subscribe(() => {
@@ -62,9 +70,12 @@ export class ScreeningListComponent implements OnInit, OnDestroy {
           isFirstNavigation = false;
           return;
         }
-        // Clear cache and reload when navigating to this route
-        this.api.clearCache();
-        this.loadScreenings();
+        // Only reload if no refresh query param (to avoid double load)
+        const hasRefresh = this.route.snapshot.queryParams['refresh'] === 'true';
+        if (!hasRefresh) {
+          this.api.clearCache();
+          this.loadScreenings();
+        }
       });
   }
 
@@ -128,25 +139,21 @@ export class ScreeningListComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
-            // Use setTimeout to defer change detection
-            setTimeout(() => {
-              this.success = 'Proiecția a fost ștearsă cu succes!';
-              this.cdr.detectChanges();
-              
-              // Clear after 3 seconds
-              setTimeout(() => {
-                this.success = null;
-                this.cdr.detectChanges();
-              }, 3000);
-            }, 0);
-            
-            // Clear cache
+            // Clear cache immediately
             this.api.clearCache();
             
-            // Reload screenings to ensure consistency (but don't do it immediately to avoid double load)
+            // Show success message
+            this.success = 'Proiecția a fost ștearsă cu succes!';
+            this.cdr.detectChanges();
+            
+            // Reload screenings to ensure consistency
+            this.loadScreenings();
+            
+            // Clear success message after 3 seconds
             setTimeout(() => {
-              this.loadScreenings();
-            }, 500);
+              this.success = null;
+              this.cdr.detectChanges();
+            }, 3000);
           },
           error: (err) => {
             // Restore original screenings on error
@@ -177,40 +184,38 @@ export class ScreeningListComponent implements OnInit, OnDestroy {
   }
 
   onScreeningFormSubmit(screeningData: any) {
-    const operation = this.editingScreening ? 
-      this.api.updateScreening(this.editingScreening.id, screeningData) :
+    // Store editing state before making the request
+    const isEditing = !!this.editingScreening;
+    // Use ID from editingScreening or from screeningData (form might send it)
+    const screeningId = this.editingScreening?.id || screeningData?.id;
+    
+    const operation = isEditing && screeningId ? 
+      this.api.updateScreening(screeningId, screeningData) :
       this.api.createScreening(screeningData);
 
     operation
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.success = this.editingScreening ? 
+          this.success = isEditing ? 
             'Proiecția a fost actualizată cu succes!' : 
             'Proiecția a fost adăugată cu succes!';
           this.showScreeningForm = false;
-          this.editingScreening = null;
+          
+          // Clear cache before reloading to ensure fresh data
+          this.api.clearCache();
+          
           // Reload screenings
           this.loading = true;
-          this.api.getAllScreenings()
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-              next: (data: any) => {
-                this.screenings = data.map((s: any) => ({
-                  ...s,
-                  startTime: s.startTime || s.start_time,
-                  roomNumber: s.roomNumber || s.room_number
-                }));
-                this.loading = false;
-              },
-              error: () => {
-                this.loading = false;
-              }
-            });
+          this.loadScreenings();
+          
+          // Reset editing state after successful operation
+          this.editingScreening = null;
+          
           setTimeout(() => this.success = null, 3000);
         },
         error: (err) => {
-          this.error = this.editingScreening ? 
+          this.error = isEditing ? 
             'Nu am putut actualiza proiecția. Te rugăm să încerci din nou.' :
             'Nu am putut adăuga proiecția. Te rugăm să încerci din nou.';
           setTimeout(() => this.error = null, 3000);

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -63,9 +63,6 @@ export class ReservationPage implements OnInit, OnDestroy {
   isExistingReservation = false;
   qrCodeDataUrl: string | null = null;
   private destroy$ = new Subject<void>();
-  private cdr = inject(ChangeDetectorRef);
-  private logger = inject(LoggerService);
-  private notificationService = inject(NotificationService);
   private lastScreeningId: string | null = null;
   private lastReservationId: string | null = null;
 
@@ -77,7 +74,10 @@ export class ReservationPage implements OnInit, OnDestroy {
     private authService: AuthService,
     private getScreeningById: GetScreeningByIdService,
     private getReservationById: GetReservationByIdService,
-    private reservationApi: ReservationApiService
+    private reservationApi: ReservationApiService,
+    private cdr: ChangeDetectorRef,
+    private logger: LoggerService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit() {
@@ -332,24 +332,37 @@ export class ReservationPage implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
+          // Backend now creates reservation with CONFIRMED status (payment is simulated)
           this.reservation = res;
-          this.isCreatingReservation = false;
-          this.success = 'Rezervarea a fost creată cu succes! Plata a fost procesată. Biletele au fost generate automat.';
           
-          // Clear selected seats
-          this.selectedSeats = [];
-          this.showPaymentForm = false;
-          this.paymentData = {
-            cardNumber: '',
-            cardHolder: '',
-            expiry: '',
-            cvv: ''
-          };
-          
-          // Redirect to reservations page after 3 seconds (don't reload seats)
+          // Use setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
           setTimeout(() => {
-            this.router.navigate(['/reservations']);
-          }, 3000);
+            this.isCreatingReservation = false;
+            this.success = 'Rezervarea a fost creată cu succes! Plata a fost procesată. Biletele au fost generate automat.';
+            
+            // Clear cache for user reservations to force refresh on next load
+            this.reservationApi.clearUserReservationsCache(userId);
+            
+            // Don't clear selected seats yet - keep them visible in summary until redirect
+            // They will be cleared when navigating away
+            this.showPaymentForm = false;
+            this.paymentData = {
+              cardNumber: '',
+              cardHolder: '',
+              expiry: '',
+              cvv: ''
+            };
+            
+            // Force change detection
+            this.cdr.detectChanges();
+            
+            // Redirect to reservations page after 3 seconds with refresh flag
+            setTimeout(() => {
+              // Clear selected seats only when redirecting
+              this.selectedSeats = [];
+              this.router.navigate(['/reservations'], { queryParams: { refresh: 'true' } });
+            }, 3000);
+          }, 0);
         },
         error: (err) => {
           this.logger.error('Error creating reservation:', err);
@@ -373,6 +386,40 @@ export class ReservationPage implements OnInit, OnDestroy {
     };
     this.error = null;
     this.success = null;
+  }
+
+  getReservationStatusText(): string {
+    if (!this.reservation?.status) return 'Necunoscut';
+    
+    const status = this.reservation.status.toUpperCase();
+    switch (status) {
+      case 'CONFIRMED':
+      case 'CREATED': // Treat CREATED as paid since payment is simulated
+        return 'Paid';
+      case 'PENDING':
+        return 'Pending';
+      case 'CANCELLED':
+        return 'Cancelled';
+      default:
+        return 'Paid'; // Default to Paid for any other status
+    }
+  }
+
+  getReservationStatusClass(): string {
+    if (!this.reservation?.status) return 'bg-success';
+    
+    const status = this.reservation.status.toUpperCase();
+    switch (status) {
+      case 'CONFIRMED':
+      case 'CREATED': // Treat CREATED as paid (green)
+        return 'bg-success';
+      case 'PENDING':
+        return 'bg-warning';
+      case 'CANCELLED':
+        return 'bg-danger';
+      default:
+        return 'bg-success'; // Default to green (paid) for any other status
+    }
   }
 
   generateQRCode() {

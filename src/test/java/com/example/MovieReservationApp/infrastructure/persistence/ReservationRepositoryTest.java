@@ -87,7 +87,7 @@ class ReservationRepositoryTest {
         Hall hall = new Hall();
         hall.setName("Main Hall");
         hall.setCapacity(100);
-        hall.setNumber(1000 + (int)(Math.random() * 1000)); // Unique number
+        hall.setNumber(2);
         hall = hallRepository.save(hall);
 
         // Creează și salvează screening-urile
