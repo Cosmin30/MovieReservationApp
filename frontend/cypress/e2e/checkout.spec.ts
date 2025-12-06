@@ -55,11 +55,12 @@ describe("Checkout & Payment", () => {
     });
   });
 
-  it("handles payment failure and allows retry", function() {
-    let attemptCount = 0;
-    cy.intercept("POST", "/payments*", (req) => {
-      attemptCount += 1;
-      if (attemptCount === 1) {
+  it("handles payment failure and allows retry", () => {
+    const tracker = { attempt: 0 };
+    
+    cy.intercept("POST", "/payments*", (req: any) => {
+      tracker.attempt = tracker.attempt + 1;
+      if (tracker.attempt === 1) {
         req.reply({ statusCode: 402, body: { message: "Payment declined" } });
       } else {
         req.reply({ statusCode: 200, body: { id: "p2", status: "OK" } });
@@ -74,7 +75,7 @@ describe("Checkout & Payment", () => {
     cy.get("button").contains("Finalizează").click({ force: true });
 
     cy.wait("@paymentRetry");
-    cy.get("body").then($body => {
+    cy.get("body").then(($body) => {
       expect($body.text()).to.match(/declined|rejected|failed/i);
     });
   });
@@ -98,9 +99,7 @@ describe("Checkout & Payment", () => {
 
   it("shows loading spinner during payment processing", () => {
     cy.intercept("POST", "/payments*", (req) => {
-      req.reply(res => {
-        res.delay(2000);
-      });
+      req.reply({ delayMs: 2000 });
     }).as("paymentDelayed");
 
     cy.visit("http://localhost:4200/checkout");

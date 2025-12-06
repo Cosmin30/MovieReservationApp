@@ -62,8 +62,8 @@ describe("Seats selection", () => {
     });
   });
 
-  it("shows error when seat becomes unavailable", function() {
-    cy.intercept("POST", "/reservations*", (req) => {
+  it("shows error when seat becomes unavailable", () => {
+    cy.intercept("POST", "/reservations*", (req: any) => {
       req.reply({ statusCode: 409, body: { message: "Seat no longer available" } });
     }).as("conflictRes");
 
@@ -73,16 +73,16 @@ describe("Seats selection", () => {
     cy.get("button").contains(/Continuă|Continue/i).click({ force: true });
 
     cy.wait("@conflictRes");
-    cy.get("body").then($body => {
+    cy.get("body").then(($body) => {
       expect($body.text()).to.match(/longer available|nu mai e disponibil/i);
     });
   });
 
   it("handles loading state while fetching seats", () => {
     cy.intercept("GET", "/seats/screening/*", (req) => {
-      req.reply(res => {
-        res.delay(2000);
-      });
+      setTimeout(() => {
+        req.reply({ fixture: "seats.json" });
+      }, 2000);
     }).as("getSeatsDelayed");
 
     cy.visit("http://localhost:4200/screenings/1");
