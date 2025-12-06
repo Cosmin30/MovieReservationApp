@@ -4,69 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="fixed tests">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/core/auth/auth-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/core/auth/auth-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/core/guards/admin-guard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/core/guards/admin-guard.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/core/guards/guest-guard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/core/guards/guest-guard.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/core/interceptors/auth-interceptor.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/core/interceptors/auth-interceptor.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/core/services/api-base-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/core/services/api-base-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/core/services/error-handler-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/core/services/error-handler-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/halls/application/use-cases/get-all-halls-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/halls/application/use-cases/get-all-halls-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/halls/application/use-cases/get-hall-by-id-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/halls/application/use-cases/get-hall-by-id-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/halls/infrastructure/adapters/hall-api-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/halls/infrastructure/adapters/hall-api-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/halls/infrastructure/adapters/hall-mapper.mapper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/halls/infrastructure/adapters/hall-mapper.mapper.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/halls/infrastructure/dtos/seat.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/halls/infrastructure/dtos/seat.dto.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/halls/presentation/components/hall-layout/hall-layout.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/halls/presentation/components/hall-layout/hall-layout.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/halls/presentation/components/halls-list/halls-list.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/halls/presentation/components/halls-list/halls-list.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/movies/application/use-cases/filter-movies-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/movies/application/use-cases/filter-movies-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/movies/application/use-cases/get-all-movies-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/movies/application/use-cases/get-all-movies-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/movies/application/use-cases/get-movie-by-id-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/movies/application/use-cases/get-movie-by-id-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/movies/application/use-cases/search-movies-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/movies/application/use-cases/search-movies-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/movies/infrastructure/adapters/movie-api-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/movies/infrastructure/adapters/movie-api-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/movies/infrastructure/adapters/movie-mapper.mapper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/movies/infrastructure/adapters/movie-mapper.mapper.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/components/movie-filters/movie-filters.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/components/movie-filters/movie-filters.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/components/movie-form/movie-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/components/movie-form/movie-form.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/pages/movie-details-page/movie-details-page.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/pages/movie-details-page/movie-details-page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/pages/movie-details-page/movie-details-page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/pages/movie-details-page/movie-details-page.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/pages/movies-list-page/movies-list-page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/movies/presentation/pages/movies-list-page/movies-list-page.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/payments/infrastructure/adapters/payment-api-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/payments/infrastructure/adapters/payment-api-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/payments/presentation/pages/payment-page/payment-page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/payments/presentation/pages/payment-page/payment-page.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/application/use-cases/create-reservation-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/application/use-cases/create-reservation-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/application/use-cases/get-available-seats-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/application/use-cases/get-available-seats-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/application/use-cases/get-reservation-by-id-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/application/use-cases/get-reservation-by-id-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/application/use-cases/get-user-reservations-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/application/use-cases/get-user-reservations-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/infrastructure/adapters/reservation-api-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/infrastructure/adapters/reservation-api-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/infrastructure/adapters/reservation-mapper.mapper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/infrastructure/adapters/reservation-mapper.mapper.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/components/reservation-card/reservation-card.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/components/reservation-card/reservation-card.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/pages/my-reservations-page/my-reservations-page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/pages/my-reservations-page/my-reservations-page.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/pages/reservation-page/reservation-page.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/pages/reservation-page/reservation-page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/pages/reservation-page/reservation-page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/pages/reservation-page/reservation-page.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/screenings/application/use-cases/get-screening-by-id-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/screenings/application/use-cases/get-screening-by-id-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/screenings/infrastructure/adapters/screening-api-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/screenings/infrastructure/adapters/screening-api-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/screenings/infrastructure/adapters/screening-mapper.mapper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/screenings/infrastructure/adapters/screening-mapper.mapper.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/screenings/infrastructure/dtos/screening.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/screenings/infrastructure/dtos/screening.dto.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-card/screening-card.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-card/screening-card.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-list/screening-list.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-list/screening-list.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/tickets/infrastructure/adapters/ticket-api-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/tickets/infrastructure/adapters/ticket-api-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/application/use-cases/login-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/application/use-cases/login-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/application/use-cases/register-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/application/use-cases/register-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/infrastructure/adapters/auth-api-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/infrastructure/adapters/auth-api-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/infrastructure/adapters/user-api-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/infrastructure/adapters/user-api-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/infrastructure/adapters/user-mapper.mapper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/infrastructure/adapters/user-mapper.mapper.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/infrastructure/dtos/user.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/infrastructure/dtos/user.dto.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/components/login-form/login-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/components/login-form/login-form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/components/login-form/login-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/components/login-form/login-form.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/components/register-form/register-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/components/register-form/register-form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/components/register-form/register-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/components/register-form/register-form.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/pages/login-page/login-page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/pages/login-page/login-page.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/pages/profile-page/profile-page.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/pages/profile-page/profile-page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/pages/profile-page/profile-page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/pages/profile-page/profile-page.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/pages/register-page/register-page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/pages/register-page/register-page.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/shared/components/notification/notification.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/shared/components/notification/notification.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/shared/components/notification/notification.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/shared/components/notification/notification.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/shared/services/loading-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/shared/services/loading-service.ts" afterDir="false" />
-    </list>
+    <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment="fixed tests" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -81,7 +19,6 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -116,49 +53,52 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.MovieReservationAppApplication.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.AuditServiceTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ComputationServiceTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.HallControllerIntegrationTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.HallControllerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.HallRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.MovieControllerIntegrationTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.MovieControllerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.MovieRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.MovieReservationAppApplicationTests.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.PaymentControllerIntegrationTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.PaymentControllerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.PaymentRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ReservationControllerIntegrationTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ReservationControllerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ReservationRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ScreeningControllerIntegrationTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ScreeningControllerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ScreeningRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.SeatControllerIntegrationTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.SeatControllerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.SeatRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.TicketControllerIntegrationTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.TicketControllerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.TicketRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserControllerIntegrationTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserControllerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ValidationServiceTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.WorkflowServiceTest.executor&quot;: &quot;Run&quot;,
-    &quot;Maven.MovieReservationApp [deploy].executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/denis/Desktop/MovieReservationApp&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.MovieReservationAppApplication.executor": "Run",
+    "JUnit.AuditServiceTest.executor": "Run",
+    "JUnit.ComputationServiceTest.executor": "Run",
+    "JUnit.HallControllerIntegrationTest.executor": "Run",
+    "JUnit.HallControllerTest.executor": "Run",
+    "JUnit.HallRepositoryTest.executor": "Run",
+    "JUnit.MovieControllerIntegrationTest.executor": "Run",
+    "JUnit.MovieControllerTest.executor": "Run",
+    "JUnit.MovieRepositoryTest.executor": "Run",
+    "JUnit.MovieReservationAppApplicationTests.executor": "Run",
+    "JUnit.PaymentControllerIntegrationTest.executor": "Run",
+    "JUnit.PaymentControllerTest.executor": "Run",
+    "JUnit.PaymentRepositoryTest.executor": "Run",
+    "JUnit.ReservationControllerIntegrationTest.executor": "Run",
+    "JUnit.ReservationControllerTest.executor": "Run",
+    "JUnit.ReservationRepositoryTest.executor": "Run",
+    "JUnit.ScreeningControllerIntegrationTest.executor": "Run",
+    "JUnit.ScreeningControllerTest.executor": "Run",
+    "JUnit.ScreeningRepositoryTest.executor": "Run",
+    "JUnit.SeatControllerIntegrationTest.executor": "Run",
+    "JUnit.SeatControllerTest.executor": "Run",
+    "JUnit.SeatRepositoryTest.executor": "Run",
+    "JUnit.TicketControllerIntegrationTest.executor": "Run",
+    "JUnit.TicketControllerTest.executor": "Run",
+    "JUnit.TicketRepositoryTest.executor": "Run",
+    "JUnit.UserControllerIntegrationTest.executor": "Run",
+    "JUnit.UserControllerTest.executor": "Run",
+    "JUnit.UserRepositoryTest.executor": "Run",
+    "JUnit.ValidationServiceTest.executor": "Run",
+    "JUnit.WorkflowServiceTest.executor": "Run",
+    "Maven.MovieReservationApp [deploy].executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/denis/Desktop/MovieReservationApp",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="com.example.MovieReservationApp.api" />
