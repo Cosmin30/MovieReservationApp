@@ -1,29 +1,30 @@
-// admin.guard.ts
 import { inject } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '../auth/auth-service';
+import { LoggerService } from '../services/logger.service';
 
 export const adminGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
+  const logger = inject(LoggerService);
   
-  console.log('🛡️ AdminGuard - Checking...', {
+  logger.debug('AdminGuard - Checking...', {
     authenticated: authService.isAuthenticated(),
     role: authService.getRole()
   });
   
   if (!authService.isAuthenticated()) {
-    console.log('❌ AdminGuard - Not authenticated');
+    logger.debug('AdminGuard - Not authenticated');
     return router.createUrlTree(['/login']);
   }
   
   const role = authService.getRole();
   
   if (role === 'ADMIN') {
-    console.log('✅ AdminGuard - Admin access granted');
+    logger.debug('AdminGuard - Admin access granted');
     return true;
   }
   
-  console.log('❌ AdminGuard - Not admin, redirecting');
-  return router.createUrlTree(['/movies']); // ✅ Schimbat de la /home la /movies
+  logger.debug('AdminGuard - Not admin, redirecting');
+  return router.createUrlTree(['/movies']);
 };

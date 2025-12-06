@@ -1,36 +1,37 @@
 import { Component, EventEmitter, Output, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MovieModel } from '../../../domain/models/movie.model';
+
 @Component({
   selector: 'app-movie-filters',
   templateUrl: './movie-filters.html',
   styleUrls: ['./movie-filters.css'],
-  standalone:true, 
+  standalone: true, 
   imports: [
     CommonModule   
   ]
 })
 export class MovieFiltersComponent implements OnInit, OnChanges {
-
-  @Input() movies: any[] = []; // Filtered movies (for display)
-  @Input() allMovies: any[] = []; // All movies from database (for genre extraction)
+  @Input() movies: MovieModel[] = []; // Filtered movies (for display)
+  @Input() allMovies: MovieModel[] = []; // All movies from database (for genre extraction)
   genres: string[] = [];
   selectedGenres: Set<string> = new Set<string>();
 
   @Output() onFilter = new EventEmitter<string>();
   @Output() onGenreFilter = new EventEmitter<string[]>();
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.updateGenres();
   }
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
     // Only update genres when allMovies changes, not when filtered movies change
     if (changes['allMovies']) {
       this.updateGenres();
     }
   }
 
-  private updateGenres() {
+  private updateGenres(): void {
     // Extract unique genres from ALL movies in database (not filtered ones)
     // This ensures all genres remain available even after filtering
     const uniqueGenres = new Set<string>();
@@ -50,17 +51,14 @@ export class MovieFiltersComponent implements OnInit, OnChanges {
     
     // Sort genres alphabetically
     this.genres = Array.from(uniqueGenres).sort();
-    
-    console.log('🎬 [MOVIE FILTERS] Extracted genres from database:', this.genres);
-    console.log('🎬 [MOVIE FILTERS] Total movies:', moviesToUse?.length || 0);
   }
 
-  filter(event: Event) {
+  filter(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.onFilter.emit(value);
   }
 
-  toggleGenre(genre: string, event: Event) {
+  toggleGenre(genre: string, event: Event): void {
     const isChecked = (event.target as HTMLInputElement).checked;
     
     if (isChecked) {
@@ -72,14 +70,10 @@ export class MovieFiltersComponent implements OnInit, OnChanges {
     // Emit array of selected genres
     const selectedGenresArray = Array.from(this.selectedGenres);
     this.onGenreFilter.emit(selectedGenresArray);
-    
-    console.log('🎬 [MOVIE FILTERS] Selected genres:', selectedGenresArray);
   }
 
-  clearGenreFilters() {
+  clearGenreFilters(): void {
     this.selectedGenres.clear();
     this.onGenreFilter.emit([]);
-    console.log('🎬 [MOVIE FILTERS] Cleared genre filters');
   }
-
 }

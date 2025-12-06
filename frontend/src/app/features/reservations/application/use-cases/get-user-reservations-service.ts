@@ -1,23 +1,23 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, map } from 'rxjs/operators';
 import { ReservationApiService } from '../../infrastructure/adapters/reservation-api-service';
 import { ReservationState } from '../state/reservation-state.state';
+import { ReservationMapper } from '../../infrastructure/adapters/reservation-mapper.mapper';
+import { ReservationModel } from '../../domain/models/reservation.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GetUserReservationsService {
+  private api = inject(ReservationApiService);
+  private state = inject(ReservationState);
 
-  constructor(
-    private api: ReservationApiService,
-    private state: ReservationState
-  ) {}
-
-  execute(userId: string): Observable<any[]> {
+  execute(userId: string): Observable<ReservationModel[]> {
     return this.api.getReservationsByUser(userId).pipe(
-      tap(res => {
-        this.state.setReservations(res);
+      map(dtos => dtos.map(dto => ReservationMapper.fromDto(dto))),
+      tap(reservations => {
+        this.state.setReservations(reservations);
       })
     );
   }

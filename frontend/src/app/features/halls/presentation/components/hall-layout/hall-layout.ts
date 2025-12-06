@@ -69,8 +69,8 @@ export class HallLayoutComponent implements OnInit, OnDestroy {
           // Force change detection
           this.cdr.detectChanges();
         },
-        error: (err: any) => {
-          console.error('Error loading hall:', err);
+        error: (err) => {
+          // Error is already handled by errorInterceptor and ErrorHandlerService
           this.error = 'Nu am putut încărca detaliile salii. Vă rugăm încercați din nou.';
           this.isLoading = false;
           this.cdr.detectChanges();

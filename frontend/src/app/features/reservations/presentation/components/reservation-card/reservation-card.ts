@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { ReservationModel } from '../../../domain/models/reservation.model';
 
 @Component({
   selector: 'app-reservation-card',
@@ -10,5 +11,5 @@ import { RouterModule } from '@angular/router';
   imports: [CommonModule, RouterModule]
 })
 export class ReservationCardComponent {
-  @Input() reservation: any;
+  @Input() reservation!: ReservationModel;
 }

@@ -9,6 +9,10 @@ import { GetAllMoviesService } from '../../../application/use-cases/get-all-movi
 import { FilterMoviesService } from '../../../application/use-cases/filter-movies-service';
 import { MovieApiService } from '../../../infrastructure/adapters/movie-api-service';
 import { AuthService } from '../../../../../core/auth/auth-service';
+import { MovieModel } from '../../../domain/models/movie.model';
+import { MovieDTO } from '../../../infrastructure/dtos/movie.dto';
+import { LoggerService } from '../../../../../core/services/logger.service';
+import { NotificationService } from '../../../../../shared/services/notification.service';
 
 import { MovieGridComponent } from '../../components/movie-grid/movie-grid';
 import { MovieSearchComponent } from '../../components/movie-search/movie-search';
@@ -31,17 +35,19 @@ import { CacheService } from '../../../../../core/services/cache-service';
 })
 export class MoviesListPage implements OnInit, OnDestroy {
 
-  movies: any[] = []; // Filtered movies (for display)
-  allMovies: any[] = []; // All movies from database (for genre extraction)
+  movies: MovieModel[] = []; // Filtered movies (for display)
+  allMovies: MovieModel[] = []; // All movies from database (for genre extraction)
   error: string | null = null;
   success: string | null = null;
   showMovieForm = false;
-  editingMovie: any = null;
+  editingMovie: MovieModel | null = null;
   private destroy$ = new Subject<void>();
   authService = inject(AuthService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private cacheService = inject(CacheService);
+  private logger = inject(LoggerService);
+  private notificationService = inject(NotificationService);
 
   constructor(
     private state: MoviesState,
@@ -57,23 +63,9 @@ export class MoviesListPage implements OnInit, OnDestroy {
     
     this.state.movies$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(m => {
-        // Normalize snake_case to camelCase for all movies
-        // Backend may send release_date (snake_case), so we normalize it
-        const normalizedMovies = m.map((movie: any) => {
-          const normalized: any = { ...movie };
-          // Handle both release_date (from backend) and releaseDate (normalized)
-          // Prioritize release_date from backend, but keep both for compatibility
-          const releaseDate = normalized.release_date || normalized.releaseDate;
-          if (releaseDate) {
-            normalized.releaseDate = releaseDate;
-            normalized.release_date = releaseDate; // Keep both
-          }
-          return normalized;
-        });
-        
-        // Update filtered movies (what's displayed)
-        this.movies = normalizedMovies;
+      .subscribe(movies => {
+        // Movies are already normalized by mapper, no need for manual normalization
+        this.movies = movies;
         
         // Set allMovies from filterService originalMovies (all movies from database)
         // This ensures genres are always extracted from all movies, not filtered ones
@@ -82,10 +74,9 @@ export class MoviesListPage implements OnInit, OnDestroy {
           this.allMovies = originalMovies;
         } else {
           // First load - set allMovies to current movies and store in filterService
-          this.allMovies = [...normalizedMovies];
-          this.filterService.setOriginalMovies(normalizedMovies);
+          this.allMovies = [...movies];
+          this.filterService.setOriginalMovies(movies);
         }
-        // Force change detection
         this.cdr.detectChanges();
       });
     
@@ -97,8 +88,9 @@ export class MoviesListPage implements OnInit, OnDestroy {
           // Data loaded successfully
         },
         error: (err) => {
-          console.error('Error loading movies:', err);
+          this.logger.error('Error loading movies:', err);
           this.error = 'Nu am putut încărca filmele. Te rugăm să reîncerci.';
+          this.notificationService.error('Nu am putut încărca filmele. Te rugăm să reîncerci.');
         }
       });
 
@@ -107,7 +99,7 @@ export class MoviesListPage implements OnInit, OnDestroy {
     this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),
-        filter((event: any) => event.url === '/movies' || (event.url.includes('/movies') && !event.url.includes('/movies/'))),
+        filter((event: NavigationEnd) => event.url === '/movies' || (event.url.includes('/movies') && !event.url.includes('/movies/'))),
         takeUntil(this.destroy$)
       )
       .subscribe(() => {
@@ -125,8 +117,9 @@ export class MoviesListPage implements OnInit, OnDestroy {
               // Data reloaded successfully
             },
             error: (err) => {
-              console.error('Error reloading movies:', err);
+              this.logger.error('Error reloading movies:', err);
               this.error = 'Nu am putut reîncărca filmele. Te rugăm să reîncerci.';
+              this.notificationService.error('Nu am putut reîncărca filmele. Te rugăm să reîncerci.');
             }
           });
       });
@@ -137,25 +130,35 @@ export class MoviesListPage implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  search(query: string) {
+  search(query: string): void {
     this.filterService.execute(query);
   }
 
-  filter(query: string) {
+  filter(query: string): void {
     this.filterService.execute(query);
   }
 
-  filterGenre(genres: string[]) {
+  filterGenre(genres: string[]): void {
     this.filterService.filterByGenres(genres);
   }
 
-  onDeleteMovie(movieId: string) {
+  onDeleteMovie(movieId: string): void {
     if (confirm('Ești sigur că vrei să ștergi acest film?')) {
       this.movieApi.deleteMovie(movieId)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
-            this.success = 'Filmul a fost șters cu succes!';
+            // Use setTimeout to defer change detection
+            setTimeout(() => {
+              this.success = 'Filmul a fost șters cu succes!';
+              this.cdr.detectChanges();
+              
+              // Clear after 3 seconds
+              setTimeout(() => {
+                this.success = null;
+                this.cdr.detectChanges();
+              }, 3000);
+            }, 0);
             
             // Clear all related caches (movies and screenings)
             this.movieApi.clearCache();
@@ -165,7 +168,6 @@ export class MoviesListPage implements OnInit, OnDestroy {
             // Remove movie from local array immediately for better UX
             this.movies = this.movies.filter(m => m.id !== movieId);
             this.filterService.setOriginalMovies(this.movies);
-            this.cdr.detectChanges();
             
             // Then reload movies to ensure consistency
             this.getAllMovies.execute()
@@ -176,53 +178,36 @@ export class MoviesListPage implements OnInit, OnDestroy {
                   this.cdr.detectChanges();
                 },
                 error: (err) => {
-                  console.error('Error reloading movies after delete:', err);
+                  this.logger.error('Error reloading movies after delete:', err);
                 }
               });
             
-            setTimeout(() => this.success = null, 3000);
+            this.notificationService.success('Filmul a fost șters cu succes!');
           },
           error: (err) => {
+            this.logger.error('Error deleting movie:', err);
             this.error = 'Nu am putut șterge filmul. Te rugăm să încerci din nou.';
+            this.notificationService.error('Nu am putut șterge filmul. Te rugăm să încerci din nou.');
             setTimeout(() => this.error = null, 3000);
           }
         });
     }
   }
 
-  onAddMovie() {
+  onAddMovie(): void {
     this.editingMovie = null;
     this.showMovieForm = true;
   }
 
-  onEditMovie(movieId: string) {
+  onEditMovie(movieId: string): void {
     const movie = this.movies.find(m => m.id === movieId);
     if (movie) {
-      // Normalize snake_case to camelCase for releaseDate
-      const movieData = movie as any;
-      console.log('🔍 [MOVIES LIST] Original movie data:', movieData);
-      console.log('🔍 [MOVIES LIST] release_date:', movieData.release_date);
-      console.log('🔍 [MOVIES LIST] releaseDate:', movieData.releaseDate);
-      
-      // Get releaseDate from either snake_case or camelCase, prioritize snake_case (from backend)
-      const releaseDate = movieData.release_date || movieData.releaseDate;
-      
-      const normalizedMovie: any = {
-        ...movieData,
-        releaseDate: releaseDate,
-        release_date: releaseDate // Keep both for compatibility
-      };
-      
-      console.log('🔍 [MOVIES LIST] Normalized movie:', normalizedMovie);
-      console.log('🔍 [MOVIES LIST] Final releaseDate:', normalizedMovie.releaseDate);
-      console.log('🔍 [MOVIES LIST] Final release_date:', normalizedMovie.release_date);
-      
-      this.editingMovie = normalizedMovie;
+      this.editingMovie = movie;
       this.showMovieForm = true;
     }
   }
 
-  onMovieFormSubmit(movieData: any) {
+  onMovieFormSubmit(movieData: MovieDTO): void {
     const operation = this.editingMovie ? 
       this.movieApi.updateMovie(this.editingMovie.id, movieData) :
       this.movieApi.createMovie(movieData);
@@ -231,9 +216,23 @@ export class MoviesListPage implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.success = this.editingMovie ? 
+          const message = this.editingMovie ? 
             'Filmul a fost actualizat cu succes!' : 
             'Filmul a fost adăugat cu succes!';
+          
+          // Use setTimeout to defer change detection
+          setTimeout(() => {
+            this.success = message;
+            this.cdr.detectChanges();
+            
+            // Clear after 3 seconds
+            setTimeout(() => {
+              this.success = null;
+              this.cdr.detectChanges();
+            }, 3000);
+          }, 0);
+          
+          this.notificationService.success(message);
           this.showMovieForm = false;
           this.editingMovie = null;
           // Clear cache and reload movies
@@ -241,18 +240,20 @@ export class MoviesListPage implements OnInit, OnDestroy {
           this.getAllMovies.execute()
             .pipe(takeUntil(this.destroy$))
             .subscribe();
-          setTimeout(() => this.success = null, 3000);
         },
         error: (err) => {
-          this.error = this.editingMovie ? 
+          this.logger.error('Error saving movie:', err);
+          const errorMessage = this.editingMovie ? 
             'Nu am putut actualiza filmul. Te rugăm să încerci din nou.' :
             'Nu am putut adăuga filmul. Te rugăm să încerci din nou.';
+          this.error = errorMessage;
+          this.notificationService.error(errorMessage);
           setTimeout(() => this.error = null, 3000);
         }
       });
   }
 
-  onMovieFormCancel() {
+  onMovieFormCancel(): void {
     this.showMovieForm = false;
     this.editingMovie = null;
   }

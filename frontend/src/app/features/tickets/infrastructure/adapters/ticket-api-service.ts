@@ -1,45 +1,46 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../../../environments/environment';
+import { TicketDTO } from '../dtos/ticket.dto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TicketApiService {
+  private http = inject(HttpClient);
+  private baseUrl = `${environment.apiUrl}/tickets`;
 
-  private baseUrl = 'http://localhost:8080/api/tickets';
-
-  constructor(private http: HttpClient) {}
-
-  getAllTickets() {
-    return this.http.get<any[]>(this.baseUrl);
+  getAllTickets(): Observable<TicketDTO[]> {
+    return this.http.get<TicketDTO[]>(this.baseUrl);
   }
 
-  getTicketById(id: string) {
-    return this.http.get<any>(`${this.baseUrl}/${id}`);
+  getTicketById(id: string): Observable<TicketDTO> {
+    return this.http.get<TicketDTO>(`${this.baseUrl}/${encodeURIComponent(id)}`);
   }
 
-  getTicketsByReservation(reservationId: string) {
-    return this.http.get<any[]>(`${this.baseUrl}/reservation/${reservationId}`);
+  getTicketsByReservation(reservationId: string): Observable<TicketDTO[]> {
+    return this.http.get<TicketDTO[]>(`${this.baseUrl}/reservation/${encodeURIComponent(reservationId)}`);
   }
 
-  createTicket(dto: any) {
-    return this.http.post(this.baseUrl, dto);
+  createTicket(dto: TicketDTO): Observable<TicketDTO> {
+    return this.http.post<TicketDTO>(this.baseUrl, dto);
   }
 
-  updateTicket(id: string, dto: any) {
-    return this.http.put(`${this.baseUrl}/${id}`, dto);
+  updateTicket(id: string, dto: TicketDTO): Observable<TicketDTO> {
+    return this.http.put<TicketDTO>(`${this.baseUrl}/${encodeURIComponent(id)}`, dto);
   }
 
-  patchTicket(id: string, dto: any) {
-    return this.http.patch(`${this.baseUrl}/${id}`, dto);
+  patchTicket(id: string, dto: Partial<TicketDTO>): Observable<TicketDTO> {
+    return this.http.patch<TicketDTO>(`${this.baseUrl}/${encodeURIComponent(id)}`, dto);
   }
 
-  deleteTicket(id: string) {
-    return this.http.delete(`${this.baseUrl}/${id}`);
+  deleteTicket(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${encodeURIComponent(id)}`);
   }
 
-  downloadTicket(id: string) {
-    return this.http.get(`${this.baseUrl}/${id}/download`, {
+  downloadTicket(id: string): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/${encodeURIComponent(id)}/download`, {
       responseType: 'blob'
     });
   }

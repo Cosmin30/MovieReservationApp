@@ -1,7 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../../../../core/auth/auth-service';
+import { UserModel } from '../../../domain/models/user.model';
 
 @Component({
   selector: 'app-profile-page',
@@ -10,19 +13,21 @@ import { AuthService } from '../../../../../core/auth/auth-service';
   standalone: true,
   imports: [CommonModule, RouterLink]
 })
-export class ProfilePage implements OnInit {
+export class ProfilePage implements OnInit, OnDestroy {
   authService = inject(AuthService);
-  profile: any = null;
+  profile: UserModel | null = null;
+  private destroy$ = new Subject<void>();
 
-  ngOnInit() {
-    this.authService.currentUser$.subscribe(user => {
-      if (user) {
-        // Normalize createdAt - handle both snake_case and camelCase, and null values
-        this.profile = {
-          ...user,
-          createdAt: user.createdAt || (user as any).created_at || null
-        };
-      }
-    });
+  ngOnInit(): void {
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        this.profile = user;
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

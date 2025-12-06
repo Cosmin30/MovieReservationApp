@@ -1,9 +1,11 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { RegisterFormComponent } from '../../components/register-form/register-form';
+import { RegisterFormComponent, RegisterFormData } from '../../components/register-form/register-form';
 import { RegisterService } from '../../../application/use-cases/register-service';
+import { NotificationService } from '../../../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-register-page',
@@ -11,28 +13,29 @@ import { RegisterService } from '../../../application/use-cases/register-service
   standalone: true,
   imports: [CommonModule, RegisterFormComponent]
 })
-export class RegisterPage implements OnInit, OnDestroy {
+export class RegisterPage implements OnDestroy {
+  private registerService = inject(RegisterService);
+  private notificationService = inject(NotificationService);
+  private router = inject(Router);
   private destroy$ = new Subject<void>();
 
-  constructor(private registerService: RegisterService) {}
-
-  ngOnInit() {}
-
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  register(form: any) {
+  register(form: RegisterFormData): void {
     this.registerService.execute(form)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          alert("Cont creat cu succes!");
-          window.location.href = '/login';
+          this.notificationService.success('Cont creat cu succes!');
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 1500);
         },
         error: () => {
-          alert("A apărut o eroare la înregistrare.");
+          this.notificationService.error('A apărut o eroare la înregistrare. Te rugăm să încerci din nou.');
         }
       });
   }

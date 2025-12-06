@@ -2,10 +2,15 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angula
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, map } from 'rxjs/operators';
 import { GetMovieByIdService } from '../../../application/use-cases/get-movie-by-id-service';
 import { MovieApiService } from '../../../infrastructure/adapters/movie-api-service';
 import { ScreeningApiService } from '../../../../screenings/infrastructure/adapters/screening-api-service';
+import { MovieModel } from '../../../domain/models/movie.model';
+import { ScreeningModel } from '../../../../screenings/domain/models/screening.model';
+import { ScreeningMapper } from '../../../../screenings/infrastructure/adapters/screening-mapper.mapper';
+import { LoggerService } from '../../../../../core/services/logger.service';
+import { NotificationService } from '../../../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-movie-details-page',
@@ -15,14 +20,15 @@ import { ScreeningApiService } from '../../../../screenings/infrastructure/adapt
   styleUrls: ['./movie-details-page.css']
 })
 export class MovieDetailsPage implements OnInit, OnDestroy {
-
-  movie: any = null;
-  screenings: any[] = [];
+  movie: MovieModel | null = null;
+  screenings: ScreeningModel[] = [];
   isLoading = true;
   isLoadingScreenings = false;
   error: string | null = null;
   private destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
+  private logger = inject(LoggerService);
+  private notificationService = inject(NotificationService);
 
   constructor(
     private route: ActivatedRoute,
@@ -48,25 +54,18 @@ export class MovieDetailsPage implements OnInit, OnDestroy {
     this.getMovie.execute(id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (m: any) => {
-          // Normalize snake_case to camelCase
-          // Backend sends release_date, so prioritize that
-          const releaseDate = m.release_date || m.releaseDate;
-          this.movie = {
-            ...m,
-            releaseDate: releaseDate
-          };
-          
+        next: (movie: MovieModel) => {
+          this.movie = movie;
           this.isLoading = false;
-          // Force change detection
           this.cdr.detectChanges();
           
           // Load screenings for this movie (after movie is loaded)
           this.loadScreenings(id);
         },
-        error: (err: any) => {
-          console.error('Error loading movie:', err);
+        error: (err) => {
+          this.logger.error('Error loading movie:', err);
           this.error = 'Nu am putut încărca detaliile filmului. Te rugăm să reîncerci.';
+          this.notificationService.error('Nu am putut încărca detaliile filmului. Te rugăm să reîncerci.');
           this.isLoading = false;
           this.cdr.detectChanges();
         }
@@ -108,11 +107,10 @@ export class MovieDetailsPage implements OnInit, OnDestroy {
           // Force change detection
           this.cdr.detectChanges();
         },
-        error: (err: any) => {
-          console.error('Error loading screenings:', err);
+        error: (err) => {
+          this.logger.error('Error loading screenings:', err);
           this.screenings = [];
           this.isLoadingScreenings = false;
-          // Force change detection
           this.cdr.detectChanges();
         }
       });
@@ -179,7 +177,7 @@ export class MovieDetailsPage implements OnInit, OnDestroy {
         day: 'numeric'
       });
     } catch (error) {
-      console.error('formatDate error:', error, date);
+      this.logger.error('formatDate error:', error, date);
       return String(date);
     }
   }

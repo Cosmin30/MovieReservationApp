@@ -7,6 +7,9 @@ import { ReservationState } from '../../../application/state/reservation-state.s
 import { GetUserReservationsService } from '../../../application/use-cases/get-user-reservations-service';
 import { ReservationCardComponent } from '../../components/reservation-card/reservation-card';
 import { AuthService } from '../../../../../core/auth/auth-service';
+import { ReservationModel } from '../../../domain/models/reservation.model';
+import { LoggerService } from '../../../../../core/services/logger.service';
+import { NotificationService } from '../../../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-my-reservations-page',
@@ -20,12 +23,13 @@ import { AuthService } from '../../../../../core/auth/auth-service';
   styleUrls: ['./my-reservations-page.css']
 })
 export class MyReservationsPage implements OnInit, OnDestroy {
-
-  reservations: any[] = [];
+  reservations: ReservationModel[] = [];
   isLoading = true;
   error: string | null = null;
   private destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
+  private logger = inject(LoggerService);
+  private notificationService = inject(NotificationService);
 
   constructor(
     private state: ReservationState,
@@ -69,9 +73,10 @@ export class MyReservationsPage implements OnInit, OnDestroy {
           // Force change detection
           this.cdr.detectChanges();
         },
-        error: (err: any) => {
-          console.error('Error loading reservations:', err);
+        error: (err) => {
+          this.logger.error('Error loading reservations:', err);
           this.error = 'Nu am putut încărca rezervările.';
+          this.notificationService.error('Nu am putut încărca rezervările.');
           this.isLoading = false;
           this.cdr.detectChanges();
         }

@@ -8,6 +8,13 @@ import { AuthService } from '../../../../../core/auth/auth-service';
 import { SeatGridComponent } from '../../../../reservations/presentation/components/seat-grid/seat-grid';
 import { ScreeningApiService } from '../../../infrastructure/adapters/screening-api-service';
 import { ScreeningFormComponent } from '../screening-form/screening-form';
+import { NotificationService } from '../../../../../shared/services/notification.service';
+import { LoggerService } from '../../../../../core/services/logger.service';
+import { ScreeningModel } from '../../../domain/models/screening.model';
+import { SeatModel } from '../../../../halls/domain/models/seat.model';
+import { ScreeningDTO } from '../../../infrastructure/dtos/screening.dto';
+import { ScreeningMapper } from '../../../infrastructure/adapters/screening-mapper.mapper';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-screening-card',
@@ -17,7 +24,7 @@ import { ScreeningFormComponent } from '../screening-form/screening-form';
   styleUrls: ['./screening-card.css']
 })
 export class ScreeningCardComponent implements OnInit, OnDestroy {
-  @Input() screening: any;
+  @Input() screening: ScreeningModel | null = null;
   @Output() deleteScreening = new EventEmitter<string>();
   @Output() editScreening = new EventEmitter<string>();
   isLoading = false; // Only true if we're loading detail page
@@ -25,10 +32,12 @@ export class ScreeningCardComponent implements OnInit, OnDestroy {
   isDetailPage = false;
   authService = inject(AuthService);
   showScreeningForm = false;
-  editingScreening: any = null;
+  editingScreening: ScreeningModel | null = null;
   success: string | null = null;
   private destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
+  private notificationService = inject(NotificationService);
+  private logger = inject(LoggerService);
   private lastScreeningId: string | null = null;
 
   constructor(
@@ -67,28 +76,16 @@ export class ScreeningCardComponent implements OnInit, OnDestroy {
           takeUntil(this.destroy$)
         )
         .subscribe({
-          next: (res: any) => {
-            // Normalize snake_case to camelCase if needed
-            this.screening = {
-              ...res,
-              startTime: res.startTime || res.start_time,
-              roomNumber: res.roomNumber || res.room_number,
-              // Normalize seats if they exist
-              seats: res.seats ? res.seats.map((seat: any) => ({
-                ...seat,
-                isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true),
-                status: this.getSeatStatus(seat),
-                isSelected: false,
-                row: seat.row || String(seat.rowNumber) || '0',
-                number: seat.number || seat.seatNumber || 0
-              })) : []
-            };
+          next: (screening: ScreeningModel) => {
+            // Screening is already normalized by mapper
+            this.screening = screening;
             this.isLoading = false;
-            // Force change detection
             this.cdr.detectChanges();
           },
-          error: (err: any) => {
+          error: (err) => {
+            this.logger.error('Failed to load screening details:', err);
             this.error = 'Failed to load screening details';
+            this.notificationService.error('Nu am putut încărca detaliile proiecției.');
             this.isLoading = false;
             this.cdr.detectChanges();
           }
@@ -104,70 +101,75 @@ export class ScreeningCardComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  selectedSeats: any[] = [];
+  selectedSeats: SeatModel[] = [];
 
-  getSeatStatus(seat: any): string {
-    if (seat.status) {
-      return seat.status;
-    }
-    const isAvailable = seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : false);
-    if (isAvailable === true || isAvailable === 'true') {
-      return 'AVAILABLE';
-    }
-    return 'RESERVED';
-  }
-
-  toggleSeat(seat: any) {
+  toggleSeat(seat: SeatModel): void {
     if (seat?.status !== 'AVAILABLE') return;
     seat.isSelected = !seat.isSelected;
     this.updateSelectedSeats();
   }
 
-  updateSelectedSeats() {
-    this.selectedSeats = this.screening?.seats?.filter((s: any) => s.isSelected) || [];
+  updateSelectedSeats(): void {
+    this.selectedSeats = this.screening?.seats?.filter((s: SeatModel) => s.isSelected) || [];
   }
 
   getAvailableSeatsCount(): number {
-    if (!this.screening?.seats) return 0;
+    if (!this.screening?.seats || this.screening.seats.length === 0) return 0;
+    // Check status or isAvailable/is_available flags
     return this.screening.seats.filter((s: any) => {
-      const isAvailable = s.isAvailable !== undefined ? s.isAvailable : (s.is_available !== undefined ? s.is_available : false);
-      return isAvailable === true || isAvailable === 'true';
+      return s.status === 'AVAILABLE' || 
+             s.isAvailable === true || 
+             s.is_available === true ||
+             (s.status !== 'RESERVED' && s.status !== 'UNAVAILABLE' && (s.isAvailable !== false && s.is_available !== false));
     }).length;
   }
 
   getReservedSeatsCount(): number {
-    if (!this.screening?.seats) return 0;
+    if (!this.screening?.seats || this.screening.seats.length === 0) return 0;
+    // Check status or isAvailable/is_available flags
     return this.screening.seats.filter((s: any) => {
-      const isAvailable = s.isAvailable !== undefined ? s.isAvailable : (s.is_available !== undefined ? s.is_available : true);
-      return isAvailable === false || isAvailable === 'false';
+      return s.status === 'RESERVED' || 
+             s.isAvailable === false || 
+             s.is_available === false;
     }).length;
   }
 
-  goToReservation() {
+  goToReservation(): void {
     if (this.selectedSeats.length === 0) {
-      alert('Te rugăm să selectezi cel puțin un loc înainte de a continua.');
+      this.notificationService.warning('Te rugăm să selectezi cel puțin un loc înainte de a continua.');
       return;
     }
+    if (!this.screening?.id) return;
+    
     // Navigate to reservation page with selected seats
     const seatIds = this.selectedSeats.map(s => s.id).join(',');
-    window.location.href = `/reservations/new?screeningId=${this.screening.id}&seatIds=${seatIds}`;
+    this.router.navigate(['/reservations/new'], {
+      queryParams: {
+        screeningId: this.screening.id,
+        seatIds: seatIds
+      }
+    });
   }
 
-  onEditScreening() {
+  onEditScreening(): void {
     if (this.isDetailPage) {
       // Show form directly on detail page
       this.editingScreening = this.screening;
       this.showScreeningForm = true;
       this.cdr.detectChanges();
     } else {
-      this.editScreening.emit(this.screening.id);
+      if (this.screening?.id) {
+        this.editScreening.emit(this.screening.id);
+      }
     }
   }
 
-  onDeleteScreening() {
+  onDeleteScreening(): void {
     if (this.isDetailPage) {
       // Delete directly from detail page
       if (confirm('Ești sigur că vrei să ștergi această proiecție?')) {
+        if (!this.screening?.id) return;
+        
         this.screeningApi.deleteScreening(this.screening.id)
           .pipe(takeUntil(this.destroy$))
           .subscribe({
@@ -185,41 +187,40 @@ export class ScreeningCardComponent implements OnInit, OnDestroy {
           });
       }
     } else {
-      this.deleteScreening.emit(this.screening.id);
+      if (this.screening?.id) {
+        this.deleteScreening.emit(this.screening.id);
+      }
     }
   }
 
-  onScreeningFormSubmit(screeningData: any) {
-    const operation = this.editingScreening ? 
+  onScreeningFormSubmit(screeningData: ScreeningDTO): void {
+    if (!this.editingScreening?.id && !screeningData.id) {
+      this.logger.error('Cannot submit screening form: missing ID');
+      return;
+    }
+    
+    const operation = this.editingScreening?.id ? 
       this.screeningApi.updateScreening(this.editingScreening.id, screeningData) :
       this.screeningApi.createScreening(screeningData);
 
     operation
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        map((dto: ScreeningDTO) => ScreeningMapper.fromDto(dto)),
+        takeUntil(this.destroy$)
+      )
       .subscribe({
-        next: (response: any) => {
-          this.success = this.editingScreening ? 
+        next: (screening: ScreeningModel) => {
+          const successMessage = this.editingScreening ? 
             'Proiecția a fost actualizată cu succes!' : 
             'Proiecția a fost adăugată cu succes!';
+          this.success = successMessage;
+          this.notificationService.success(successMessage);
           this.showScreeningForm = false;
           this.editingScreening = null;
           
-          // Update screening with response data directly (faster and avoids 403 issues)
-          if (this.isDetailPage && response) {
-            // Use the response data directly to update the screening
-            this.screening = {
-              ...response,
-              startTime: response.startTime || response.start_time,
-              roomNumber: response.roomNumber || response.room_number,
-              seats: response.seats ? response.seats.map((seat: any) => ({
-                ...seat,
-                isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true),
-                status: this.getSeatStatus(seat),
-                isSelected: false,
-                row: seat.row || String(seat.rowNumber) || '0',
-                number: seat.number || seat.seatNumber || 0
-              })) : (this.screening?.seats || [])
-            };
+          // Update screening with response data (already normalized by mapper)
+          if (this.isDetailPage && screening) {
+            this.screening = screening;
             
             // Clear cache for this screening to ensure fresh data on next load
             if (this.screening?.id) {
@@ -229,32 +230,21 @@ export class ScreeningCardComponent implements OnInit, OnDestroy {
             this.cdr.detectChanges();
           } else if (this.isDetailPage && this.screening?.id) {
             // Fallback: reload screening details after a short delay if response doesn't have all data
-            this.screeningApi.clearScreeningCache(this.screening.id);
+            const screeningId = this.screening.id;
+            this.screeningApi.clearScreeningCache(screeningId);
             
             setTimeout(() => {
-              this.getScreeningById.execute(this.screening.id)
+              this.getScreeningById.execute(screeningId)
                 .pipe(takeUntil(this.destroy$))
                 .subscribe({
-                  next: (res: any) => {
-                    this.screening = {
-                      ...res,
-                      startTime: res.startTime || res.start_time,
-                      roomNumber: res.roomNumber || res.room_number,
-                      seats: res.seats ? res.seats.map((seat: any) => ({
-                        ...seat,
-                        isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true),
-                        status: this.getSeatStatus(seat),
-                        isSelected: false,
-                        row: seat.row || String(seat.rowNumber) || '0',
-                        number: seat.number || seat.seatNumber || 0
-                      })) : []
-                    };
+                  next: (reloadedScreening: ScreeningModel) => {
+                    this.screening = reloadedScreening;
                     this.cdr.detectChanges();
                   },
                   error: (err) => {
-                    console.error('Error reloading screening after update:', err);
-                    // If reload fails, just show error but don't navigate away
+                    this.logger.error('Error reloading screening after update:', err);
                     this.error = 'Proiecția a fost actualizată, dar nu am putut reîncărca detaliile. Te rugăm să reîmprospătezi pagina.';
+                    this.notificationService.warning('Proiecția a fost actualizată, dar nu am putut reîncărca detaliile. Te rugăm să reîmprospătezi pagina.');
                     setTimeout(() => this.error = null, 5000);
                     this.cdr.detectChanges();
                   }
@@ -265,15 +255,18 @@ export class ScreeningCardComponent implements OnInit, OnDestroy {
           setTimeout(() => this.success = null, 3000);
         },
         error: (err) => {
-          this.error = this.editingScreening ? 
+          this.logger.error('Error saving screening:', err);
+          const errorMessage = this.editingScreening ? 
             'Nu am putut actualiza proiecția. Te rugăm să încerci din nou.' :
             'Nu am putut adăuga proiecția. Te rugăm să încerci din nou.';
+          this.error = errorMessage;
+          this.notificationService.error(errorMessage);
           setTimeout(() => this.error = null, 3000);
         }
       });
   }
 
-  onScreeningFormCancel() {
+  onScreeningFormCancel(): void {
     this.showScreeningForm = false;
     this.editingScreening = null;
   }

@@ -76,7 +76,7 @@
               <div class="info-item">
                 <label class="info-label"><i class="fas fa-money-bill-wave"></i> Preț Total</label>
                 <p class="info-value">
-                  {{ reservation.totalPrice || reservation.total_price || (reservation.tickets?.length * 50) || 0 }} RON
+                  {{ reservation.totalPrice || (reservation.tickets && reservation.tickets.length * 50) || 0 }} RON
                 </p>
               </div>
             </div>
@@ -145,11 +145,11 @@
             <div class="info-grid mb-4">
               <div class="info-item">
                 <label class="info-label"><i class="fas fa-calendar-alt"></i> Data & Ora</label>
-                <p class="info-value">{{ (screening.startTime || screening.start_time) | date:'dd MMM yyyy, HH:mm' }}</p>
+                <p class="info-value">{{ screening.startTime | date:'dd MMM yyyy, HH:mm' }}</p>
               </div>
               <div class="info-item">
                 <label class="info-label"><i class="fas fa-door-open"></i> Sală Nr.</label>
-                <p class="info-value">{{ screening.roomNumber || screening.room_number || '-' }}</p>
+                <p class="info-value">{{ screening.roomNumber || '-' }}</p>
               </div>
             </div>
 
@@ -217,7 +217,7 @@
                 </div>
                 <div class="quick-item">
                   <span class="quick-label">Data:</span>
-                  <span class="quick-value">{{ (screening.startTime || screening.start_time) | date:'dd MMM, HH:mm' }}</span>
+                  <span class="quick-value">{{ screening.startTime | date:'dd MMM, HH:mm' }}</span>
                 </div>
               </div>
 

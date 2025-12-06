@@ -1,14 +1,14 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { AuthService } from '../../../../core/auth/auth-service';
+import { LoginFormData } from '../../presentation/components/login-form/login-form';
 
 @Injectable({
   providedIn: 'root'
 })
-@Injectable({ providedIn: 'root' })
 export class LoginService {
-  constructor(private authService: AuthService) {}
+  private authService = inject(AuthService);
 
-  execute(form: any) {
+  execute(form: LoginFormData) {
     return this.authService.login(form.email, form.password);
   }
 }

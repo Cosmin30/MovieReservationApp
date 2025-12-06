@@ -1,9 +1,13 @@
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
-import { BehaviorSubject, tap, timeout, catchError, of } from 'rxjs';
+import { BehaviorSubject, tap, timeout, catchError, of, Subscription } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { UserModel } from '../../features/users/domain/models/user.model';
+import { environment } from '../../../environments/environment';
+import { LoggerService } from '../services/logger.service';
+import { UserDTO } from '../../features/users/infrastructure/dtos/user.dto';
+import { UserMapper } from '../../features/users/infrastructure/adapters/user-mapper.mapper';
 
 interface LoginResponse {
   token: string;
@@ -15,10 +19,13 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
   private platformId = inject(PLATFORM_ID);
-  private apiUrl = 'http://localhost:8080/api';
+  private logger = inject(LoggerService);
+  private apiUrl = `${environment.apiUrl}/auth`;
 
   private currentUserSubject = new BehaviorSubject<UserModel | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
+
+  private userProfileSubscription: Subscription | null = null;
 
   constructor() {
     if (this.isBrowser()) {
@@ -31,8 +38,8 @@ export class AuthService {
   }
 
   login(email: string, password: string) {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, { email, password }).pipe(
-      timeout(10000), // ✅ Adaugă timeout
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
+      timeout(10000),
       tap(response => {
         if (this.isBrowser()) {
           localStorage.setItem('token', response.token);
@@ -42,71 +49,78 @@ export class AuthService {
         this.router.navigate(['/home']);
       }),
       catchError(error => {
-        console.error('❌ Login failed:', error);
+        this.logger.error('Login failed:', error);
         throw error;
       })
     );
   }
 
-  private loadUserFromStorage() {
+  private loadUserFromStorage(): void {
     if (!this.isBrowser()) return;
 
     const token = localStorage.getItem('token');
     if (token) {
-      console.log('🔑 Token found, loading user profile...');
+      this.logger.debug('Token found, loading user profile...');
       this.loadUserProfile();
     } else {
-      console.log('⚠️ No token found');
+      this.logger.debug('No token found');
     }
   }
 
-  loadUserProfile() {
+  loadUserProfile(): void {
     const token = this.getToken();
     if (!token) {
-      console.log('⚠️ No token available');
+      this.logger.debug('No token available');
       return;
     }
 
-    console.log('📡 Fetching user profile...');
+    // Unsubscribe previous subscription if exists
+    if (this.userProfileSubscription) {
+      this.userProfileSubscription.unsubscribe();
+    }
+
+    this.logger.debug('Fetching user profile...');
     
-    this.http
-      .get<any>(`${this.apiUrl}/users/me`, {
+    // Use http directly to avoid circular dependency with UserApiService
+    this.userProfileSubscription = this.http
+      .get<UserDTO>(`${environment.apiUrl}/users/me`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       .pipe(
-        timeout(8000), // ✅ 8 secunde timeout
+        timeout(8000),
         catchError(error => {
-          console.error('❌ Failed to load user profile:', error);
-          // Nu face logout automat - poate fi problema de network temporară
-          // this.logout();
-          return of(null); // ✅ Returnează null în loc să arunce eroare
+          this.logger.error('Failed to load user profile:', error);
+          return of(null);
         })
       )
       .subscribe({
-        next: response => {
+        next: (response) => {
           if (!response) {
-            console.log('⚠️ No user data received');
+            this.logger.debug('No user data received');
             return;
           }
 
-          const user: UserModel = {
-            id: response.id,
-            email: response.email,
-            fullName: response.full_name || response.fullName,
-            createdAt: response.created_at || response.createdAt || null,
-            reservations: response.reservations
-          };
-          
-          console.log('👤 User loaded:', user);
-          this.currentUserSubject.next(user);
-          if (this.isBrowser()) {
-            localStorage.setItem('user', JSON.stringify(user));
+          try {
+            const user = UserMapper.fromDto(response);
+            this.logger.debug('User loaded:', user);
+            this.currentUserSubject.next(user);
+            if (this.isBrowser()) {
+              localStorage.setItem('user', JSON.stringify(user));
+            }
+          } catch (error) {
+            this.logger.error('Error mapping user:', error);
           }
         },
         error: (err) => {
-          console.error('❌ Subscription error:', err);
+          this.logger.error('Subscription error:', err);
         }
       });
+  }
+
+  ngOnDestroy(): void {
+    if (this.userProfileSubscription) {
+      this.userProfileSubscription.unsubscribe();
+    }
   }
 
   logout() {
@@ -133,7 +147,7 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     const hasToken = !!this.getToken();
-    console.log('🔐 isAuthenticated:', hasToken);
+    this.logger.debug('isAuthenticated:', hasToken);
     return hasToken;
   }
 

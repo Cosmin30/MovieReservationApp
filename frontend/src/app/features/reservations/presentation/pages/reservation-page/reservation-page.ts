@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angula
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject, of, EMPTY } from 'rxjs';
-import { takeUntil, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import QRCode from 'qrcode';
 
 import { SeatSelectionComponent } from '../../components/seat-selection/seat-selection';
@@ -13,6 +13,14 @@ import { AuthService } from '../../../../../core/auth/auth-service';
 import { GetScreeningByIdService } from '../../../../screenings/application/use-cases/get-screening-by-id-service';
 import { GetReservationByIdService } from '../../../application/use-cases/get-reservation-by-id-service';
 import { ReservationApiService } from '../../../infrastructure/adapters/reservation-api-service';
+import { ScreeningModel } from '../../../../screenings/domain/models/screening.model';
+import { ReservationModel } from '../../../domain/models/reservation.model';
+import { SeatModel } from '../../../../halls/domain/models/seat.model';
+import { LoggerService } from '../../../../../core/services/logger.service';
+import { NotificationService } from '../../../../../shared/services/notification.service';
+import { SeatMapper } from '../../../../halls/infrastructure/adapters/seat-mapper.mapper';
+import { AvailableSeatsResponseDTO } from '../../../infrastructure/dtos/available-seats-response.dto';
+import { SeatDTO } from '../../../../halls/infrastructure/dtos/seat.dto';
 
 @Component({
   selector: 'app-reservation-page',
@@ -29,10 +37,10 @@ import { ReservationApiService } from '../../../infrastructure/adapters/reservat
 export class ReservationPage implements OnInit, OnDestroy {
 
   screeningId!: string;
-  screening: any = null;
-  availableSeats: any[] = [];
-  selectedSeats: any[] = [];
-  reservation: any;
+  screening: ScreeningModel | null = null;
+  availableSeats: SeatModel[] = [];
+  selectedSeats: SeatModel[] = [];
+  reservation: ReservationModel | null = null;
   pricePerSeat = 50; // Lei
   preselectedSeatIds: string[] = []; // Store seat IDs from query params
   
@@ -56,6 +64,8 @@ export class ReservationPage implements OnInit, OnDestroy {
   qrCodeDataUrl: string | null = null;
   private destroy$ = new Subject<void>();
   private cdr = inject(ChangeDetectorRef);
+  private logger = inject(LoggerService);
+  private notificationService = inject(NotificationService);
   private lastScreeningId: string | null = null;
   private lastReservationId: string | null = null;
 
@@ -108,11 +118,11 @@ export class ReservationPage implements OnInit, OnDestroy {
             // Force change detection
             this.cdr.detectChanges();
           },
-          error: (err: any) => {
-            console.error('Error loading reservation:', err);
+          error: (err) => {
+            this.logger.error('Error loading reservation:', err);
             this.error = 'Nu am putut încărca detaliile rezervării. Te rugăm să reîmprospătezi pagina.';
+            this.notificationService.error('Nu am putut încărca detaliile rezervării. Te rugăm să reîmprospătezi pagina.');
             this.isLoadingReservation = false;
-            // Force change detection
             this.cdr.detectChanges();
           }
         });
@@ -144,45 +154,25 @@ export class ReservationPage implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  loadScreeningDetails() {
+  loadScreeningDetails(): void {
     this.isLoadingScreening = true;
     this.error = null;
 
     this.getScreeningById.execute(this.screeningId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (res: any) => {
-          // Normalize snake_case to camelCase if needed
-          this.screening = {
-            ...res,
-            startTime: res.startTime || res.start_time,
-            roomNumber: res.roomNumber || res.room_number,
-            capacity: res.capacity || 0,
-            // Normalize seats if they exist
-            seats: res.seats ? res.seats.map((seat: any) => ({
-              ...seat,
-              isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true),
-              status: this.getSeatStatus(seat),
-              row: seat.row || String(seat.rowNumber) || '0',
-              number: seat.number || seat.seatNumber || 0,
-              isSelected: false
-            })) : (res.seats || []),
-            // Ensure movie and hall are preserved
-            movie: res.movie || null,
-            hall: res.hall || null
-          };
-          
+        next: (screening: ScreeningModel) => {
+          this.screening = screening;
           this.isLoadingScreening = false;
-          
-          // Force change detection
           this.cdr.detectChanges();
           
           // Load seats after screening is loaded
           this.loadAvailableSeats();
         },
-        error: (err: any) => {
-          console.error('Error loading screening details:', err);
+        error: (err) => {
+          this.logger.error('Error loading screening details:', err);
           this.error = 'Nu am putut încărca detaliile proiecției. Te rugăm să reîmprospătezi pagina.';
+          this.notificationService.error('Nu am putut încărca detaliile proiecției. Te rugăm să reîmprospătezi pagina.');
           this.isLoadingScreening = false;
           this.cdr.detectChanges();
         }
@@ -190,19 +180,22 @@ export class ReservationPage implements OnInit, OnDestroy {
   }
 
   getAvailableSeatsCount(): number {
-    if (!this.screening?.seats || this.screening.seats.length === 0) return 0;
+    // Use screening.seats which has all seats with their status
+    if (!this.screening?.seats || this.screening.seats.length === 0) {
+      return 0;
+    }
+    // Check status or isAvailable/is_available flags
     return this.screening.seats.filter((s: any) => {
-      const isAvailable = s.isAvailable !== undefined ? s.isAvailable : (s.is_available !== undefined ? s.is_available : false);
-      return isAvailable === true || isAvailable === 'true';
+      return s.status === 'AVAILABLE' || 
+             s.isAvailable === true || 
+             s.is_available === true ||
+             (s.status !== 'RESERVED' && s.status !== 'UNAVAILABLE' && (s.isAvailable !== false && s.is_available !== false));
     }).length;
   }
 
   getReservedSeatsCount(): number {
     if (!this.screening?.seats || this.screening.seats.length === 0) return 0;
-    return this.screening.seats.filter((s: any) => {
-      const isAvailable = s.isAvailable !== undefined ? s.isAvailable : (s.is_available !== undefined ? s.is_available : true);
-      return isAvailable === false || isAvailable === 'false';
-    }).length;
+    return this.screening.seats.filter((s: SeatModel) => s.status === 'RESERVED').length;
   }
 
   loadAvailableSeats() {
@@ -211,29 +204,24 @@ export class ReservationPage implements OnInit, OnDestroy {
 
     // First try to use seats from screening if already loaded
     if (this.screening?.seats && this.screening.seats.length > 0) {
-      this.availableSeats = this.screening.seats.map((seat: any) => {
-        // Check if this seat should be preselected
+      // Seats are already SeatModel from mapper
+      this.availableSeats = this.screening.seats.map((seat: SeatModel) => {
         const isPreselected = this.preselectedSeatIds.includes(seat.id);
         return {
-          id: seat.id,
-          row: seat.row || String(seat.rowNumber) || '0',
-          number: seat.number || seat.seatNumber || 0,
-          status: this.getSeatStatus(seat),
-          isSelected: isPreselected, // Preselect if in preselectedSeatIds
-          isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true)
+          ...seat,
+          isSelected: isPreselected
         };
       });
       
-          // Update selectedSeats with preselected seats
-          this.selectedSeats = this.availableSeats.filter(seat => seat.isSelected);
-          
-          // Emit event to update seat selection component
-          if (this.selectedSeats.length > 0) {
-            this.onSeatsSelected(this.selectedSeats);
-          }
+      // Update selectedSeats with preselected seats
+      this.selectedSeats = this.availableSeats.filter(seat => seat.isSelected);
+      
+      // Emit event to update seat selection component
+      if (this.selectedSeats.length > 0) {
+        this.onSeatsSelected(this.selectedSeats);
+      }
       
       this.isLoadingSeats = false;
-      // Force change detection
       this.cdr.detectChanges();
       return;
     }
@@ -242,21 +230,15 @@ export class ReservationPage implements OnInit, OnDestroy {
     this.getSeats.execute(this.screeningId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (res: any) => {
-          // Backend returns array of seats directly
-          const seats = Array.isArray(res) ? res : (res.seats || []);
-          
-          // Transform backend data to frontend format
-          this.availableSeats = seats.map((seat: any) => {
-            // Check if this seat should be preselected
+        next: (seatsDto: SeatDTO[]) => {
+          // Backend returns List<SeatDTO> directly
+          // Transform backend data to frontend format using SeatMapper
+          this.availableSeats = seatsDto.map(dto => {
+            const seat = SeatMapper.fromDto(dto);
             const isPreselected = this.preselectedSeatIds.includes(seat.id);
             return {
-              id: seat.id,
-              row: seat.row || String(seat.rowNumber) || '0',
-              number: seat.number || seat.seatNumber || 0,
-              status: this.getSeatStatus(seat),
-              isSelected: isPreselected, // Preselect if in preselectedSeatIds
-              isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true)
+              ...seat,
+              isSelected: isPreselected
             };
           });
           
@@ -269,30 +251,22 @@ export class ReservationPage implements OnInit, OnDestroy {
           }
           
           this.isLoadingSeats = false;
-          // Force change detection
           this.cdr.detectChanges();
         },
-        error: (err: any) => {
-          console.error('Error loading seats:', err);
+        error: (err) => {
+          this.logger.error('Error loading seats:', err);
           // If we have screening seats, use those
           if (this.screening?.seats && this.screening.seats.length > 0) {
-            this.availableSeats = this.screening.seats.map((seat: any) => {
-              // Check if this seat should be preselected
+            this.availableSeats = this.screening.seats.map((seat: SeatModel) => {
               const isPreselected = this.preselectedSeatIds.includes(seat.id);
               return {
-                id: seat.id,
-                row: seat.row || String(seat.rowNumber) || '0',
-                number: seat.number || seat.seatNumber || 0,
-                status: this.getSeatStatus(seat),
-                isSelected: isPreselected, // Preselect if in preselectedSeatIds
-                isAvailable: seat.isAvailable !== undefined ? seat.isAvailable : (seat.is_available !== undefined ? seat.is_available : true)
+                ...seat,
+                isSelected: isPreselected
               };
             });
             
-            // Update selectedSeats with preselected seats
             this.selectedSeats = this.availableSeats.filter(seat => seat.isSelected);
             
-            // Emit event to update seat selection component
             if (this.selectedSeats.length > 0) {
               this.onSeatsSelected(this.selectedSeats);
             }
@@ -300,6 +274,7 @@ export class ReservationPage implements OnInit, OnDestroy {
             this.isLoadingSeats = false;
           } else {
             this.error = 'Nu am putut încărca locurile disponibile. Te rugăm să reîmprospătezi pagina.';
+            this.notificationService.error('Nu am putut încărca locurile disponibile. Te rugăm să reîmprospătezi pagina.');
             this.isLoadingSeats = false;
           }
           this.cdr.detectChanges();
@@ -307,21 +282,8 @@ export class ReservationPage implements OnInit, OnDestroy {
       });
   }
 
-  getSeatStatus(seat: any): string {
-    // Backend uses isAvailable (boolean), transform to status
-    if (seat.status) {
-      return seat.status;
-    }
-    if (seat.isAvailable === true || seat.isAvailable === 'true') {
-      return 'AVAILABLE';
-    }
-    if (seat.isAvailable === false || seat.isAvailable === 'false') {
-      return 'RESERVED';
-    }
-    return 'UNAVAILABLE';
-  }
 
-  onSeatsSelected(seats: any[]) {
+  onSeatsSelected(seats: SeatModel[]): void {
     this.selectedSeats = seats;
   }
 
@@ -389,9 +351,11 @@ export class ReservationPage implements OnInit, OnDestroy {
             this.router.navigate(['/reservations']);
           }, 3000);
         },
-        error: (err: any) => {
-          console.error('Error creating reservation:', err);
-          this.error = err.error?.message || 'Nu am putut crea rezervarea. Te rugăm să încerci din nou.';
+        error: (err) => {
+          this.logger.error('Error creating reservation:', err);
+          const errorMessage = err.error?.message || 'Nu am putut crea rezervarea. Te rugăm să încerci din nou.';
+          this.error = errorMessage;
+          this.notificationService.error(errorMessage);
           this.isCreatingReservation = false;
         }
       });
@@ -415,17 +379,28 @@ export class ReservationPage implements OnInit, OnDestroy {
     if (!this.reservation) return;
 
     // Create QR code data with reservation information
+    const user = this.reservation.user;
+    const screening = this.reservation.screening as ScreeningModel | null;
+    const userId = user && typeof user === 'object' && 'id' in user ? (user as any).id : null;
+    const screeningId = screening && typeof screening === 'object' && 'id' in screening ? screening.id : null;
+    
     const qrData = JSON.stringify({
       reservationId: this.reservation.id,
-      userId: this.reservation.user?.id || this.reservation.userId,
-      screeningId: this.reservation.screening?.id || this.reservation.screeningId,
-      movie: this.reservation.screening?.movie?.title || 'N/A',
-      hall: this.reservation.screening?.hall?.name || 'N/A',
-      date: this.reservation.screening?.startTime || this.reservation.screening?.start_time || 'N/A',
+      userId: userId || 'N/A',
+      screeningId: screeningId || 'N/A',
+      movie: screening?.movie && typeof screening.movie === 'object' && 'title' in screening.movie 
+        ? (screening.movie as any).title 
+        : 'N/A',
+      hall: screening?.hall && typeof screening.hall === 'object' && 'name' in screening.hall
+        ? (screening.hall as any).name
+        : 'N/A',
+      date: screening?.startTime || 'N/A',
       totalPrice: this.reservation.totalPrice || 0,
       status: this.reservation.status || 'N/A',
-      tickets: this.reservation.tickets?.map((t: any) => ({
-        seat: `${t.seat?.row || 'N/A'}-${t.seat?.number || 'N/A'}`
+      tickets: this.reservation.tickets?.map((ticket) => ({
+        seat: ticket.seat && typeof ticket.seat === 'object'
+          ? `${(ticket.seat as any).row || 'N/A'}-${(ticket.seat as any).number || 'N/A'}`
+          : 'N/A'
       })) || []
     });
 
@@ -442,8 +417,8 @@ export class ReservationPage implements OnInit, OnDestroy {
         this.qrCodeDataUrl = url;
         this.cdr.detectChanges();
       })
-      .catch((err: any) => {
-        console.error('Error generating QR code:', err);
+      .catch((err) => {
+        this.logger.error('Error generating QR code:', err);
       });
   }
 }

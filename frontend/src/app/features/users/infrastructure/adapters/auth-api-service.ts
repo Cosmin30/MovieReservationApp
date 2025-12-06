@@ -1,24 +1,28 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../../../environments/environment';
+import { LoginRequestDTO } from '../dtos/login-request.dto';
+import { LoginResponseDTO } from '../dtos/login-response.dto';
+import { RegisterRequestDTO } from '../dtos/register-request.dto';
+import { RegisterResponseDTO } from '../dtos/register-response.dto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthApiService {
+  private http = inject(HttpClient);
+  private baseUrl = `${environment.apiUrl}/auth`;
 
-  private baseUrl = 'http://localhost:8080/api/auth';
-
-  constructor(private http: HttpClient) {}
-
-  login(dto: any) {
-    return this.http.post(`${this.baseUrl}/login`, dto);
+  login(dto: LoginRequestDTO): Observable<LoginResponseDTO> {
+    return this.http.post<LoginResponseDTO>(`${this.baseUrl}/login`, dto);
   }
 
-  logout() {
-    return this.http.post(`${this.baseUrl}/logout`, {});
+  logout(): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/logout`, {});
   }
 
-  register(dto: any) {
-    return this.http.post(`${this.baseUrl}/register`, dto);
+  register(dto: RegisterRequestDTO): Observable<RegisterResponseDTO> {
+    return this.http.post<RegisterResponseDTO>(`${this.baseUrl}/register`, dto);
   }
 }

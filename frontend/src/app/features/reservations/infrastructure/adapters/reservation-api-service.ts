@@ -1,38 +1,46 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { CacheService } from '../../../../core/services/cache-service';
+import { LoggerService } from '../../../../core/services/logger.service';
+import { environment } from '../../../../../environments/environment';
+import { ReservationDTO } from '../dtos/reservation.dto';
+import { CreateReservationDTO } from '../dtos/create-reservation.dto';
+import { UpdateReservationDTO } from '../dtos/update-reservation.dto';
+import { AvailableSeatsResponseDTO } from '../dtos/available-seats-response.dto';
+import { SeatDTO } from '../../../halls/infrastructure/dtos/seat.dto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReservationApiService {
+  private http = inject(HttpClient);
+  private cache = inject(CacheService);
+  private logger = inject(LoggerService);
+  private baseUrl = `${environment.apiUrl}/reservations`;
 
-  private baseUrl = 'http://localhost:8080/api/reservations';
-
-  constructor(
-    private http: HttpClient,
-    private cache: CacheService
-  ) {}
-
-  createReservation(userId: string, screeningId: string, seatIds: string[], pricePerSeat: number) {
-    return this.http.post(this.baseUrl, null, {
+  createReservation(userId: string, screeningId: string, seatIds: string[], pricePerSeat: number): Observable<ReservationDTO> {
+    return this.http.post<ReservationDTO>(this.baseUrl, null, {
       params: {
         userId,
         screeningId,
         seatIds: seatIds.join(','),
-        pricePerSeat
+        pricePerSeat: pricePerSeat.toString()
       }
     });
   }
 
-  getAll() {
-    return this.http.get<any[]>(this.baseUrl);
+  getAll(): Observable<ReservationDTO[]> {
+    return this.cache.getOrFetch(
+      'all_reservations',
+      () => this.http.get<ReservationDTO[]>(this.baseUrl)
+    );
   }
 
-  getReservationById(id: string) {
+  getReservationById(id: string): Observable<ReservationDTO> {
     return this.cache.getOrFetch(
       `reservation_${id}`,
-      () => this.http.get<any>(`${this.baseUrl}/${id}`)
+      () => this.http.get<ReservationDTO>(`${this.baseUrl}/${id}`)
     );
   }
 
@@ -40,27 +48,29 @@ export class ReservationApiService {
     this.cache.clear(`reservation_${id}`);
   }
 
-  getReservationsByUser(userId: string) {
+  getReservationsByUser(userId: string): Observable<ReservationDTO[]> {
     return this.cache.getOrFetch(
       `reservations_user_${userId}`,
-      () => this.http.get<any[]>(`${this.baseUrl}/user/${userId}`)
+      () => this.http.get<ReservationDTO[]>(`${this.baseUrl}/user/${encodeURIComponent(userId)}`)
     );
   }
 
-  updateReservation(id: string, dto: any) {
-    return this.http.put(`${this.baseUrl}/${id}`, dto);
+  updateReservation(id: string, dto: UpdateReservationDTO): Observable<ReservationDTO> {
+    return this.http.put<ReservationDTO>(`${this.baseUrl}/${id}`, dto);
   }
 
-  patchReservation(id: string, dto: any) {
-    return this.http.patch(`${this.baseUrl}/${id}`, dto);
+  patchReservation(id: string, dto: Partial<UpdateReservationDTO>): Observable<ReservationDTO> {
+    return this.http.patch<ReservationDTO>(`${this.baseUrl}/${id}`, dto);
   }
 
-  deleteReservation(id: string) {
-    return this.http.delete(`${this.baseUrl}/${id}`);
+  deleteReservation(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
-  getAvailableSeats(screeningId: string) {
-    // Use seats endpoint instead - it returns all seats for a screening
-    return this.http.get(`http://localhost:8080/api/seats/screening/${screeningId}`);
+  getAvailableSeats(screeningId: string): Observable<SeatDTO[]> {
+    this.logger.debug(`Fetching all seats for screening ID: ${screeningId}`);
+    // Use /screening/{id} to get ALL seats, not just available ones
+    // This way we can count available vs reserved
+    return this.http.get<SeatDTO[]>(`${environment.apiUrl}/seats/screening/${encodeURIComponent(screeningId)}`);
   }
 }

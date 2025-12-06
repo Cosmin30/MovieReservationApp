@@ -1,16 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MoviesState } from '../state/movies-state.state';
+import { MovieModel } from '../../domain/models/movie.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FilterMoviesService {
-  private originalMovies: any[] = [];
+  private state = inject(MoviesState);
+  private originalMovies: MovieModel[] = [];
   private isFiltering = false;
 
-  constructor(private state: MoviesState) {}
-
-  setOriginalMovies(movies: any[]) {
+  setOriginalMovies(movies: MovieModel[]): void {
     if (!this.isFiltering) {
       this.originalMovies = [...movies];
     }
@@ -20,7 +20,7 @@ export class FilterMoviesService {
     return this.isFiltering;
   }
 
-  getOriginalMovies(): any[] {
+  getOriginalMovies(): MovieModel[] {
     return [...this.originalMovies];
   }
 

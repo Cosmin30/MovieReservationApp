@@ -1,75 +1,72 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { tap, map } from 'rxjs/operators';
 import { CacheService } from '../../../../core/services/cache-service';
+import { environment } from '../../../../../environments/environment';
+import { MovieDTO } from '../dtos/movie.dto';
+import { MovieMapper } from './movie-mapper.mapper';
+import { MovieModel } from '../../domain/models/movie.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MovieApiService {
+  private http = inject(HttpClient);
+  private cache = inject(CacheService);
+  private baseUrl = `${environment.apiUrl}/movies`;
 
-  private baseUrl = 'http://localhost:8080/api/movies';
-
-  constructor(
-    private http: HttpClient,
-    private cache: CacheService
-  ) {}
-
-  getAllMovies() {
+  getAllMovies(): Observable<MovieDTO[]> {
     return this.cache.getOrFetch(
       'all_movies',
-      () => this.http.get<any[]>(this.baseUrl)
+      () => this.http.get<MovieDTO[]>(this.baseUrl)
     );
   }
 
-  getMovieById(id: string) {
+  getMovieById(id: string): Observable<MovieDTO> {
     return this.cache.getOrFetch(
       `movie_${id}`,
-      () => this.http.get<any>(`${this.baseUrl}/${id}`)
+      () => this.http.get<MovieDTO>(`${this.baseUrl}/${id}`)
     );
   }
 
-  createMovie(dto: any) {
-    return this.http.post(this.baseUrl, dto).pipe(
+  createMovie(dto: MovieDTO): Observable<MovieDTO> {
+    return this.http.post<MovieDTO>(this.baseUrl, dto).pipe(
       tap(() => {
-        // Clear cache after create to force reload
         this.cache.clear('all_movies');
       })
     );
   }
 
-  updateMovie(id: string, dto: any) {
-    return this.http.put(`${this.baseUrl}/${id}`, dto).pipe(
+  updateMovie(id: string, dto: MovieDTO): Observable<MovieDTO> {
+    return this.http.put<MovieDTO>(`${this.baseUrl}/${id}`, dto).pipe(
       tap(() => {
-        // Clear cache after update to force reload
         this.cache.clear('all_movies');
         this.cache.clear(`movie_${id}`);
       })
     );
   }
 
-  patchMovie(id: string, dto: any) {
-    return this.http.patch(`${this.baseUrl}/${id}`, dto).pipe(
+  patchMovie(id: string, dto: Partial<MovieDTO>): Observable<MovieDTO> {
+    return this.http.patch<MovieDTO>(`${this.baseUrl}/${id}`, dto).pipe(
       tap(() => {
-        // Clear cache after patch to force reload
         this.cache.clear('all_movies');
         this.cache.clear(`movie_${id}`);
       })
     );
   }
 
-  deleteMovie(id: string) {
-    return this.http.delete(`${this.baseUrl}/${id}`).pipe(
+  deleteMovie(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
       tap(() => {
-        // Clear cache after delete to force reload
         this.cache.clear('all_movies');
         this.cache.clear(`movie_${id}`);
       })
     );
   }
 
-  searchMovies(query: string) {
-    return this.http.get<any[]>(`${this.baseUrl}?search=${query}`);
+  searchMovies(query: string): Observable<MovieDTO[]> {
+    return this.http.get<MovieDTO[]>(`${this.baseUrl}?search=${encodeURIComponent(query)}`);
   }
 
   clearCache(): void {

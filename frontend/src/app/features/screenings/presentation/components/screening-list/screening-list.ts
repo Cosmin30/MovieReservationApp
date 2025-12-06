@@ -34,7 +34,7 @@ export class ScreeningListComponent implements OnInit, OnDestroy {
     // Clear cache first to ensure fresh data
     this.api.clearCache();
     
-    // Check for edit/delete query params
+    // Check for edit query params (delete is handled directly via event emitter)
     this.route.queryParams
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {
@@ -42,11 +42,8 @@ export class ScreeningListComponent implements OnInit, OnDestroy {
           this.onEditScreening(params['edit']);
           // Clear query param
           this.router.navigate(['/screenings'], { replaceUrl: true });
-        } else if (params['delete']) {
-          this.onDeleteScreening(params['delete']);
-          // Clear query param
-          this.router.navigate(['/screenings'], { replaceUrl: true });
         }
+        // Removed delete query param handling - delete is handled directly via event emitter
       });
     
     // Load data on initial component creation
@@ -72,8 +69,12 @@ export class ScreeningListComponent implements OnInit, OnDestroy {
   }
 
   private loadScreenings(): void {
-    this.loading = true;
-    this.error = null;
+    // Use setTimeout to defer change detection
+    setTimeout(() => {
+      this.loading = true;
+      this.error = null;
+      this.cdr.detectChanges();
+    }, 0);
     
     this.api.getAllScreenings()
       .pipe(takeUntil(this.destroy$))
@@ -87,22 +88,26 @@ export class ScreeningListComponent implements OnInit, OnDestroy {
               roomNumber: s.roomNumber || s.room_number
             }));
             this.screenings = mappedScreenings;
-            
-            // Force change detection
-            this.cdr.detectChanges();
           } else {
             this.screenings = [];
           }
-          this.loading = false;
           
-          // Force change detection again after loading is set to false
-          this.cdr.detectChanges();
+          // Use setTimeout to defer change detection
+          setTimeout(() => {
+            this.loading = false;
+            this.cdr.detectChanges();
+          }, 0);
         },
-        error: (err: any) => {
-          console.error('Error loading screenings:', err);
+        error: (err) => {
+          // Error is already handled by errorInterceptor and ErrorHandlerService
           this.error = 'Nu am putut încărca proiecțiile. Te rugăm să reîncerci.';
           this.screenings = [];
-          this.loading = false;
+          
+          // Use setTimeout to defer change detection
+          setTimeout(() => {
+            this.loading = false;
+            this.cdr.detectChanges();
+          }, 0);
         }
       });
   }
@@ -114,27 +119,45 @@ export class ScreeningListComponent implements OnInit, OnDestroy {
 
   onDeleteScreening(screeningId: string) {
     if (confirm('Ești sigur că vrei să ștergi această proiecție?')) {
+      // Remove from local array immediately for better UX
+      const originalScreenings = [...this.screenings];
+      this.screenings = this.screenings.filter(s => s.id !== screeningId);
+      this.cdr.detectChanges();
+      
       this.api.deleteScreening(screeningId)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
-            this.success = 'Proiecția a fost ștearsă cu succes!';
+            // Use setTimeout to defer change detection
+            setTimeout(() => {
+              this.success = 'Proiecția a fost ștearsă cu succes!';
+              this.cdr.detectChanges();
+              
+              // Clear after 3 seconds
+              setTimeout(() => {
+                this.success = null;
+                this.cdr.detectChanges();
+              }, 3000);
+            }, 0);
             
-            // Clear cache first
+            // Clear cache
             this.api.clearCache();
             
-            // Remove from local array immediately for better UX
-            this.screenings = this.screenings.filter(s => s.id !== screeningId);
-            this.cdr.detectChanges();
-            
-            // Then reload screenings to ensure consistency
-            this.loadScreenings();
-            
-            setTimeout(() => this.success = null, 3000);
+            // Reload screenings to ensure consistency (but don't do it immediately to avoid double load)
+            setTimeout(() => {
+              this.loadScreenings();
+            }, 500);
           },
           error: (err) => {
+            // Restore original screenings on error
+            this.screenings = originalScreenings;
+            this.cdr.detectChanges();
+            
             this.error = 'Nu am putut șterge proiecția. Te rugăm să încerci din nou.';
-            setTimeout(() => this.error = null, 3000);
+            setTimeout(() => {
+              this.error = null;
+              this.cdr.detectChanges();
+            }, 3000);
           }
         });
     }

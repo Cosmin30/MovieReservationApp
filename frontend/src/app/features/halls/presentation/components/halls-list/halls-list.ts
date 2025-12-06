@@ -71,8 +71,8 @@ export class HallsListComponent implements OnInit, OnDestroy {
           // Force change detection
           this.cdr.detectChanges();
         },
-        error: (err: any) => {
-          console.error('Error loading halls:', err);
+        error: (err) => {
+          // Error is already handled by errorInterceptor and ErrorHandlerService
           this.error = 'Nu am putut încărca salile. Vă rugăm încercați din nou.';
           this.halls = [];
           this.isLoading = false;

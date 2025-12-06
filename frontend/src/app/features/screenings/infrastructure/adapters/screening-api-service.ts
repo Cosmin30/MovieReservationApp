@@ -1,31 +1,30 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { CacheService } from '../../../../core/services/cache-service';
+import { environment } from '../../../../../environments/environment';
+import { ScreeningDTO } from '../dtos/screening.dto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ScreeningApiService {
+  private http = inject(HttpClient);
+  private cache = inject(CacheService);
+  private baseUrl = `${environment.apiUrl}/screenings`;
 
-  private baseUrl = 'http://localhost:8080/api/screenings';
-
-  constructor(
-    private http: HttpClient,
-    private cache: CacheService
-  ) {}
-
-  getAllScreenings() {
+  getAllScreenings(): Observable<ScreeningDTO[]> {
     return this.cache.getOrFetch(
       'all_screenings',
-      () => this.http.get<any[]>(this.baseUrl)
+      () => this.http.get<ScreeningDTO[]>(this.baseUrl)
     );
   }
 
-  getScreeningById(id: string) {
+  getScreeningById(id: string): Observable<ScreeningDTO> {
     return this.cache.getOrFetch(
       `screening_${id}`,
-      () => this.http.get<any>(`${this.baseUrl}/${id}`)
+      () => this.http.get<ScreeningDTO>(`${this.baseUrl}/${id}`)
     );
   }
 
@@ -33,10 +32,10 @@ export class ScreeningApiService {
     this.cache.clear(`screening_${id}`);
   }
 
-  getScreeningsByMovie(movieId: string) {
+  getScreeningsByMovie(movieId: string): Observable<ScreeningDTO[]> {
     return this.cache.getOrFetch(
       `screenings_movie_${movieId}`,
-      () => this.http.get<any[]>(`${this.baseUrl}?movieId=${movieId}`)
+      () => this.http.get<ScreeningDTO[]>(`${this.baseUrl}?movieId=${encodeURIComponent(movieId)}`)
     );
   }
 
@@ -44,39 +43,35 @@ export class ScreeningApiService {
     this.cache.clear(`screenings_movie_${movieId}`);
   }
 
-  createScreening(dto: any) {
-    return this.http.post(this.baseUrl, dto).pipe(
+  createScreening(dto: ScreeningDTO): Observable<ScreeningDTO> {
+    return this.http.post<ScreeningDTO>(this.baseUrl, dto).pipe(
       tap(() => {
-        // Clear cache after create to force reload
         this.cache.clear('all_screenings');
       })
     );
   }
 
-  updateScreening(id: string, dto: any) {
-    return this.http.put(`${this.baseUrl}/${id}`, dto).pipe(
+  updateScreening(id: string, dto: ScreeningDTO): Observable<ScreeningDTO> {
+    return this.http.put<ScreeningDTO>(`${this.baseUrl}/${id}`, dto).pipe(
       tap(() => {
-        // Clear cache after update to force reload
         this.cache.clear('all_screenings');
         this.cache.clear(`screening_${id}`);
       })
     );
   }
 
-  patchScreening(id: string, dto: any) {
-    return this.http.patch(`${this.baseUrl}/${id}`, dto).pipe(
+  patchScreening(id: string, dto: Partial<ScreeningDTO>): Observable<ScreeningDTO> {
+    return this.http.patch<ScreeningDTO>(`${this.baseUrl}/${id}`, dto).pipe(
       tap(() => {
-        // Clear cache after patch to force reload
         this.cache.clear('all_screenings');
         this.cache.clear(`screening_${id}`);
       })
     );
   }
 
-  deleteScreening(id: string) {
-    return this.http.delete(`${this.baseUrl}/${id}`).pipe(
+  deleteScreening(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
       tap(() => {
-        // Clear cache after delete to force reload
         this.cache.clear('all_screenings');
         this.cache.clear(`screening_${id}`);
       })

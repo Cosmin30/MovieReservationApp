@@ -171,15 +171,15 @@
                   <div class="screening-info">
                     <div class="info-row">
                       <i class="fas fa-calendar-alt"></i>
-                      <span>{{ (screening.startTime || screening.start_time) | date:'dd MMM yyyy' }}</span>
+                      <span>{{ screening.startTime | date:'dd MMM yyyy' }}</span>
                     </div>
                     <div class="info-row">
                       <i class="fas fa-clock"></i>
-                      <span>{{ (screening.startTime || screening.start_time) | date:'HH:mm' }}</span>
+                      <span>{{ screening.startTime | date:'HH:mm' }}</span>
                     </div>
                     <div class="info-row">
                       <i class="fas fa-door-open"></i>
-                      <span>Sala {{ screening.roomNumber || screening.room_number || 'N/A' }}</span>
+                      <span>Sala {{ screening.roomNumber || 'N/A' }}</span>
                     </div>
                   </div>
                   <button class="btn btn-primary w-100 mt-3" 

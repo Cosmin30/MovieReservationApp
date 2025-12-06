@@ -1,18 +1,49 @@
-import { Component } from '@angular/core';
-import { NgFor } from '@angular/common';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { NotificationService, NotificationMessage } from '../../services/notification.service';
 
 @Component({
   selector: 'app-notification',
   standalone: true,
-  imports: [NgFor],
+  imports: [CommonModule],
   templateUrl: './notification.html',
   styleUrls: ['./notification.css']
 })
-export class NotificationComponent {
+export class NotificationComponent implements OnInit, OnDestroy, AfterViewInit {
+  messages: NotificationMessage[] = [];
+  private destroy$ = new Subject<void>();
 
-  messages: { type: string; text: string }[] = [
-    // exemplu de test:
-    // { type: 'success', text: 'Test notificare!' }
-  ];
+  constructor(
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
+  ngOnInit(): void {
+    // Subscribe to notifications but defer updates to next tick
+    this.notificationService.notifications$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(notifications => {
+        // Use setTimeout to defer change detection to next tick
+        setTimeout(() => {
+          this.messages = notifications;
+          this.cdr.detectChanges();
+        }, 0);
+      });
+  }
+
+  ngAfterViewInit(): void {
+    // Initial load after view is initialized
+    this.messages = this.notificationService.notificationsSubject.value;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  remove(id: string): void {
+    this.notificationService.remove(id);
+  }
 }

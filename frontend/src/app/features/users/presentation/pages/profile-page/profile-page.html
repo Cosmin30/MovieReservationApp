@@ -17,7 +17,7 @@
         <div class="card shadow-lg border-0 profile-card">
           <div class="card-header-gradient">
             <div class="profile-avatar-large">
-              {{ profile.fullName?.charAt(0)?.toUpperCase() || 'U' }}
+              {{ profile.fullName.charAt(0).toUpperCase() || 'U' }}
             </div>
             <h2 class="profile-name">{{ profile.fullName || 'Utilizator' }}</h2>
             <p class="profile-email">{{ profile.email || 'N/A' }}</p>
@@ -70,7 +70,7 @@
                 </div>
                 <div class="info-content">
                   <label class="info-label">Rezervări</label>
-                  <p class="info-value">{{ profile.reservations?.length || 0 }} rezervări</p>
+                  <p class="info-value">{{ (profile.reservations && profile.reservations.length) || 0 }} rezervări</p>
                 </div>
               </div>
             </div>
