@@ -13,7 +13,6 @@ export class LoggerService {
   }
 
   error(message: string, ...args: any[]): void {
-    // Errors should always be logged, even in production
     console.error(message, ...args);
   }
 

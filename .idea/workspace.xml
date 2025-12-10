@@ -6,86 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="1ab5bd07-7187-4e01-9f59-e1af941feefc" name="Changes" comment=".">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/angular.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/angular.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/cypress.config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/e2e/auth.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/cypress/e2e/auth.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/e2e/checkout.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/cypress/e2e/checkout.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/e2e/home.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/cypress/e2e/home.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/e2e/login.spec.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/e2e/movieDetails.spec.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/e2e/movies.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/cypress/e2e/movies.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/e2e/payment.spec.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/e2e/profile.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/cypress/e2e/profile.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/e2e/reservation.spec.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/e2e/reservations.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/cypress/e2e/reservations.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/e2e/screenings.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/cypress/e2e/screenings.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/e2e/search.spec.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/e2e/seats.spec.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/e2e/ui.spec.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/fixtures/example.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/fixtures/movies.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/fixtures/reservation.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/fixtures/screening.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/fixtures/user.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/auth.spec.ts/Auth loginlogout -- handles server error gracefully (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/auth.spec.ts/Auth loginlogout -- logs in successfully and stores token (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/auth.spec.ts/Auth loginlogout -- logs out and clears token (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/auth.spec.ts/Auth loginlogout -- shows error message on failed login (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/auth.spec.ts/Auth loginlogout -- shows validation errors for empty fields (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/checkout.spec.ts/Checkout &amp; Payment -- applies promo code and recalculates total (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/checkout.spec.ts/Checkout &amp; Payment -- completes payment with valid data (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/checkout.spec.ts/Checkout &amp; Payment -- displays order summary before payment (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/checkout.spec.ts/Checkout &amp; Payment -- handles network timeout gracefully (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/checkout.spec.ts/Checkout &amp; Payment -- handles payment failure and allows retry (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/checkout.spec.ts/Checkout &amp; Payment -- shows loading spinner during payment processing (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/checkout.spec.ts/Checkout &amp; Payment -- validates payment form fields (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/home.spec.ts/Home page -- displays featured movies on home (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/home.spec.ts/Home page -- handles empty featured movies gracefully (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/home.spec.ts/Home page -- loads home with header and footer elements (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/home.spec.ts/Home page -- navigates to movies from home link (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/login.spec.ts/Auth &amp; redirect -- logs in and navigates to movies list -- before each hook (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/movieDetails.spec.ts/Movie details &amp; screenings -- opens a movie and shows full details with screenings -- before each hook (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/movies.spec.ts/Movies list -- shows a list of movies and opens details -- before each hook (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/payment.spec.ts/Payment flow -- completes payment and shows success (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/profile.spec.ts/Profile page -- allows changing password (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/profile.spec.ts/Profile page -- allows editing profile name and phone (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/profile.spec.ts/Profile page -- handles profile load error and shows retry (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/profile.spec.ts/Profile page -- loads profile info (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/profile.spec.ts/Profile page -- shows validation errors on update (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/profile.spec.ts/Profile page -- toggles newsletter preference (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/profile.spec.ts/Profile page -- validates password change (mismatch) (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/reservation.spec.ts/Reservation flow (mocked) -- creates a reservation with validation check and success path -- before each hook (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/reservations.spec.ts/Reservations list -- allows cancellation of reservation with confirmation (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/reservations.spec.ts/Reservations list -- displays reservation details and actions (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/reservations.spec.ts/Reservations list -- filters reservations by status (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/reservations.spec.ts/Reservations list -- handles empty reservations list (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/reservations.spec.ts/Reservations list -- handles server error when loading reservations (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/reservations.spec.ts/Reservations list -- shows reservations page with all reservations (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/screenings.spec.ts/Screenings -- opens movie details and shows screenings -- before each hook (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/search.spec.ts/Search -- performs a basic search and shows results -- before each hook (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/seats.spec.ts/Seats selection -- shows seat layout with available and reserved seats -- before each hook (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/screenshots/ui.spec.ts/Basic UI smoke tests -- loads home and movies pages (failed).png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/support/commands.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/cypress/support/commands.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/cypress/support/e2e.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/cypress/support/e2e.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/application/use-cases/get-user-reservations-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/application/use-cases/get-user-reservations-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/infrastructure/adapters/reservation-api-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/infrastructure/adapters/reservation-api-service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/components/reservation-card/reservation-card.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/components/reservation-card/reservation-card.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/components/reservation-card/reservation-card.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/components/reservation-card/reservation-card.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/components/reservation-summary/reservation-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/components/reservation-summary/reservation-summary.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/components/reservation-summary/reservation-summary.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/components/reservation-summary/reservation-summary.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/pages/my-reservations-page/my-reservations-page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/pages/my-reservations-page/my-reservations-page.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/pages/reservation-page/reservation-page.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/pages/reservation-page/reservation-page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/pages/reservation-page/reservation-page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/reservations/presentation/pages/reservation-page/reservation-page.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-card/screening-card.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-card/screening-card.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-form/screening-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-form/screening-form.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-list/screening-list.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/screenings/presentation/components/screening-list/screening-list.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/ReservationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/MovieReservationApp/application/service/ReservationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/config/TestSecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/config/TestSecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/PaymentRepositoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/PaymentRepositoryTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/ReservationRepositoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/ReservationRepositoryTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/ScreeningRepositoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/ScreeningRepositoryTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/SeatRepositoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/SeatRepositoryTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/TicketRepositoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/MovieReservationApp/infrastructure/persistence/TicketRepositoryTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/core/services/logger.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/core/services/logger.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/pages/profile-page/profile-page.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/features/users/presentation/pages/profile-page/profile-page.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -135,53 +57,53 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.MovieReservationAppApplication.executor": "Run",
-    "JUnit.AuditServiceTest.executor": "Run",
-    "JUnit.ComputationServiceTest.executor": "Run",
-    "JUnit.HallControllerIntegrationTest.executor": "Run",
-    "JUnit.HallControllerTest.executor": "Run",
-    "JUnit.HallRepositoryTest.executor": "Run",
-    "JUnit.MovieControllerIntegrationTest.executor": "Run",
-    "JUnit.MovieControllerTest.executor": "Run",
-    "JUnit.MovieRepositoryTest.executor": "Run",
-    "JUnit.MovieReservationAppApplicationTests.executor": "Run",
-    "JUnit.PaymentControllerIntegrationTest.executor": "Run",
-    "JUnit.PaymentControllerTest.executor": "Run",
-    "JUnit.PaymentRepositoryTest.executor": "Run",
-    "JUnit.ReservationControllerIntegrationTest.executor": "Run",
-    "JUnit.ReservationControllerTest.executor": "Run",
-    "JUnit.ReservationRepositoryTest.executor": "Run",
-    "JUnit.ScreeningControllerIntegrationTest.executor": "Run",
-    "JUnit.ScreeningControllerTest.executor": "Run",
-    "JUnit.ScreeningRepositoryTest.executor": "Run",
-    "JUnit.SeatControllerIntegrationTest.executor": "Run",
-    "JUnit.SeatControllerTest.executor": "Run",
-    "JUnit.SeatRepositoryTest.executor": "Run",
-    "JUnit.TestSecurityConfigTest.executor": "Run",
-    "JUnit.TicketControllerIntegrationTest.executor": "Run",
-    "JUnit.TicketControllerTest.executor": "Run",
-    "JUnit.TicketRepositoryTest.executor": "Run",
-    "JUnit.UserControllerIntegrationTest.executor": "Run",
-    "JUnit.UserControllerTest.executor": "Run",
-    "JUnit.UserRepositoryTest.executor": "Run",
-    "JUnit.ValidationServiceTest.executor": "Run",
-    "JUnit.WorkflowServiceTest.executor": "Run",
-    "Maven.MovieReservationApp [deploy].executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/denis/Desktop/MovieReservationApp",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.MovieReservationAppApplication.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuditServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ComputationServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.HallControllerIntegrationTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.HallControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.HallRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MovieControllerIntegrationTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MovieControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MovieRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MovieReservationAppApplicationTests.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.PaymentControllerIntegrationTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.PaymentControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.PaymentRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ReservationControllerIntegrationTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ReservationControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ReservationRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ScreeningControllerIntegrationTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ScreeningControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ScreeningRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.SeatControllerIntegrationTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.SeatControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.SeatRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.TestSecurityConfigTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.TicketControllerIntegrationTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.TicketControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.TicketRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserControllerIntegrationTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ValidationServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.WorkflowServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.MovieReservationApp [deploy].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/denis/Desktop/MovieReservationApp&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="com.example.MovieReservationApp.api" />
